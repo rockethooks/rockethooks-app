@@ -1,0 +1,49 @@
+pre-commit:
+  parallel: true
+  commands:
+    type-check:
+      run: yarn type-check
+      fail_text: "TypeScript compilation failed"
+    biome-check:
+      glob: "*.{js,jsx,ts,tsx,json}"
+      run: npx biome check --write {staged_files}
+      stage_fixed: true
+      fail_text: "Biome check failed"
+    eslint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: npx eslint --fix {staged_files}
+      stage_fixed: true
+      fail_text: "ESLint check failed"
+
+pre-push:
+  parallel: false
+  commands:
+    type-check:
+      run: yarn type-check
+      fail_text: "TypeScript compilation failed"
+    build:
+      run: yarn build
+      fail_text: "Build failed"
+    biome-check:
+      run: npx biome check
+      fail_text: "Biome check failed"
+    eslint:
+      run: npx eslint src/
+      fail_text: "ESLint check failed"
+    audit:
+      run: yarn audit --level moderate
+      fail_text: "Security vulnerabilities found"
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: |
+        # Check if commit message follows conventional commit format
+        if ! grep -qE "^(feat|fix|docs|style|refactor|test|chore|perf|ci|build|revert)(\(.+\))?: .{1,50}" "{1}"; then
+          echo "❌ Commit message must follow conventional commit format:"
+          echo "   type(scope): description"
+          echo "   Types: feat, fix, docs, style, refactor, test, chore, perf, ci, build, revert"
+          echo "   Example: feat(auth): add login functionality"
+          exit 1
+        fi
+      fail_text: "Commit message format is invalid"
