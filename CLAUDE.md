@@ -16,7 +16,7 @@ RocketHooks frontend - React-based SaaS platform for API monitoring and webhook 
 **Architecture**: GraphQL APIs with Clerk authentication and Apollo Client for real-time features.
 
 ## Github Repository
-- [RocketHooks Frontend Webapp](https://github.com/rockethooks/reacthooks-app)
+- [RocketHooks Frontend Webapp](https://github.com/rockethooks/rockethooks-app)
 
 
 ## Authentication Integration
