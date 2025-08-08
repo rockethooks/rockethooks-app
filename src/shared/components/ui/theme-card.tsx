@@ -1,7 +1,7 @@
-import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { cn } from '@/lib/utils'
+import * as React from 'react'
 import { useThemeColor } from '@/hooks/use-theme-color'
+import { cn } from '@/lib/utils'
 
 const themeCardVariants = cva(
   'rounded-lg border theme-transition relative overflow-hidden',
@@ -12,27 +12,27 @@ const themeCardVariants = cva(
         elevated: 'theme-card-elevated',
         glass: 'theme-glass',
         gradient: 'gradient-primary text-primary-foreground',
-        'gradient-secondary': 'gradient-secondary'
+        'gradient-secondary': 'gradient-secondary',
       },
       padding: {
         none: '',
         sm: 'p-3',
         default: 'p-6',
-        lg: 'p-8'
+        lg: 'p-8',
       },
       size: {
         sm: 'max-w-sm',
         default: 'max-w-md',
         lg: 'max-w-lg',
         xl: 'max-w-xl',
-        full: 'w-full'
-      }
+        full: 'w-full',
+      },
     },
     defaultVariants: {
       variant: 'default',
       padding: 'default',
-      size: 'default'
-    }
+      size: 'default',
+    },
   }
 )
 
@@ -51,22 +51,25 @@ export interface ThemeCardProps
 }
 
 const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
-  ({ 
-    className, 
-    variant, 
-    padding, 
-    size, 
-    accent = false,
-    gradientFrom,
-    gradientTo,
-    children,
-    style,
-    ...props 
-  }, ref) => {
+  (
+    {
+      className,
+      variant,
+      padding,
+      size,
+      accent = false,
+      gradientFrom,
+      gradientTo,
+      children,
+      style,
+      ...props
+    },
+    ref
+  ) => {
     const primaryColor = useThemeColor('primary')
 
     const customStyle: React.CSSProperties = {
-      ...style
+      ...style,
     }
 
     // Apply custom gradient if provided
@@ -76,8 +79,16 @@ const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
 
     // Apply accent border if enabled
     if (accent && !gradientFrom) {
-      customStyle.borderColor = primaryColor.getHSLString()
-      customStyle.boxShadow = `0 0 0 1px ${primaryColor.getHSLAString(0.1)}, var(--shadow-elevation-medium)`
+      const primaryHSL = primaryColor.getHSLString()
+      const primaryHSLA = primaryColor.getHSLAString(0.1)
+
+      if (primaryHSL) {
+        customStyle.borderColor = primaryHSL
+      }
+
+      if (primaryHSLA) {
+        customStyle.boxShadow = `0 0 0 1px ${primaryHSLA}, var(--shadow-elevation-medium)`
+      }
     }
 
     return (
@@ -87,14 +98,23 @@ const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
         style={customStyle}
         {...props}
       >
-        {accent && !gradientFrom && (
-          <div 
-            className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r"
-            style={{
-              background: `linear-gradient(90deg, ${primaryColor.getHSLString()}, ${primaryColor.getHSLAString(0.3)})`
-            }}
-          />
-        )}
+        {accent &&
+          !gradientFrom &&
+          (() => {
+            const primaryHSL = primaryColor.getHSLString()
+            const primaryHSLA = primaryColor.getHSLAString(0.3)
+
+            if (!primaryHSL || !primaryHSLA) return null
+
+            return (
+              <div
+                className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r"
+                style={{
+                  background: `linear-gradient(90deg, ${primaryHSL}, ${primaryHSLA})`,
+                }}
+              />
+            )
+          })()}
         {children}
       </div>
     )
@@ -126,7 +146,8 @@ const ThemeCardTitle = React.forwardRef<
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   const foregroundColor = useThemeColor('card-foreground')
-  
+  const colorValue = foregroundColor.getHSLString()
+
   return (
     <h3
       ref={ref}
@@ -135,7 +156,7 @@ const ThemeCardTitle = React.forwardRef<
         className
       )}
       style={{
-        color: foregroundColor.getHSLString()
+        color: colorValue || undefined,
       }}
       {...props}
     />
@@ -151,13 +172,14 @@ const ThemeCardDescription = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   const mutedColor = useThemeColor('muted-foreground')
-  
+  const colorValue = mutedColor.getHSLString()
+
   return (
     <p
       ref={ref}
       className={cn('text-sm', className)}
       style={{
-        color: mutedColor.getHSLString()
+        color: colorValue || undefined,
       }}
       {...props}
     />
@@ -172,11 +194,7 @@ const ThemeCardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn('pt-0', className)}
-    {...props}
-  />
+  <div ref={ref} className={cn('pt-0', className)} {...props} />
 ))
 ThemeCardContent.displayName = 'ThemeCardContent'
 
@@ -202,5 +220,5 @@ export {
   ThemeCardDescription,
   ThemeCardContent,
   ThemeCardFooter,
-  themeCardVariants
+  themeCardVariants,
 }

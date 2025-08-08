@@ -1,9 +1,9 @@
 /**
  * Color Palette Documentation
- * 
+ *
  * This file contains the complete color palette used throughout the application.
  * All colors are defined as HSL values that correspond to CSS custom properties.
- * 
+ *
  * Usage:
  * - Use these constants in JavaScript/TypeScript when you need specific color values
  * - For CSS, prefer using the CSS custom properties (--primary, --background, etc.)
@@ -19,26 +19,26 @@ export const LIGHT_COLORS = {
   cardForeground: '222.2 84% 4.9%',
   popover: '0 0% 100%',
   popoverForeground: '222.2 84% 4.9%',
-  
+
   // Brand Colors
   primary: '221.2 83.2% 53.3%',
   primaryForeground: '210 40% 98%',
   secondary: '210 40% 96%',
   secondaryForeground: '222.2 84% 4.9%',
-  
+
   // Utility Colors
   muted: '210 40% 96%',
   mutedForeground: '215.4 16.3% 46.9%',
   accent: '210 40% 96%',
   accentForeground: '222.2 84% 4.9%',
-  
+
   // Interactive Colors
   destructive: '0 84.2% 60.2%',
   destructiveForeground: '210 40% 98%',
   border: '214.3 31.8% 91.4%',
   input: '214.3 31.8% 91.4%',
   ring: '221.2 83.2% 53.3%',
-  
+
   // Chart Colors
   chart1: '12 76% 61%',
   chart2: '173 58% 39%',
@@ -56,26 +56,26 @@ export const DARK_COLORS = {
   cardForeground: '210 40% 98%',
   popover: '222.2 84% 4.9%',
   popoverForeground: '210 40% 98%',
-  
+
   // Brand Colors
   primary: '217.2 91.2% 59.8%',
   primaryForeground: '222.2 84% 4.9%',
   secondary: '217.2 32.6% 17.5%',
   secondaryForeground: '210 40% 98%',
-  
+
   // Utility Colors
   muted: '217.2 32.6% 17.5%',
   mutedForeground: '215 20.2% 65.1%',
   accent: '217.2 32.6% 17.5%',
   accentForeground: '210 40% 98%',
-  
+
   // Interactive Colors
   destructive: '0 62.8% 30.6%',
   destructiveForeground: '210 40% 98%',
   border: '217.2 32.6% 17.5%',
   input: '217.2 32.6% 17.5%',
   ring: '224.3 76.3% 48%',
-  
+
   // Chart Colors
   chart1: '220 70% 50%',
   chart2: '160 60% 45%',
@@ -159,36 +159,37 @@ export const colorUtils = {
    * Convert HSL string to CSS hsl() function
    */
   toHSL: (hslValue: string) => `hsl(${hslValue})`,
-  
+
   /**
    * Convert HSL string to CSS hsla() function with alpha
    */
-  toHSLA: (hslValue: string, alpha: number) => `hsla(${hslValue} / ${String(alpha)})`,
-  
+  toHSLA: (hslValue: string, alpha: number) =>
+    `hsla(${hslValue} / ${String(alpha)})`,
+
   /**
    * Get CSS custom property reference
    */
   toCSSVar: (varName: string) => `hsl(var(--${varName}))`,
-  
+
   /**
    * Get CSS custom property reference with alpha
    */
-  toCSSVarWithAlpha: (varName: string, alpha: number) => 
+  toCSSVarWithAlpha: (varName: string, alpha: number) =>
     `hsl(var(--${varName}) / ${String(alpha)})`,
-  
+
   /**
    * Parse HSL string into components
    */
   parseHSL: (hslValue: string) => {
     const values = hslValue.split(' ')
     if (values.length !== 3) return null
-    
+
     return {
       hue: parseInt(values[0] ?? '0') || 0,
       saturation: parseInt((values[1] ?? '0').replace('%', '')) || 0,
-      lightness: parseInt((values[2] ?? '0').replace('%', '')) || 0
+      lightness: parseInt((values[2] ?? '0').replace('%', '')) || 0,
     }
-  }
+  },
 }
 
 // Color Palette Export
@@ -204,7 +205,7 @@ export const COLOR_PALETTE = {
     semantic: DARK_SEMANTIC_COLORS,
     primary: PRIMARY_VARIANTS,
     gray: DARK_GRAY_VARIANTS,
-  }
+  },
 } as const
 
 // Type definitions for better TypeScript support
@@ -212,6 +213,30 @@ export type ColorName = keyof typeof LIGHT_COLORS
 export type SemanticColorName = keyof typeof LIGHT_SEMANTIC_COLORS
 export type ColorVariant = keyof typeof PRIMARY_VARIANTS
 export type Theme = 'light' | 'dark'
+
+/**
+ * Type guard to check if a string is a valid ColorName
+ */
+function isColorName(colorName: string): colorName is ColorName {
+  return colorName in LIGHT_COLORS
+}
+
+/**
+ * Type guard to check if a string is a valid SemanticColorName
+ */
+function isSemanticColorName(
+  colorName: string
+): colorName is SemanticColorName {
+  return colorName in LIGHT_SEMANTIC_COLORS
+}
+
+/**
+ * Type guard to check if a value is a valid ColorVariant (number keys)
+ */
+function isColorVariant(value: string | number): value is ColorVariant {
+  const numValue = typeof value === 'string' ? parseInt(value, 10) : value
+  return !isNaN(numValue) && numValue in PRIMARY_VARIANTS
+}
 
 /**
  * Get color value for a specific theme
@@ -222,18 +247,38 @@ export function getColorValue(
   colorName: string
 ): string {
   const palette = COLOR_PALETTE[theme]
-  
+
   switch (colorType) {
     case 'core': {
-      const coreColors = palette as unknown as Record<string, string>
-      return coreColors[colorName] ?? ''
+      if (isColorName(colorName)) {
+        const value = palette[colorName]
+        return typeof value === 'string' ? value : ''
+      }
+      return ''
     }
     case 'semantic':
-      return palette.semantic[colorName as SemanticColorName] ?? ''
+      if (isSemanticColorName(colorName)) {
+        return palette.semantic[colorName]
+      }
+      return ''
     case 'primary':
-      return palette.primary[colorName as unknown as keyof typeof PRIMARY_VARIANTS] ?? ''
+      if (isColorVariant(colorName)) {
+        const numKey =
+          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
+        if (!isNaN(numKey) && numKey in palette.primary) {
+          return palette.primary[numKey as ColorVariant]
+        }
+      }
+      return ''
     case 'gray':
-      return palette.gray[colorName as unknown as keyof typeof LIGHT_GRAY_VARIANTS] ?? ''
+      if (isColorVariant(colorName)) {
+        const numKey =
+          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
+        if (!isNaN(numKey) && numKey in palette.gray) {
+          return palette.gray[numKey as ColorVariant]
+        }
+      }
+      return ''
     default:
       return ''
   }
@@ -278,5 +323,5 @@ export const COLOR_COMBINATIONS = {
     background: 'info',
     foreground: 'info-foreground',
     border: 'info/20',
-  }
+  },
 } as const
