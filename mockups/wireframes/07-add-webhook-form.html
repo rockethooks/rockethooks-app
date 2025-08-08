@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Add Webhook Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 40px;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Modal Container */
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .close-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* Modal Body */
+        .modal-body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .required {
+            color: #f44336;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #666;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* URL Input with Protocol */
+        .url-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .protocol-select {
+            width: 100px;
+        }
+
+        .url-input {
+            flex: 1;
+        }
+
+        /* API Selector */
+        .api-selector {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fafafa;
+        }
+
+        .api-selector-header {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .api-checkbox-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .api-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 4px;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .api-item:hover {
+            background: #f5f5f5;
+        }
+
+        .api-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+
+        .api-item.selected .api-checkbox {
+            background: #333;
+            border-color: #333;
+        }
+
+        .api-item.selected .api-checkbox::after {
+            content: '✓';
+            color: white;
+            display: block;
+            text-align: center;
+            line-height: 14px;
+            font-size: 12px;
+        }
+
+        .api-name {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .api-endpoints {
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Security Section */
+        .security-section {
+            background: #f0f7ff;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .security-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .security-icon {
+            width: 20px;
+            height: 20px;
+            background: #1976d2;
+            border-radius: 4px;
+        }
+
+        .security-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1976d2;
+        }
+
+        .secret-display {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .secret-input {
+            flex: 1;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .copy-btn {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            border-color: #999;
+        }
+
+        .regenerate-btn {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Retry Configuration */
+        .retry-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle.active {
+            background: #4CAF50;
+        }
+
+        .toggle-handle {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+        }
+
+        .toggle.active .toggle-handle {
+            left: 22px;
+        }
+
+        /* Test Webhook */
+        .test-section {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .test-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .test-btn {
+            padding: 6px 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .test-btn:hover {
+            background: #222;
+        }
+
+        .test-payload {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .footer-left {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            border-color: #999;
+        }
+
+        .btn-primary {
+            background: #333;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #222;
+        }
+
+        /* Event Filters */
+        .event-filters {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            background: #fafafa;
+        }
+
+        .filter-header {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .event-type-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .event-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            background: white;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .event-type:hover {
+            background: #f5f5f5;
+        }
+
+        .event-checkbox {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .event-type.selected .event-checkbox {
+            background: #333;
+            border-color: #333;
+        }
+
+        .event-type.selected .event-checkbox::after {
+            content: '✓';
+            color: white;
+            display: block;
+            text-align: center;
+            line-height: 12px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Add Webhook Destination</h2>
+                <button class="close-btn">×</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Basic Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Basic Information</h3>
+                    <p class="section-subtitle">Configure your webhook endpoint details</p>
+
+                    <div class="form-group">
+                        <label>Webhook Name <span class="required">*</span></label>
+                        <input type="text" placeholder="e.g., Production Server, Slack Notifications">
+                        <span class="help-text">A friendly name to identify this webhook</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Endpoint URL <span class="required">*</span></label>
+                        <div class="url-input-group">
+                            <select class="protocol-select">
+                                <option>https://</option>
+                                <option>http://</option>
+                            </select>
+                            <input type="text" class="url-input" placeholder="your-server.com/webhooks/receive">
+                        </div>
+                        <span class="help-text">The URL where events will be sent</span>
+                    </div>
+                </div>
+
+                <!-- API Selection -->
+                <div class="form-section">
+                    <h3 class="section-title">Select APIs</h3>
+                    <p class="section-subtitle">Choose which APIs should send events to this webhook</p>
+
+                    <div class="api-selector">
+                        <div class="api-selector-header">Available APIs (3 selected)</div>
+                        <div class="api-checkbox-list">
+                            <div class="api-item selected">
+                                <div class="api-checkbox"></div>
+                                <span class="api-name">Payment Gateway API</span>
+                                <span class="api-endpoints">4 endpoints</span>
+                            </div>
+                            <div class="api-item selected">
+                                <div class="api-checkbox"></div>
+                                <span class="api-name">User Management</span>
+                                <span class="api-endpoints">5 endpoints</span>
+                            </div>
+                            <div class="api-item">
+                                <div class="api-checkbox"></div>
+                                <span class="api-name">Inventory Management</span>
+                                <span class="api-endpoints">3 endpoints</span>
+                            </div>
+                            <div class="api-item selected">
+                                <div class="api-checkbox"></div>
+                                <span class="api-name">Analytics API</span>
+                                <span class="api-endpoints">2 endpoints</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Filtering -->
+                <div class="form-section">
+                    <h3 class="section-title">Event Filters</h3>
+                    <p class="section-subtitle">Choose which types of events to send (all selected by default)</p>
+
+                    <div class="event-filters">
+                        <div class="filter-header">Event Types</div>
+                        <div class="event-type-grid">
+                            <div class="event-type selected">
+                                <div class="event-checkbox"></div>
+                                <span>Created</span>
+                            </div>
+                            <div class="event-type selected">
+                                <div class="event-checkbox"></div>
+                                <span>Updated</span>
+                            </div>
+                            <div class="event-type selected">
+                                <div class="event-checkbox"></div>
+                                <span>Deleted</span>
+                            </div>
+                            <div class="event-type">
+                                <div class="event-checkbox"></div>
+                                <span>Error</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="form-section">
+                    <h3 class="section-title">Security</h3>
+                    
+                    <div class="security-section">
+                        <div class="security-header">
+                            <div class="security-icon"></div>
+                            <span class="security-title">HMAC Signature Verification</span>
+                        </div>
+                        <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+                            We'll sign each webhook with this secret so you can verify it came from RocketHooks
+                        </p>
+                        <div class="secret-display">
+                            <input type="text" class="secret-input" value="whsec_3fD9kL2mXy7..." readonly>
+                            <button class="copy-btn">Copy</button>
+                            <button class="regenerate-btn">Regenerate</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Custom Headers (Optional)</label>
+                        <textarea placeholder="Key: Value&#10;Authorization: Bearer token123"></textarea>
+                        <span class="help-text">Additional headers to include with each webhook request</span>
+                    </div>
+                </div>
+
+                <!-- Delivery Settings -->
+                <div class="form-section">
+                    <h3 class="section-title">Delivery Settings</h3>
+
+                    <div class="retry-config">
+                        <div class="form-group">
+                            <label>Max Retry Attempts</label>
+                            <select>
+                                <option>3 attempts</option>
+                                <option>5 attempts</option>
+                                <option>10 attempts</option>
+                                <option>No retry</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Timeout</label>
+                            <select>
+                                <option>5 seconds</option>
+                                <option>10 seconds</option>
+                                <option>30 seconds</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle active">
+                            <div class="toggle-handle"></div>
+                        </div>
+                        <label>Enable exponential backoff for retries</label>
+                    </div>
+                </div>
+
+                <!-- Test Webhook -->
+                <div class="form-section">
+                    <div class="test-section">
+                        <div class="test-header">
+                            <div class="test-title">Test Webhook</div>
+                            <button class="test-btn">Send Test Event</button>
+                        </div>
+                        <div class="test-payload">
+{
+  "event": "test.webhook",
+  "timestamp": "2024-03-15T10:30:00Z",
+  "data": {
+    "message": "This is a test webhook from RocketHooks",
+    "api": "Test API",
+    "endpoint": "/test"
+  }
+}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <div class="footer-left">
+                    All webhooks are active by default
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn btn-primary">Create Webhook</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

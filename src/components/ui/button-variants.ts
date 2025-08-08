@@ -14,8 +14,7 @@ export const buttonVariants = cva(
           'bg-success text-success-foreground shadow-xs hover:bg-success/90 focus-visible:ring-success/20',
         warning:
           'bg-warning text-warning-foreground shadow-xs hover:bg-warning/90 focus-visible:ring-warning/20',
-        info:
-          'bg-info text-info-foreground shadow-xs hover:bg-info/90 focus-visible:ring-info/20',
+        info: 'bg-info text-info-foreground shadow-xs hover:bg-info/90 focus-visible:ring-info/20',
         outline:
           'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
         secondary:

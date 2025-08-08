@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Events Stream Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: #666;
+            border-radius: 6px;
+            margin-right: 12px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .org-selector {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .nav-item.active {
+            color: #333;
+            background: #f0f0f0;
+            font-weight: 500;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #666;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            background: #999;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: #e8f5e9;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: #999;
+            border-radius: 50%;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-dropdown {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-dropdown:hover {
+            border-color: #999;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            border-color: #999;
+        }
+
+        /* Split View Layout */
+        .content-area {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Events List */
+        .events-list {
+            flex: 1;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+        }
+
+        .events-container {
+            padding: 0;
+        }
+
+        .event-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .event-item:hover {
+            background: #fafafa;
+        }
+
+        .event-item.selected {
+            background: #f5f5f5;
+            border-left: 3px solid #333;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-type {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .event-badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-created {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-updated {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .badge-deleted {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .event-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .event-details {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .event-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .detail-icon {
+            width: 14px;
+            height: 14px;
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .event-status {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #4CAF50;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .status-failed {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Event Detail Panel */
+        .event-detail-panel {
+            width: 50%;
+            background: white;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .detail-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Tab Navigation */
+        .detail-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #333;
+        }
+
+        .tab.active {
+            color: #333;
+            font-weight: 500;
+            border-bottom-color: #333;
+            background: white;
+        }
+
+        .detail-content {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* JSON Viewer */
+        .json-viewer {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 16px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .json-key {
+            color: #881391;
+        }
+
+        .json-value {
+            color: #1976d2;
+        }
+
+        .json-string {
+            color: #4caf50;
+        }
+
+        /* Diff Viewer */
+        .diff-viewer {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .diff-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .diff-label {
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+        }
+
+        .diff-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .diff-side {
+            padding: 12px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+            border-right: 1px solid #ddd;
+        }
+
+        .diff-side:last-child {
+            border-right: none;
+        }
+
+        .diff-line {
+            padding: 2px 4px;
+            margin: 2px 0;
+        }
+
+        .diff-added {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .diff-removed {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Delivery Attempts */
+        .delivery-timeline {
+            padding: 20px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .timeline-marker {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .marker-success {
+            background: #e8f5e9;
+            color: #4CAF50;
+        }
+
+        .marker-failed {
+            background: #ffebee;
+            color: #f44336;
+        }
+
+        .marker-pending {
+            background: #fff3e0;
+            color: #ff9800;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .timeline-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .timeline-details {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            color: #999;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtext {
+            font-size: 14px;
+            color: #bbb;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            padding: 12px 20px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            border-color: #999;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo"></div>
+                    <span class="logo-text">RocketHooks</span>
+                </div>
+                <div class="org-selector">
+                    <span>Acme Corp</span>
+                    <span>▼</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>APIs & Endpoints</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Webhooks</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Transformations</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>Events</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Logs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-row">
+                    <h1 class="page-title">Event Stream</h1>
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        <span>Live - 47 events/min</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="search-box">
+                    <span class="search-icon"></span>
+                    <input type="text" class="search-input" placeholder="Search events...">
+                </div>
+                
+                <div class="filter-group">
+                    <select class="filter-dropdown">
+                        <option>All APIs</option>
+                        <option>Payment Gateway</option>
+                        <option>User Management</option>
+                        <option>Inventory</option>
+                    </select>
+
+                    <select class="filter-dropdown">
+                        <option>All Webhooks</option>
+                        <option>Production</option>
+                        <option>Development</option>
+                        <option>Slack</option>
+                    </select>
+
+                    <select class="filter-dropdown">
+                        <option>All Status</option>
+                        <option>Delivered</option>
+                        <option>Pending</option>
+                        <option>Failed</option>
+                    </select>
+
+                    <select class="filter-dropdown">
+                        <option>Last Hour</option>
+                        <option>Last 24 Hours</option>
+                        <option>Last 7 Days</option>
+                        <option>Custom Range</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-secondary">
+                    Export
+                </button>
+            </div>
+
+            <!-- Split View Content -->
+            <div class="content-area">
+                <!-- Events List -->
+                <div class="events-list">
+                    <div class="events-container">
+                        <!-- Event Item 1 - Selected -->
+                        <div class="event-item selected">
+                            <div class="event-header">
+                                <div class="event-title">
+                                    <span class="event-type">user.updated</span>
+                                    <span class="event-badge badge-updated">UPDATE</span>
+                                </div>
+                                <span class="event-time">2 min ago</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>User Management API</span>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Production Webhook</span>
+                                </div>
+                            </div>
+                            <div class="event-status">
+                                <div class="status-indicator status-success">
+                                    <span class="status-dot"></span>
+                                    <span>Delivered (200 OK)</span>
+                                </div>
+                                <span style="font-size: 11px; color: #999;">142ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Event Item 2 -->
+                        <div class="event-item">
+                            <div class="event-header">
+                                <div class="event-title">
+                                    <span class="event-type">payment.processed</span>
+                                    <span class="event-badge badge-created">CREATE</span>
+                                </div>
+                                <span class="event-time">5 min ago</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Payment Gateway API</span>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Production Webhook</span>
+                                </div>
+                            </div>
+                            <div class="event-status">
+                                <div class="status-indicator status-success">
+                                    <span class="status-dot"></span>
+                                    <span>Delivered (200 OK)</span>
+                                </div>
+                                <span style="font-size: 11px; color: #999;">98ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Event Item 3 - Failed -->
+                        <div class="event-item">
+                            <div class="event-header">
+                                <div class="event-title">
+                                    <span class="event-type">inventory.updated</span>
+                                    <span class="event-badge badge-updated">UPDATE</span>
+                                </div>
+                                <span class="event-time">8 min ago</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Inventory API</span>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Development Server</span>
+                                </div>
+                            </div>
+                            <div class="event-status">
+                                <div class="status-indicator status-failed">
+                                    <span class="status-dot"></span>
+                                    <span>Failed (500 Error)</span>
+                                </div>
+                                <span style="font-size: 11px; color: #999;">3 retries</span>
+                            </div>
+                        </div>
+
+                        <!-- Event Item 4 - Pending -->
+                        <div class="event-item">
+                            <div class="event-header">
+                                <div class="event-title">
+                                    <span class="event-type">order.created</span>
+                                    <span class="event-badge badge-created">CREATE</span>
+                                </div>
+                                <span class="event-time">12 min ago</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Payment Gateway API</span>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Analytics Pipeline</span>
+                                </div>
+                            </div>
+                            <div class="event-status">
+                                <div class="status-indicator status-pending">
+                                    <span class="status-dot"></span>
+                                    <span>Pending (Retry 2/3)</span>
+                                </div>
+                                <span style="font-size: 11px; color: #999;">Next retry in 30s</span>
+                            </div>
+                        </div>
+
+                        <!-- More events... -->
+                        <div class="event-item">
+                            <div class="event-header">
+                                <div class="event-title">
+                                    <span class="event-type">product.deleted</span>
+                                    <span class="event-badge badge-deleted">DELETE</span>
+                                </div>
+                                <span class="event-time">15 min ago</span>
+                            </div>
+                            <div class="event-details">
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Inventory API</span>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="detail-icon"></span>
+                                    <span>Production Webhook</span>
+                                </div>
+                            </div>
+                            <div class="event-status">
+                                <div class="status-indicator status-success">
+                                    <span class="status-dot"></span>
+                                    <span>Delivered (200 OK)</span>
+                                </div>
+                                <span style="font-size: 11px; color: #999;">156ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Detail Panel -->
+                <div class="event-detail-panel">
+                    <div class="detail-header">
+                        <h2 class="detail-title">user.updated</h2>
+                        <div class="detail-meta">
+                            <div class="meta-item">
+                                <span class="detail-icon"></span>
+                                <span>Event ID: evt_2hX9kL3m</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="detail-icon"></span>
+                                <span>March 15, 2024 10:32:45 AM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="detail-tabs">
+                        <div class="tab active">Payload</div>
+                        <div class="tab">Changes</div>
+                        <div class="tab">Delivery</div>
+                        <div class="tab">Raw</div>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="detail-content">
+                        <!-- Payload Tab (Active) -->
+                        <div class="tab-pane active">
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Event Data</h3>
+                            <div class="json-viewer">
+<pre>{
+  <span class="json-key">"event"</span>: <span class="json-string">"user.updated"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-03-15T10:32:45Z"</span>,
+  <span class="json-key">"api"</span>: {
+    <span class="json-key">"name"</span>: <span class="json-string">"User Management API"</span>,
+    <span class="json-key">"endpoint"</span>: <span class="json-string">"/users/123"</span>
+  },
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-value">123</span>,
+    <span class="json-key">"email"</span>: <span class="json-string">"john.doe@company.com"</span>,
+    <span class="json-key">"name"</span>: <span class="json-string">"John Doe"</span>,
+    <span class="json-key">"role"</span>: <span class="json-string">"admin"</span>,
+    <span class="json-key">"last_login"</span>: <span class="json-string">"2024-03-15T10:30:00Z"</span>
+  }
+}</pre>
+                            </div>
+
+                            <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">Changed Fields</h3>
+                            <div class="diff-viewer">
+                                <div class="diff-header">
+                                    <div class="diff-label">Before</div>
+                                    <div class="diff-label">After</div>
+                                </div>
+                                <div class="diff-content">
+                                    <div class="diff-side">
+                                        <div class="diff-line diff-removed">"role": "user"</div>
+                                        <div class="diff-line diff-removed">"last_login": "2024-03-14T15:22:00Z"</div>
+                                    </div>
+                                    <div class="diff-side">
+                                        <div class="diff-line diff-added">"role": "admin"</div>
+                                        <div class="diff-line diff-added">"last_login": "2024-03-15T10:30:00Z"</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Bar -->
+                    <div class="action-bar">
+                        <button class="action-btn">Replay Event</button>
+                        <button class="action-btn">Copy Payload</button>
+                        <button class="action-btn">Download</button>
+                        <button class="action-btn">View in Logs</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

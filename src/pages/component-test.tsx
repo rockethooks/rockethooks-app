@@ -1,6 +1,8 @@
-import { useState } from 'react'
 import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
+// Import our custom RocketHooks components
+import { ComponentsDemo } from '@/components/rockethooks/demo'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -24,11 +26,8 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
-import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-// Import our custom RocketHooks components
-import { ComponentsDemo } from '@/components/rockethooks/demo'
+import { Textarea } from '@/components/ui/textarea'
 
 export function ComponentTest() {
   const [activeTab, setActiveTab] = useState('shadcn')
@@ -48,7 +47,9 @@ export function ComponentTest() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="shadcn">shadcn/ui Components</TabsTrigger>
-            <TabsTrigger value="rockethooks">RocketHooks Custom Components</TabsTrigger>
+            <TabsTrigger value="rockethooks">
+              RocketHooks Custom Components
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="shadcn" className="mt-6">
@@ -90,7 +91,9 @@ export function ComponentTest() {
                 <CardContent className="space-y-4">
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-medium mb-2">Custom Button Variants:</p>
+                      <p className="text-sm font-medium mb-2">
+                        Custom Button Variants:
+                      </p>
                       <div className="flex gap-2 flex-wrap">
                         <Button variant="success">
                           <CheckCircle className="h-4 w-4" />
@@ -106,9 +109,11 @@ export function ComponentTest() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div>
-                      <p className="text-sm font-medium mb-2">Custom Badge Variants:</p>
+                      <p className="text-sm font-medium mb-2">
+                        Custom Badge Variants:
+                      </p>
                       <div className="flex gap-2 flex-wrap">
                         <Badge variant="success">Success</Badge>
                         <Badge variant="warning">Warning</Badge>
@@ -118,15 +123,18 @@ export function ComponentTest() {
                   </div>
 
                   <Separator />
-                  
+
                   <div className="space-y-4">
-                    <p className="text-sm font-medium">Alert Components with Custom Colors:</p>
-                    
+                    <p className="text-sm font-medium">
+                      Alert Components with Custom Colors:
+                    </p>
+
                     <Alert>
                       <Info className="h-4 w-4" />
                       <AlertTitle>Info Alert</AlertTitle>
                       <AlertDescription>
-                        This is an info alert using the custom info color variant.
+                        This is an info alert using the custom info color
+                        variant.
                       </AlertDescription>
                     </Alert>
 
@@ -134,7 +142,8 @@ export function ComponentTest() {
                       <CheckCircle className="h-4 w-4" />
                       <AlertTitle>Success Alert</AlertTitle>
                       <AlertDescription>
-                        This is a success alert using the custom success color variant.
+                        This is a success alert using the custom success color
+                        variant.
                       </AlertDescription>
                     </Alert>
 
@@ -142,7 +151,8 @@ export function ComponentTest() {
                       <AlertTriangle className="h-4 w-4" />
                       <AlertTitle>Warning Alert</AlertTitle>
                       <AlertDescription>
-                        This is a warning alert using the custom warning color variant.
+                        This is a warning alert using the custom warning color
+                        variant.
                       </AlertDescription>
                     </Alert>
 
@@ -161,13 +171,19 @@ export function ComponentTest() {
               <Card>
                 <CardHeader>
                   <CardTitle>Form Components</CardTitle>
-                  <CardDescription>Testing form inputs and controls</CardDescription>
+                  <CardDescription>
+                    Testing form inputs and controls
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="Enter your email" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                      />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="select">Select Option</Label>
@@ -200,7 +216,9 @@ export function ComponentTest() {
               <Card>
                 <CardHeader>
                   <CardTitle>Progress & Avatar Components</CardTitle>
-                  <CardDescription>Testing progress bars and avatars</CardDescription>
+                  <CardDescription>
+                    Testing progress bars and avatars
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -212,7 +230,10 @@ export function ComponentTest() {
 
                   <div className="flex items-center space-x-4">
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" alt="Avatar" />
+                      <AvatarImage
+                        src="https://github.com/shadcn.png"
+                        alt="Avatar"
+                      />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div>
@@ -251,7 +272,8 @@ export function ComponentTest() {
                       variant="destructive"
                       onClick={() =>
                         toast.error('Error notification!', {
-                          description: 'This is an error message using Sonner toast.',
+                          description:
+                            'This is an error message using Sonner toast.',
                         })
                       }
                     >
@@ -262,18 +284,20 @@ export function ComponentTest() {
                       variant="warning"
                       onClick={() =>
                         toast.warning('Warning notification!', {
-                          description: 'This is a warning message using Sonner toast.',
+                          description:
+                            'This is a warning message using Sonner toast.',
                         })
                       }
                     >
                       Test Warning Toast
                     </Button>
-                    
+
                     <Button
                       variant="info"
                       onClick={() =>
                         toast.info('Info notification!', {
-                          description: 'This is an info message using Sonner toast.',
+                          description:
+                            'This is an info message using Sonner toast.',
                         })
                       }
                     >
@@ -282,9 +306,10 @@ export function ComponentTest() {
                   </div>
 
                   <p className="text-sm text-muted-foreground">
-                    Click the buttons above to test toast notifications and verify the
-                    theme is working correctly. Notice how the buttons now use the
-                    custom color variants that match their purpose.
+                    Click the buttons above to test toast notifications and
+                    verify the theme is working correctly. Notice how the
+                    buttons now use the custom color variants that match their
+                    purpose.
                   </p>
                 </CardContent>
               </Card>

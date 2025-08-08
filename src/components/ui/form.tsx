@@ -31,9 +31,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->({
-  ...props
-}: ControllerProps<TFieldValues, TName>) {
+>({ ...props }: ControllerProps<TFieldValues, TName>) {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
@@ -111,9 +109,7 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
       data-slot="form-control"
       id={formItemId}
       aria-describedby={
-        !error
-          ? formDescriptionId
-          : `${formDescriptionId} ${formMessageId}`
+        !error ? formDescriptionId : `${formDescriptionId} ${formMessageId}`
       }
       aria-invalid={!!error}
       {...props}

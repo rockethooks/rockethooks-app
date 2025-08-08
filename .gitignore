@@ -50,3 +50,6 @@ Thumbs.db
 # yarn
 yarn-error.log
 .yarn-integrity
+
+# Storybook build outputs
+storybook-static/
