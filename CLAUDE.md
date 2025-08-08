@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-## 🚨 CRITICAL: Load CLAUDE-TEMPLATE.md First
+## 🚨 CRITICAL: Load CLAUDE_CONTEXT.md First
 **MANDATORY REQUIREMENT**: Before working with any RocketHooks project, you MUST first read and load the shared development guidelines from:
 
 **`/Users/adnene/Projects/RocketHooks/specification/CLAUDE_CONTEXT.md`**
