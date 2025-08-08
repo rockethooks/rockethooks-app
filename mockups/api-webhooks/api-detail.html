@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Endpoint Detail - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav a.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: hsl(246 80% 60%);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .endpoint-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .method-get { background: #dcfce7; color: #166534; }
+        .method-post { background: #dbeafe; color: #1d4ed8; }
+        .method-put { background: #fef3c7; color: #d97706; }
+        .method-delete { background: #fee2e2; color: #dc2626; }
+
+        .endpoint-url {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .endpoint-description {
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-healthy {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-healthy .status-indicator { background: #22c55e; }
+        .status-warning .status-indicator { background: #f59e0b; }
+        .status-error .status-indicator { background: #ef4444; }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 80% 55%);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: hsl(246 80% 60%);
+            border-bottom-color: hsl(246 80% 60%);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .json-key { color: #60a5fa; }
+        .json-string { color: #34d399; }
+        .json-number { color: #fbbf24; }
+        .json-boolean { color: #f87171; }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            min-height: 120px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle input {
+            width: 40px;
+            height: 20px;
+            appearance: none;
+            background: #e2e8f0;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle input:checked {
+            background: hsl(246 80% 60%);
+        }
+
+        .toggle input::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+        }
+
+        .toggle input:checked::before {
+            left: 22px;
+        }
+
+        .parameter-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .parameter {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .parameter-info {
+            flex: 1;
+        }
+
+        .parameter-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .parameter-type {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .parameter-required {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.125rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .response-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-200 { background: #dcfce7; color: #166534; }
+        .status-400 { background: #fef3c7; color: #d97706; }
+        .status-500 { background: #fee2e2; color: #dc2626; }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .content-grid { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; align-items: stretch; }
+            .endpoint-title { flex-direction: column; align-items: flex-start; }
+            .actions { justify-content: stretch; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🚀 RocketHooks</div>
+            <nav class="nav">
+                <a href="#" class="active">Endpoints</a>
+                <a href="#">Webhooks</a>
+                <a href="#">Events</a>
+                <a href="#">Monitoring</a>
+                <a href="#">Testing</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">Endpoints</a> / <strong>GET /api/v1/users</strong>
+        </div>
+
+        <div class="page-header">
+            <div>
+                <div class="endpoint-title">
+                    <span class="endpoint-method method-get">GET</span>
+                    <span class="endpoint-url">/api/v1/users</span>
+                </div>
+                <p class="endpoint-description">Retrieve list of users with pagination and filters</p>
+                <div class="status-badge status-healthy">
+                    <span class="status-indicator"></span>
+                    Healthy - Last checked 2 min ago
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary">🧪 Test Endpoint</button>
+                <button class="btn btn-secondary">📊 View Logs</button>
+                <button class="btn btn-secondary">⚙️ Edit</button>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="main-content">
+                <div class="card">
+                    <h2 class="card-title">Performance Metrics</h2>
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <div class="metric-value">124ms</div>
+                            <div class="metric-label">Avg Response Time</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">99.2%</div>
+                            <div class="metric-label">Uptime (24h)</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">1.2k</div>
+                            <div class="metric-label">Requests/hour</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">0.5%</div>
+                            <div class="metric-label">Error Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('parameters')">Parameters</button>
+                        <button class="tab" onclick="showTab('request')">Request Example</button>
+                        <button class="tab" onclick="showTab('response')">Response Example</button>
+                        <button class="tab" onclick="showTab('headers')">Headers</button>
+                        <button class="tab" onclick="showTab('auth')">Authentication</button>
+                    </div>
+
+                    <div id="parameters" class="tab-content active">
+                        <h3 style="margin-bottom: 1rem;">Query Parameters</h3>
+                        <div class="parameter-list">
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">page</div>
+                                    <div class="parameter-type">integer - Page number for pagination (default: 1)</div>
+                                </div>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">limit</div>
+                                    <div class="parameter-type">integer - Items per page (default: 10, max: 100)</div>
+                                </div>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">search</div>
+                                    <div class="parameter-type">string - Search users by name or email</div>
+                                </div>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">status</div>
+                                    <div class="parameter-type">string - Filter by status (active, inactive, pending)</div>
+                                </div>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">created_after</div>
+                                    <div class="parameter-type">datetime - Filter users created after this date</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="request" class="tab-content">
+                        <h3 style="margin-bottom: 1rem;">Request Example</h3>
+                        <div class="code-block">
+curl -X GET "https://api.rockethooks.com/v1/users?page=1&limit=10&search=john" \
+  -H <span class="json-string">"Authorization: Bearer your_api_token"</span> \
+  -H <span class="json-string">"Content-Type: application/json"</span>
+                        </div>
+                    </div>
+
+                    <div id="response" class="tab-content">
+                        <h3 style="margin-bottom: 1rem;">Response Examples</h3>
+                        
+                        <div class="response-status status-200">
+                            <strong>200 OK</strong> - Success
+                        </div>
+                        <div class="code-block">
+{
+  <span class="json-key">"data"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-string">"user_123"</span>,
+      <span class="json-key">"name"</span>: <span class="json-string">"John Doe"</span>,
+      <span class="json-key">"email"</span>: <span class="json-string">"john@example.com"</span>,
+      <span class="json-key">"status"</span>: <span class="json-string">"active"</span>,
+      <span class="json-key">"created_at"</span>: <span class="json-string">"2024-01-15T10:30:00Z"</span>,
+      <span class="json-key">"last_login"</span>: <span class="json-string">"2024-01-20T14:22:00Z"</span>
+    }
+  ],
+  <span class="json-key">"pagination"</span>: {
+    <span class="json-key">"page"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"limit"</span>: <span class="json-number">10</span>,
+    <span class="json-key">"total"</span>: <span class="json-number">156</span>,
+    <span class="json-key">"pages"</span>: <span class="json-number">16</span>
+  }
+}
+                        </div>
+
+                        <div class="response-status status-400">
+                            <strong>400 Bad Request</strong> - Invalid parameters
+                        </div>
+                        <div class="code-block">
+{
+  <span class="json-key">"error"</span>: {
+    <span class="json-key">"code"</span>: <span class="json-string">"INVALID_PARAMETER"</span>,
+    <span class="json-key">"message"</span>: <span class="json-string">"Limit must be between 1 and 100"</span>,
+    <span class="json-key">"details"</span>: {
+      <span class="json-key">"parameter"</span>: <span class="json-string">"limit"</span>,
+      <span class="json-key">"value"</span>: <span class="json-number">150</span>
+    }
+  }
+}
+                        </div>
+                    </div>
+
+                    <div id="headers" class="tab-content">
+                        <h3 style="margin-bottom: 1rem;">Required Headers</h3>
+                        <div class="parameter-list">
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">Authorization</div>
+                                    <div class="parameter-type">Bearer token for API authentication</div>
+                                </div>
+                                <span class="parameter-required">Required</span>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">Content-Type</div>
+                                    <div class="parameter-type">application/json</div>
+                                </div>
+                                <span class="parameter-required">Required</span>
+                            </div>
+                        </div>
+
+                        <h3 style="margin: 2rem 0 1rem;">Optional Headers</h3>
+                        <div class="parameter-list">
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">X-Request-ID</div>
+                                    <div class="parameter-type">Unique identifier for request tracking</div>
+                                </div>
+                            </div>
+                            <div class="parameter">
+                                <div class="parameter-info">
+                                    <div class="parameter-name">Accept-Language</div>
+                                    <div class="parameter-type">Preferred language for error messages</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="auth" class="tab-content">
+                        <h3 style="margin-bottom: 1rem;">Authentication Requirements</h3>
+                        <div class="form-group">
+                            <label class="label">Authentication Type</label>
+                            <select class="select">
+                                <option>Bearer Token</option>
+                                <option>API Key</option>
+                                <option>OAuth 2.0</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Required Scopes</label>
+                            <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin-top: 0.5rem;">
+                                <code>users:read</code>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Token Expiration</label>
+                            <div style="color: #64748b; font-size: 0.9rem;">24 hours</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">Monitoring Settings</h3>
+                    <div class="form-group">
+                        <div class="toggle">
+                            <input type="checkbox" checked>
+                            <label>Enable monitoring</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Check Interval</label>
+                        <select class="select">
+                            <option>1 minute</option>
+                            <option>5 minutes</option>
+                            <option>15 minutes</option>
+                            <option>30 minutes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Timeout (seconds)</label>
+                        <input type="number" class="input" value="30">
+                    </div>
+                    <div class="form-group">
+                        <div class="toggle">
+                            <input type="checkbox" checked>
+                            <label>Alert on failures</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Alert Rules</h3>
+                    <div class="form-group">
+                        <label class="label">Response Time Threshold</label>
+                        <input type="text" class="input" value="500ms" placeholder="e.g., 500ms">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Error Rate Threshold</label>
+                        <input type="text" class="input" value="5%" placeholder="e.g., 5%">
+                    </div>
+                    <div class="form-group">
+                        <label class="label">Consecutive Failures</label>
+                        <input type="number" class="input" value="3">
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%;">Save Rules</button>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">Recent Activity</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 0.875rem;">
+                            <div style="color: #22c55e; font-weight: 500;">✓ Health check passed</div>
+                            <div style="color: #64748b;">2 minutes ago</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 0.875rem;">
+                            <div style="color: #f59e0b; font-weight: 500;">⚠ Slow response (890ms)</div>
+                            <div style="color: #64748b;">15 minutes ago</div>
+                        </div>
+                        <div style="padding: 0.75rem; background: #f8fafc; border-radius: 0.5rem; font-size: 0.875rem;">
+                            <div style="color: #22c55e; font-weight: 500;">✓ Configuration updated</div>
+                            <div style="color: #64748b;">1 hour ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

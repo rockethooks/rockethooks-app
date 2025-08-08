@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RocketHooks</title>
+    <style>
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --primary: 246 80% 60%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --accent: 210 40% 96.1%;
+            --accent-foreground: 222.2 47.4% 11.2%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 214.3 31.8% 91.4%;
+            --input: 214.3 31.8% 91.4%;
+            --ring: 221.2 83.2% 53.3%;
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-placeholder {
+            width: 48px;
+            height: 48px;
+            background: hsl(var(--primary));
+            border-radius: 8px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: hsl(var(--primary-foreground));
+            font-weight: bold;
+            font-size: 1.25rem;
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .form-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: hsl(var(--foreground));
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.875rem;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            ring: 2px;
+            ring-color: hsl(var(--ring));
+            ring-offset: 2px;
+            border-color: hsl(var(--ring));
+        }
+
+        .form-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .checkbox {
+            width: 1rem;
+            height: 1rem;
+            accent-color: hsl(var(--primary));
+        }
+
+        .checkbox-label {
+            font-size: 0.875rem;
+            color: hsl(var(--muted-foreground));
+        }
+
+        .button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 44px;
+        }
+
+        .button-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+        }
+
+        .button-primary:hover {
+            background: hsl(var(--primary) / 0.9);
+        }
+
+        .button-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border: 1px solid hsl(var(--border));
+        }
+
+        .button-secondary:hover {
+            background: hsl(var(--accent));
+        }
+
+        .button-outline {
+            background: transparent;
+            color: hsl(var(--foreground));
+            border: 1px solid hsl(var(--border));
+        }
+
+        .button-outline:hover {
+            background: hsl(var(--accent));
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .oauth-section {
+            margin: 1.5rem 0;
+        }
+
+        .oauth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .oauth-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) - 2px);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-height: 44px;
+        }
+
+        .oauth-button:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--border));
+        }
+
+        .oauth-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: hsl(var(--border));
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        .form-links {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .form-link {
+            color: hsl(var(--primary));
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-link:hover {
+            text-decoration: underline;
+        }
+
+        .demo-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid hsl(var(--border));
+            text-align: center;
+        }
+
+        .demo-text {
+            color: hsl(var(--muted-foreground));
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            background: hsl(var(--destructive) / 0.1);
+            border: 1px solid hsl(var(--destructive) / 0.2);
+            color: hsl(var(--destructive));
+            padding: 0.75rem;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .form-links {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-placeholder">RH</div>
+            <h1 class="brand-title">RocketHooks</h1>
+            <p class="brand-subtitle">API monitoring and webhook management</p>
+        </div>
+
+        <!-- Login Card -->
+        <div class="card">
+            <div class="form-header">
+                <h2 class="form-title">Welcome back</h2>
+                <p class="form-subtitle">Sign in to your RocketHooks account</p>
+            </div>
+
+            <!-- Error Message (Hidden by default) -->
+            <div class="error-message" style="display: none;" id="error-message">
+                Invalid email or password. Please try again.
+            </div>
+
+            <!-- OAuth Section -->
+            <div class="oauth-section">
+                <div class="oauth-buttons">
+                    <a href="#" class="oauth-button" onclick="showLoading('google-btn')">
+                        <svg class="oauth-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        <span id="google-text">Continue with Google</span>
+                        <div class="loading-spinner" id="google-spinner" style="display: none;"></div>
+                    </a>
+                    
+                    <a href="#" class="oauth-button" onclick="showLoading('github-btn')">
+                        <svg class="oauth-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span id="github-text">Continue with GitHub</span>
+                        <div class="loading-spinner" id="github-spinner" style="display: none;"></div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="divider">or continue with email</div>
+
+            <!-- Email/Password Form -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="you@example.com" 
+                        required 
+                        autocomplete="email"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="Enter your password" 
+                        required 
+                        autocomplete="current-password"
+                    />
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="remember" name="remember" class="checkbox" />
+                    <label for="remember" class="checkbox-label">Remember me</label>
+                </div>
+
+                <button type="submit" class="button button-primary" id="login-btn">
+                    <span id="login-text">Sign In</span>
+                    <div class="loading-spinner" id="login-spinner" style="display: none;"></div>
+                </button>
+            </form>
+
+            <div class="form-links">
+                <a href="password-reset.html" class="form-link">Forgot password?</a>
+                <a href="signup.html" class="form-link">Create account</a>
+            </div>
+
+            <!-- Demo Access Section -->
+            <div class="demo-section">
+                <p class="demo-text">Want to explore without signing up?</p>
+                <button class="button button-outline" onclick="accessDemo()">
+                    Try Demo Access
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoading(buttonType) {
+            const textElement = buttonType === 'google-btn' ? 
+                document.getElementById('google-text') : 
+                document.getElementById('github-text');
+            const spinnerElement = buttonType === 'google-btn' ? 
+                document.getElementById('google-spinner') : 
+                document.getElementById('github-spinner');
+            
+            textElement.style.display = 'none';
+            spinnerElement.style.display = 'block';
+            
+            // Simulate OAuth flow
+            setTimeout(() => {
+                alert(`${buttonType === 'google-btn' ? 'Google' : 'GitHub'} OAuth flow would start here`);
+                textElement.style.display = 'block';
+                spinnerElement.style.display = 'none';
+            }, 2000);
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const loginBtn = document.getElementById('login-btn');
+            const loginText = document.getElementById('login-text');
+            const loginSpinner = document.getElementById('login-spinner');
+            const errorMessage = document.getElementById('error-message');
+            
+            // Show loading state
+            loginText.style.display = 'none';
+            loginSpinner.style.display = 'block';
+            loginBtn.disabled = true;
+            errorMessage.style.display = 'none';
+            
+            // Simulate login attempt
+            setTimeout(() => {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                // Simulate successful login (in real app, this would be an API call)
+                if (email && password) {
+                    alert('Login successful! Redirecting to onboarding...');
+                    window.location.href = 'onboarding.html';
+                } else {
+                    // Show error
+                    errorMessage.style.display = 'block';
+                    loginText.style.display = 'block';
+                    loginSpinner.style.display = 'none';
+                    loginBtn.disabled = false;
+                }
+            }, 2000);
+        }
+
+        function accessDemo() {
+            alert('Demo access granted! Redirecting to dashboard...');
+            // In real app, this would set demo mode and redirect
+        }
+
+        // Auto-focus email field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('email').focus();
+        });
+
+        // Show error message example (for demonstration)
+        function showError() {
+            document.getElementById('error-message').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

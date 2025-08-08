@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing Interface - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav a.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .testing-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 200px);
+        }
+
+        .request-panel, .response-panel {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1rem 1.5rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+        }
+
+        .url-section {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .method-select {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+            font-weight: 600;
+            min-width: 100px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .send-btn {
+            padding: 0.75rem 1.5rem;
+            background: hsl(246 80% 60%);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: hsl(246 80% 55%);
+        }
+
+        .send-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: hsl(246 80% 60%);
+            border-bottom-color: hsl(246 80% 60%);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .headers-section, .params-section {
+            flex: 1;
+        }
+
+        .key-value-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .key-input, .value-input {
+            padding: 0.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .remove-btn {
+            padding: 0.5rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .add-btn {
+            padding: 0.5rem 1rem;
+            background: #22c55e;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .body-editor {
+            flex: 1;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            resize: none;
+        }
+
+        .body-editor:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .response-status {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .status-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .status-200 { color: #22c55e; }
+        .status-400 { color: #f59e0b; }
+        .status-500 { color: #ef4444; }
+
+        .status-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .response-viewer {
+            flex: 1;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        .json-key { color: #60a5fa; }
+        .json-string { color: #34d399; }
+        .json-number { color: #fbbf24; }
+        .json-boolean { color: #f87171; }
+
+        .history-sidebar {
+            position: fixed;
+            right: 0;
+            top: 80px;
+            width: 300px;
+            height: calc(100vh - 80px);
+            background: white;
+            border-left: 1px solid #e2e8f0;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 20;
+        }
+
+        .history-sidebar.open {
+            transform: translateX(0);
+        }
+
+        .history-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .close-history {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .history-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .history-item {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #f8fafc;
+        }
+
+        .history-method {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .history-url {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .floating-actions {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .fab {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: hsl(246 80% 60%);
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .fab:hover {
+            background: hsl(246 80% 55%);
+            transform: scale(1.05);
+        }
+
+        .fab-secondary {
+            background: #64748b;
+        }
+
+        .fab-secondary:hover {
+            background: #475569;
+        }
+
+        .mock-data-panel {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 300px;
+            height: calc(100vh - 80px);
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+            z-index: 20;
+        }
+
+        .mock-data-panel.open {
+            transform: translateX(0);
+        }
+
+        .mock-header {
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mock-title {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .close-mock {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .mock-content {
+            padding: 1rem;
+        }
+
+        .mock-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .mock-category-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .mock-item {
+            padding: 0.5rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .mock-item:hover {
+            background: #f1f5f9;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .testing-interface { 
+                grid-template-columns: 1fr; 
+                height: auto;
+            }
+            .history-sidebar, .mock-data-panel { 
+                width: 100vw; 
+                left: 0;
+                transform: translateX(100%);
+            }
+            .mock-data-panel.open, .history-sidebar.open {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🚀 RocketHooks</div>
+            <nav class="nav">
+                <a href="#">Endpoints</a>
+                <a href="#">Webhooks</a>
+                <a href="#">Events</a>
+                <a href="#">Monitoring</a>
+                <a href="#" class="active">Testing</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">🧪 API Testing Console</h1>
+            <p class="page-subtitle">Test your APIs with our interactive request builder and response viewer</p>
+        </div>
+
+        <div class="testing-interface">
+            <!-- Request Panel -->
+            <div class="request-panel">
+                <div class="panel-header">
+                    📤 Request Builder
+                    <div>
+                        <button class="fab-secondary" style="width: auto; height: auto; padding: 0.5rem 1rem; border-radius: 0.375rem;" onclick="toggleMockData()">
+                            🎲 Mock Data
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="url-section">
+                        <select class="method-select" id="method">
+                            <option>GET</option>
+                            <option>POST</option>
+                            <option>PUT</option>
+                            <option>DELETE</option>
+                            <option>PATCH</option>
+                        </select>
+                        <input type="url" class="url-input" id="url" placeholder="https://api.example.com/users" value="https://api.rockethooks.com/v1/users">
+                        <button class="send-btn" onclick="sendRequest()">Send</button>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="showTab('params')">Params</button>
+                        <button class="tab" onclick="showTab('headers')">Headers</button>
+                        <button class="tab" onclick="showTab('body')">Body</button>
+                        <button class="tab" onclick="showTab('auth')">Auth</button>
+                    </div>
+
+                    <div id="params" class="tab-content active">
+                        <div class="params-section">
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Key" value="page">
+                                <input type="text" class="value-input" placeholder="Value" value="1">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Key" value="limit">
+                                <input type="text" class="value-input" placeholder="Value" value="10">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Key">
+                                <input type="text" class="value-input" placeholder="Value">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <button class="add-btn">+ Add Parameter</button>
+                        </div>
+                    </div>
+
+                    <div id="headers" class="tab-content">
+                        <div class="headers-section">
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Header Name" value="Content-Type">
+                                <input type="text" class="value-input" placeholder="Header Value" value="application/json">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Header Name" value="Authorization">
+                                <input type="text" class="value-input" placeholder="Header Value" value="Bearer your_api_token">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <div class="key-value-pair">
+                                <input type="text" class="key-input" placeholder="Header Name">
+                                <input type="text" class="value-input" placeholder="Header Value">
+                                <button class="remove-btn">✕</button>
+                            </div>
+                            <button class="add-btn">+ Add Header</button>
+                        </div>
+                    </div>
+
+                    <div id="body" class="tab-content">
+                        <textarea class="body-editor" placeholder="Request body (JSON, XML, etc.)">{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "plan": "pro"
+}</textarea>
+                    </div>
+
+                    <div id="auth" class="tab-content">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Authentication Type</label>
+                            <select style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+                                <option>No Auth</option>
+                                <option>Bearer Token</option>
+                                <option>API Key</option>
+                                <option>Basic Auth</option>
+                                <option>OAuth 2.0</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Token</label>
+                            <input type="password" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" placeholder="Your API token">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Response Panel -->
+            <div class="response-panel">
+                <div class="panel-header">
+                    📥 Response
+                    <div>
+                        <button class="fab-secondary" style="width: auto; height: auto; padding: 0.5rem 1rem; border-radius: 0.375rem;" onclick="toggleHistory()">
+                            📚 History
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div class="response-status">
+                        <div class="status-item">
+                            <div class="status-value status-200">200</div>
+                            <div class="status-label">Status</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">245ms</div>
+                            <div class="status-label">Time</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value">1.2KB</div>
+                            <div class="status-label">Size</div>
+                        </div>
+                    </div>
+
+                    <div class="tabs">
+                        <button class="tab active" onclick="showResponseTab('response-body')">Response</button>
+                        <button class="tab" onclick="showResponseTab('response-headers')">Headers</button>
+                        <button class="tab" onclick="showResponseTab('response-cookies')">Cookies</button>
+                    </div>
+
+                    <div id="response-body" class="tab-content active">
+                        <div class="response-viewer">{
+  <span class="json-key">"data"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-string">"user_123"</span>,
+      <span class="json-key">"name"</span>: <span class="json-string">"John Doe"</span>,
+      <span class="json-key">"email"</span>: <span class="json-string">"john@example.com"</span>,
+      <span class="json-key">"status"</span>: <span class="json-string">"active"</span>,
+      <span class="json-key">"created_at"</span>: <span class="json-string">"2024-01-15T10:30:00Z"</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-string">"user_124"</span>,
+      <span class="json-key">"name"</span>: <span class="json-string">"Jane Smith"</span>,
+      <span class="json-key">"email"</span>: <span class="json-string">"jane@example.com"</span>,
+      <span class="json-key">"status"</span>: <span class="json-string">"active"</span>,
+      <span class="json-key">"created_at"</span>: <span class="json-string">"2024-01-14T15:22:00Z"</span>
+    }
+  ],
+  <span class="json-key">"pagination"</span>: {
+    <span class="json-key">"page"</span>: <span class="json-number">1</span>,
+    <span class="json-key">"limit"</span>: <span class="json-number">10</span>,
+    <span class="json-key">"total"</span>: <span class="json-number">156</span>,
+    <span class="json-key">"pages"</span>: <span class="json-number">16</span>
+  }
+}</div>
+                    </div>
+
+                    <div id="response-headers" class="tab-content">
+                        <div class="response-viewer">content-type: application/json; charset=utf-8
+content-length: 1247
+server: nginx/1.18.0
+date: Sat, 20 Jan 2024 14:30:15 GMT
+x-ratelimit-limit: 1000
+x-ratelimit-remaining: 999
+x-ratelimit-reset: 1642687815
+cache-control: no-cache
+connection: keep-alive</div>
+                    </div>
+
+                    <div id="response-cookies" class="tab-content">
+                        <div class="response-viewer">session_token=abc123def456; Path=/; HttpOnly; Secure
+csrf_token=xyz789uvw012; Path=/; SameSite=Strict</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Sidebar -->
+    <div id="history-sidebar" class="history-sidebar">
+        <div class="history-header">
+            <div class="history-title">Request History</div>
+            <button class="close-history" onclick="toggleHistory()">&times;</button>
+        </div>
+        <div class="history-list">
+            <div class="history-item" onclick="loadHistoryItem(1)">
+                <div class="history-method" style="color: #22c55e;">GET</div>
+                <div class="history-url">/api/v1/users</div>
+                <div class="history-time">2 minutes ago</div>
+            </div>
+            <div class="history-item" onclick="loadHistoryItem(2)">
+                <div class="history-method" style="color: #3b82f6;">POST</div>
+                <div class="history-url">/api/v1/users</div>
+                <div class="history-time">5 minutes ago</div>
+            </div>
+            <div class="history-item" onclick="loadHistoryItem(3)">
+                <div class="history-method" style="color: #f59e0b;">PUT</div>
+                <div class="history-url">/api/v1/users/123</div>
+                <div class="history-time">10 minutes ago</div>
+            </div>
+            <div class="history-item" onclick="loadHistoryItem(4)">
+                <div class="history-method" style="color: #ef4444;">DELETE</div>
+                <div class="history-url">/api/v1/users/456</div>
+                <div class="history-time">15 minutes ago</div>
+            </div>
+            <div class="history-item" onclick="loadHistoryItem(5)">
+                <div class="history-method" style="color: #22c55e;">GET</div>
+                <div class="history-url">/api/v1/webhooks</div>
+                <div class="history-time">22 minutes ago</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mock Data Panel -->
+    <div id="mock-data-panel" class="mock-data-panel">
+        <div class="mock-header">
+            <div class="mock-title">Mock Data Generator</div>
+            <button class="close-mock" onclick="toggleMockData()">&times;</button>
+        </div>
+        <div class="mock-content">
+            <div class="mock-category">
+                <div class="mock-category-title">User Data</div>
+                <div class="mock-item" onclick="insertMockData('user')">User Object</div>
+                <div class="mock-item" onclick="insertMockData('users-array')">Users Array</div>
+                <div class="mock-item" onclick="insertMockData('user-profile')">User Profile</div>
+            </div>
+            <div class="mock-category">
+                <div class="mock-category-title">Payment Data</div>
+                <div class="mock-item" onclick="insertMockData('payment')">Payment Object</div>
+                <div class="mock-item" onclick="insertMockData('subscription')">Subscription</div>
+                <div class="mock-item" onclick="insertMockData('invoice')">Invoice</div>
+            </div>
+            <div class="mock-category">
+                <div class="mock-category-title">Webhook Data</div>
+                <div class="mock-item" onclick="insertMockData('webhook-event')">Webhook Event</div>
+                <div class="mock-item" onclick="insertMockData('webhook-config')">Webhook Config</div>
+            </div>
+            <div class="mock-category">
+                <div class="mock-category-title">Common</div>
+                <div class="mock-item" onclick="insertMockData('pagination')">Pagination</div>
+                <div class="mock-item" onclick="insertMockData('error')">Error Response</div>
+                <div class="mock-item" onclick="insertMockData('success')">Success Response</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-actions">
+        <button class="fab" onclick="clearAll()" title="Clear All">🗑️</button>
+        <button class="fab" onclick="saveRequest()" title="Save Request">💾</button>
+        <button class="fab" onclick="shareRequest()" title="Share Request">🔗</button>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all request tab contents
+            document.querySelectorAll('.request-panel .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all request tabs
+            document.querySelectorAll('.request-panel .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function showResponseTab(tabName) {
+            // Hide all response tab contents
+            document.querySelectorAll('.response-panel .tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all response tabs
+            document.querySelectorAll('.response-panel .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function sendRequest() {
+            const sendBtn = document.querySelector('.send-btn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+                
+                // Update response status randomly
+                const statuses = [200, 201, 400, 404, 500];
+                const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                const statusEl = document.querySelector('.status-value');
+                statusEl.textContent = randomStatus;
+                statusEl.className = `status-value status-${randomStatus >= 200 && randomStatus < 300 ? '200' : randomStatus >= 400 && randomStatus < 500 ? '400' : '500'}`;
+                
+                // Add to history
+                addToHistory();
+            }, 1000);
+        }
+
+        function toggleHistory() {
+            const sidebar = document.getElementById('history-sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        function toggleMockData() {
+            const panel = document.getElementById('mock-data-panel');
+            panel.classList.toggle('open');
+        }
+
+        function loadHistoryItem(id) {
+            // Simulate loading a previous request
+            console.log('Loading history item:', id);
+            toggleHistory(); // Close sidebar after selection
+        }
+
+        function insertMockData(type) {
+            const bodyEditor = document.querySelector('.body-editor');
+            let mockData = '';
+            
+            switch(type) {
+                case 'user':
+                    mockData = JSON.stringify({
+                        name: "John Doe",
+                        email: "john.doe@example.com",
+                        status: "active",
+                        plan: "pro"
+                    }, null, 2);
+                    break;
+                case 'users-array':
+                    mockData = JSON.stringify([
+                        {
+                            id: "user_123",
+                            name: "John Doe",
+                            email: "john@example.com"
+                        },
+                        {
+                            id: "user_124",
+                            name: "Jane Smith",
+                            email: "jane@example.com"
+                        }
+                    ], null, 2);
+                    break;
+                case 'webhook-event':
+                    mockData = JSON.stringify({
+                        event_type: "user.created",
+                        timestamp: "2024-01-20T14:30:15Z",
+                        data: {
+                            user_id: "user_123",
+                            email: "john@example.com"
+                        }
+                    }, null, 2);
+                    break;
+                default:
+                    mockData = '{\n  "message": "Mock data not implemented"\n}';
+            }
+            
+            bodyEditor.value = mockData;
+            toggleMockData(); // Close panel after selection
+            
+            // Switch to body tab
+            showTab('body');
+        }
+
+        function addToHistory() {
+            const method = document.getElementById('method').value;
+            const url = document.getElementById('url').value;
+            const historyList = document.querySelector('.history-list');
+            
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div class="history-method" style="color: ${method === 'GET' ? '#22c55e' : method === 'POST' ? '#3b82f6' : method === 'PUT' ? '#f59e0b' : '#ef4444'};">${method}</div>
+                <div class="history-url">${new URL(url).pathname}</div>
+                <div class="history-time">Just now</div>
+            `;
+            
+            historyList.insertBefore(historyItem, historyList.firstChild);
+        }
+
+        function clearAll() {
+            if (confirm('Clear all request data?')) {
+                document.getElementById('url').value = '';
+                document.querySelector('.body-editor').value = '';
+                // Clear all key-value pairs
+                document.querySelectorAll('.key-input, .value-input').forEach(input => {
+                    input.value = '';
+                });
+            }
+        }
+
+        function saveRequest() {
+            alert('Request saved to workspace!');
+        }
+
+        function shareRequest() {
+            navigator.clipboard.writeText(window.location.href + '?shared=abc123').then(() => {
+                alert('Share link copied to clipboard!');
+            });
+        }
+
+        // Close sidebars when clicking outside
+        document.addEventListener('click', function(e) {
+            const historysidebar = document.getElementById('history-sidebar');
+            const mockPanel = document.getElementById('mock-data-panel');
+            
+            if (!historysidebar.contains(e.target) && !e.target.closest('[onclick*="toggleHistory"]')) {
+                historysidebar.classList.remove('open');
+            }
+            
+            if (!mockPanel.contains(e.target) && !e.target.closest('[onclick*="toggleMockData"]')) {
+                mockPanel.classList.remove('open');
+            }
+        });
+
+        // Auto-resize body editor
+        document.querySelector('.body-editor').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook Configuration - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav a.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            margin-bottom: 1rem;
+        }
+
+        .breadcrumb a {
+            color: #64748b;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: hsl(246 80% 60%);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+
+        .main-form {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+
+        .form-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .label-required::after {
+            content: ' *';
+            color: #ef4444;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            min-height: 120px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            resize: vertical;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .help-text {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toggle input {
+            width: 44px;
+            height: 24px;
+            appearance: none;
+            background: #e2e8f0;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle input:checked {
+            background: hsl(246 80% 60%);
+        }
+
+        .toggle input::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: left 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle input:checked::before {
+            left: 22px;
+        }
+
+        .event-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .event-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .event-checkbox:hover {
+            background: #f1f5f9;
+        }
+
+        .event-checkbox input {
+            margin: 0;
+        }
+
+        .event-checkbox.checked {
+            background: hsl(246 80% 95%);
+            border-color: hsl(246 80% 60%);
+        }
+
+        .code-editor {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            min-height: 200px;
+            border: none;
+            resize: vertical;
+        }
+
+        .code-editor:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 80% 55%);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .status-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-active .status-dot { background: #22c55e; }
+        .status-inactive .status-dot { background: #6b7280; }
+        .status-error .status-dot { background: #ef4444; }
+
+        .test-result {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .test-success {
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .test-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .webhook-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .example-item {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border-left: 4px solid hsl(246 80% 60%);
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-code {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .form-container { grid-template-columns: 1fr; }
+            .event-grid { grid-template-columns: 1fr; }
+            .actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🚀 RocketHooks</div>
+            <nav class="nav">
+                <a href="#">Endpoints</a>
+                <a href="#" class="active">Webhooks</a>
+                <a href="#">Events</a>
+                <a href="#">Monitoring</a>
+                <a href="#">Testing</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="#">Webhooks</a> / <strong>New Webhook</strong>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">🔗 Webhook Configuration</h1>
+            <p class="page-subtitle">Configure webhook endpoints to receive real-time event notifications</p>
+        </div>
+
+        <div class="form-container">
+            <div class="main-form">
+                <div class="form-section">
+                    <h2 class="section-title">📡 Basic Configuration</h2>
+                    
+                    <div class="form-group">
+                        <label class="label label-required">Webhook Name</label>
+                        <input type="text" class="input" placeholder="Enter a descriptive name" value="User Events Webhook">
+                        <div class="help-text">A friendly name to identify this webhook</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label label-required">Endpoint URL</label>
+                        <input type="url" class="input" placeholder="https://your-app.com/webhooks/users" value="https://app.example.com/webhooks/rockethooks">
+                        <div class="help-text">The URL where webhook events will be sent</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Description</label>
+                        <textarea class="textarea" placeholder="Optional description of this webhook's purpose">Receives user-related events for syncing with our CRM system</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle">
+                            <input type="checkbox" id="active" checked>
+                            <label for="active">Active</label>
+                        </div>
+                        <div class="help-text">Enable or disable this webhook</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">🎯 Event Triggers</h2>
+                    <p style="color: #64748b; margin-bottom: 1rem;">Select which events should trigger this webhook</p>
+                    
+                    <div class="event-grid">
+                        <label class="event-checkbox checked">
+                            <input type="checkbox" checked>
+                            <span>user.created</span>
+                        </label>
+                        <label class="event-checkbox checked">
+                            <input type="checkbox" checked>
+                            <span>user.updated</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>user.deleted</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>user.login</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>user.logout</span>
+                        </label>
+                        <label class="event-checkbox checked">
+                            <input type="checkbox" checked>
+                            <span>user.password_changed</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>payment.created</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>payment.failed</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>subscription.created</span>
+                        </label>
+                        <label class="event-checkbox">
+                            <input type="checkbox">
+                            <span>subscription.cancelled</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">🔧 Payload Configuration</h2>
+                    
+                    <div class="form-group">
+                        <label class="label">Content Type</label>
+                        <select class="select">
+                            <option>application/json</option>
+                            <option>application/x-www-form-urlencoded</option>
+                            <option>text/plain</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Custom Headers</label>
+                        <textarea class="textarea" placeholder="X-Custom-Header: value&#10;Authorization: Bearer token">X-Source: RocketHooks
+X-Environment: production</textarea>
+                        <div class="help-text">One header per line in format: Header-Name: value</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Payload Template (Optional)</label>
+                        <textarea class="code-editor" placeholder="Leave empty for default payload or customize with JSON template">{
+  "event": "{{event_type}}",
+  "timestamp": "{{timestamp}}",
+  "data": {{event_data}},
+  "metadata": {
+    "source": "RocketHooks",
+    "version": "1.0"
+  }
+}</textarea>
+                        <div class="help-text">Use {{variable}} placeholders for dynamic content</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">🔄 Retry Policy</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="label">Max Retry Attempts</label>
+                            <select class="select">
+                                <option>0 (No retries)</option>
+                                <option>1</option>
+                                <option>3</option>
+                                <option selected>5</option>
+                                <option>10</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="label">Retry Interval</label>
+                            <select class="select">
+                                <option>1 minute</option>
+                                <option selected>5 minutes</option>
+                                <option>15 minutes</option>
+                                <option>30 minutes</option>
+                                <option>1 hour</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Timeout (seconds)</label>
+                        <input type="number" class="input" value="30" min="1" max="300">
+                        <div class="help-text">Maximum time to wait for response</div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="toggle">
+                            <input type="checkbox" id="exponential-backoff" checked>
+                            <label for="exponential-backoff">Use exponential backoff</label>
+                        </div>
+                        <div class="help-text">Gradually increase delay between retry attempts</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">🔐 Security Settings</h2>
+                    
+                    <div class="form-group">
+                        <div class="toggle">
+                            <input type="checkbox" id="enable-signature" checked>
+                            <label for="enable-signature">Enable signature verification</label>
+                        </div>
+                        <div class="help-text">Add HMAC signature to verify webhook authenticity</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Secret Key</label>
+                        <input type="password" class="input" value="wh_secret_abc123def456" placeholder="Enter secret key for signing">
+                        <div class="help-text">Used to generate HMAC signature in X-RocketHooks-Signature header</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="label">Allowed IP Addresses (Optional)</label>
+                        <textarea class="textarea" placeholder="192.168.1.0/24&#10;10.0.0.1">203.0.113.0/24
+198.51.100.50</textarea>
+                        <div class="help-text">Restrict webhook to specific IP ranges (one per line)</div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn btn-secondary">Save as Draft</button>
+                    <button class="btn btn-success" onclick="testWebhook()">🧪 Test Webhook</button>
+                    <button class="btn btn-primary">Create Webhook</button>
+                </div>
+
+                <div id="test-result" class="test-result">
+                    <strong>Test Result:</strong>
+                    <div id="test-message"></div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <h3 class="card-title">📊 Webhook Status</h3>
+                    <div class="status-indicator status-inactive">
+                        <span class="status-dot"></span>
+                        Not Created Yet
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.875rem; color: #64748b;">
+                        Complete the configuration and click "Create Webhook" to activate.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📚 Payload Examples</h3>
+                    <div class="webhook-examples">
+                        <div class="example-item">
+                            <div class="example-title">User Created Event</div>
+                            <div class="example-code">
+{<br>
+&nbsp;&nbsp;"event": "user.created",<br>
+&nbsp;&nbsp;"data": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"id": "user_123",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"email": "john@example.com"<br>
+&nbsp;&nbsp;}<br>
+}
+                            </div>
+                        </div>
+                        <div class="example-item">
+                            <div class="example-title">User Updated Event</div>
+                            <div class="example-code">
+{<br>
+&nbsp;&nbsp;"event": "user.updated",<br>
+&nbsp;&nbsp;"data": {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"id": "user_123",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;"changes": ["name", "email"]<br>
+&nbsp;&nbsp;}<br>
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">⚡ Quick Tips</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.75rem;">
+                        <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: hsl(246 80% 60%); font-weight: bold;">•</span>
+                            <span>Test your webhook URL before saving to ensure it's reachable</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: hsl(246 80% 60%); font-weight: bold;">•</span>
+                            <span>Use HTTPS URLs for security and reliability</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: hsl(246 80% 60%); font-weight: bold;">•</span>
+                            <span>Enable signature verification to validate webhook authenticity</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: hsl(246 80% 60%); font-weight: bold;">•</span>
+                            <span>Set appropriate retry policies for better reliability</span>
+                        </li>
+                        <li style="display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.875rem;">
+                            <span style="color: hsl(246 80% 60%); font-weight: bold;">•</span>
+                            <span>Monitor webhook delivery status in the Events section</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">🔗 Related Links</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <a href="#" style="color: hsl(246 80% 60%); text-decoration: none; font-size: 0.875rem;">📖 Webhook Documentation</a>
+                        <a href="#" style="color: hsl(246 80% 60%); text-decoration: none; font-size: 0.875rem;">🔐 Security Best Practices</a>
+                        <a href="#" style="color: hsl(246 80% 60%); text-decoration: none; font-size: 0.875rem;">🧪 Testing Tools</a>
+                        <a href="#" style="color: hsl(246 80% 60%); text-decoration: none; font-size: 0.875rem;">📊 Event Logs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Event checkbox handling
+        document.querySelectorAll('.event-checkbox input').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    this.closest('.event-checkbox').classList.add('checked');
+                } else {
+                    this.closest('.event-checkbox').classList.remove('checked');
+                }
+            });
+        });
+
+        // Test webhook function
+        function testWebhook() {
+            const testResult = document.getElementById('test-result');
+            const testMessage = document.getElementById('test-message');
+            
+            testResult.style.display = 'block';
+            testResult.className = 'test-result';
+            testMessage.textContent = 'Testing webhook endpoint...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                const url = document.querySelector('input[type="url"]').value;
+                if (url && url.startsWith('https://')) {
+                    testResult.classList.add('test-success');
+                    testMessage.innerHTML = `✅ Webhook test successful!<br>Response: 200 OK<br>Response time: 234ms`;
+                } else {
+                    testResult.classList.add('test-error');
+                    testMessage.innerHTML = `❌ Webhook test failed!<br>Error: Invalid or unreachable URL<br>Please check your endpoint URL`;
+                }
+            }, 2000);
+        }
+
+        // Auto-generate secret key
+        document.addEventListener('DOMContentLoaded', function() {
+            const secretInput = document.querySelector('input[type="password"]');
+            if (!secretInput.value) {
+                const randomSecret = 'wh_secret_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                secretInput.value = randomSecret;
+            }
+        });
+    </script>
+</body>
+</html>

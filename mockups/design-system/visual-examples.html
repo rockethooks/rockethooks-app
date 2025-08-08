@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks Design System - Visual Examples</title>
+    <style>
+        /* CSS Custom Properties - Design Tokens */
+        :root {
+            /* Colors */
+            --primary: 246 80% 60%;
+            --primary-foreground: 210 40% 98%;
+            --secondary: 210 40% 96.1%;
+            --secondary-foreground: 222.2 47.4% 11.2%;
+            --background: 0 0% 100%;
+            --foreground: 222.2 84% 4.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 222.2 84% 4.9%;
+            --muted: 210 40% 96.1%;
+            --muted-foreground: 215.4 16.3% 46.9%;
+            --border: 214.3 31.8% 91.4%;
+            --success: 142 76% 36%;
+            --success-foreground: 210 40% 98%;
+            --warning: 38 92% 50%;
+            --warning-foreground: 210 40% 98%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --info: 217 91% 60%;
+            --info-foreground: 210 40% 98%;
+            --ring: 221.2 83.2% 53.3%;
+
+            /* Spacing */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-12: 48px;
+            --space-16: 64px;
+
+            /* Border Radius */
+            --radius: 8px;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --radius-xl: 12px;
+            --radius-full: 9999px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.05);
+            --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+            --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -4px hsl(0 0% 0% / 0.1);
+            --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.1), 0 8px 10px -6px hsl(0 0% 0% / 0.1);
+
+            /* Animation */
+            --duration-fast: 100ms;
+            --duration-normal: 150ms;
+            --duration-medium: 200ms;
+            --ease-out: cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --border: 217.2 32.6% 17.5%;
+            --destructive: 0 62.8% 30.6%;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            line-height: 1.5;
+            font-feature-settings: 'rlig' 1, 'calt' 1;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8);
+        }
+
+        .section {
+            margin-bottom: var(--space-16);
+        }
+
+        .section-title {
+            font-size: 30px;
+            font-weight: 600;
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .subsection {
+            margin-bottom: var(--space-12);
+        }
+
+        .subsection-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-6);
+            color: hsl(var(--muted-foreground));
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .grid-5 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Color Swatches */
+        .color-swatch {
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .color-preview {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .color-info {
+            padding: var(--space-4);
+            background: hsl(var(--card));
+            border-top: 1px solid hsl(var(--border));
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: var(--space-1);
+        }
+
+        .color-value {
+            font-size: 12px;
+            color: hsl(var(--muted-foreground));
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        /* Typography Examples */
+        .typography-example {
+            margin-bottom: var(--space-6);
+            padding: var(--space-6);
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-lg);
+        }
+
+        .typography-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: hsl(var(--muted-foreground));
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--space-2);
+        }
+
+        /* Typography Styles */
+        .text-display-2xl {
+            font-size: 72px;
+            line-height: 1.25;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+        }
+
+        .text-h1 {
+            font-size: 36px;
+            line-height: 1.11;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .text-h2 {
+            font-size: 30px;
+            line-height: 1.2;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .text-h3 {
+            font-size: 24px;
+            line-height: 1.33;
+            font-weight: 600;
+        }
+
+        .text-lg {
+            font-size: 18px;
+            line-height: 1.55;
+        }
+
+        .text-base {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .text-sm {
+            font-size: 14px;
+            line-height: 1.43;
+        }
+
+        /* Spacing Examples */
+        .spacing-example {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .spacing-visual {
+            width: var(--size);
+            height: 24px;
+            background: hsl(var(--primary));
+            border-radius: var(--radius-sm);
+            margin-right: var(--space-4);
+        }
+
+        .spacing-label {
+            font-weight: 500;
+            margin-right: var(--space-2);
+        }
+
+        .spacing-value {
+            font-size: 14px;
+            color: hsl(var(--muted-foreground));
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+
+        /* Component Examples */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            min-height: 44px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--duration-normal) var(--ease-out);
+            text-decoration: none;
+            gap: var(--space-2);
+        }
+
+        .btn-primary {
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border: 1px solid hsl(var(--border));
+        }
+
+        .btn-destructive {
+            background: hsl(var(--destructive));
+            color: hsl(var(--destructive-foreground));
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            min-height: 32px;
+        }
+
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 16px;
+            min-height: 48px;
+        }
+
+        /* Card Examples */
+        .card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow var(--duration-normal) var(--ease-out);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid hsl(var(--border));
+        }
+
+        .card-content {
+            padding: var(--space-6);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .card-description {
+            color: hsl(var(--muted-foreground));
+            font-size: 14px;
+        }
+
+        /* Input Examples */
+        .input {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-size: 14px;
+            min-height: 44px;
+            transition: border-color var(--duration-normal) var(--ease-out);
+            width: 100%;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: hsl(var(--ring));
+            box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+        }
+
+        .input::placeholder {
+            color: hsl(var(--muted-foreground));
+        }
+
+        /* Badge Examples */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background: hsl(var(--success) / 0.1);
+            color: hsl(var(--success));
+            border: 1px solid hsl(var(--success) / 0.2);
+        }
+
+        .badge-warning {
+            background: hsl(var(--warning) / 0.1);
+            color: hsl(var(--warning));
+            border: 1px solid hsl(var(--warning) / 0.2);
+        }
+
+        .badge-destructive {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+            border: 1px solid hsl(var(--destructive) / 0.2);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: var(--space-4);
+            right: var(--space-4);
+            padding: var(--space-2);
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Alert Examples */
+        .alert {
+            padding: var(--space-4);
+            border-radius: var(--radius-md);
+            border: 1px solid;
+            margin-bottom: var(--space-4);
+        }
+
+        .alert-success {
+            background: hsl(var(--success) / 0.1);
+            color: hsl(var(--success));
+            border-color: hsl(var(--success) / 0.2);
+        }
+
+        .alert-warning {
+            background: hsl(var(--warning) / 0.1);
+            color: hsl(var(--warning));
+            border-color: hsl(var(--warning) / 0.2);
+        }
+
+        .alert-destructive {
+            background: hsl(var(--destructive) / 0.1);
+            color: hsl(var(--destructive));
+            border-color: hsl(var(--destructive) / 0.2);
+        }
+
+        .alert-info {
+            background: hsl(var(--info) / 0.1);
+            color: hsl(var(--info));
+            border-color: hsl(var(--info) / 0.2);
+        }
+
+        /* Component Grid */
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .component-example {
+            padding: var(--space-6);
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius-lg);
+        }
+
+        .component-title {
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .gap-4 {
+            gap: var(--space-4);
+        }
+
+        .gap-2 {
+            gap: var(--space-2);
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--space-4);
+            }
+            
+            .text-display-2xl {
+                font-size: 48px;
+            }
+            
+            .text-h1 {
+                font-size: 30px;
+            }
+            
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+    
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 64px;">
+            <h1 class="text-display-2xl" style="background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--info))); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">RocketHooks</h1>
+            <p class="text-lg" style="color: hsl(var(--muted-foreground)); margin-top: 16px;">Design System Visual Examples</p>
+        </header>
+
+        <!-- Color System -->
+        <section class="section">
+            <h2 class="section-title">Color System</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Primary Colors</h3>
+                <div class="grid grid-3">
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--primary)); color: hsl(var(--primary-foreground));">Primary</div>
+                        <div class="color-info">
+                            <div class="color-name">Primary</div>
+                            <div class="color-value">hsl(246, 80%, 60%)</div>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground));">Secondary</div>
+                        <div class="color-info">
+                            <div class="color-name">Secondary</div>
+                            <div class="color-value">hsl(210, 40%, 96.1%)</div>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--muted)); color: hsl(var(--muted-foreground));">Muted</div>
+                        <div class="color-info">
+                            <div class="color-name">Muted</div>
+                            <div class="color-value">hsl(210, 40%, 96.1%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">State Colors</h3>
+                <div class="grid grid-4">
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--success)); color: hsl(var(--success-foreground));">Success</div>
+                        <div class="color-info">
+                            <div class="color-name">Success</div>
+                            <div class="color-value">hsl(142, 76%, 36%)</div>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--warning)); color: hsl(var(--warning-foreground));">Warning</div>
+                        <div class="color-info">
+                            <div class="color-name">Warning</div>
+                            <div class="color-value">hsl(38, 92%, 50%)</div>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--destructive)); color: hsl(var(--destructive-foreground));">Error</div>
+                        <div class="color-info">
+                            <div class="color-name">Destructive</div>
+                            <div class="color-value">hsl(0, 84.2%, 60.2%)</div>
+                        </div>
+                    </div>
+                    <div class="color-swatch">
+                        <div class="color-preview" style="background: hsl(var(--info)); color: hsl(var(--info-foreground));">Info</div>
+                        <div class="color-info">
+                            <div class="color-name">Info</div>
+                            <div class="color-value">hsl(217, 91%, 60%)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography -->
+        <section class="section">
+            <h2 class="section-title">Typography</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Heading Styles</h3>
+                <div class="typography-example">
+                    <div class="typography-label">Display 2XL</div>
+                    <div class="text-display-2xl">The quick brown fox</div>
+                </div>
+                <div class="typography-example">
+                    <div class="typography-label">Heading 1</div>
+                    <div class="text-h1">The quick brown fox jumps</div>
+                </div>
+                <div class="typography-example">
+                    <div class="typography-label">Heading 2</div>
+                    <div class="text-h2">The quick brown fox jumps over</div>
+                </div>
+                <div class="typography-example">
+                    <div class="typography-label">Heading 3</div>
+                    <div class="text-h3">The quick brown fox jumps over the lazy dog</div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Body Text</h3>
+                <div class="typography-example">
+                    <div class="typography-label">Large Text</div>
+                    <div class="text-lg">The quick brown fox jumps over the lazy dog. This is large body text that provides excellent readability for introduction paragraphs or emphasized content.</div>
+                </div>
+                <div class="typography-example">
+                    <div class="typography-label">Base Text</div>
+                    <div class="text-base">The quick brown fox jumps over the lazy dog. This is the default body text size, optimized for comfortable reading across all devices and screen sizes.</div>
+                </div>
+                <div class="typography-example">
+                    <div class="typography-label">Small Text</div>
+                    <div class="text-sm">The quick brown fox jumps over the lazy dog. This is small text, typically used for captions, footnotes, or secondary information that supports the main content.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Spacing -->
+        <section class="section">
+            <h2 class="section-title">Spacing Scale</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Base Units (4px system)</h3>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 4px;"></div>
+                    <span class="spacing-label">Space 1</span>
+                    <span class="spacing-value">4px / 0.25rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 8px;"></div>
+                    <span class="spacing-label">Space 2</span>
+                    <span class="spacing-value">8px / 0.5rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 12px;"></div>
+                    <span class="spacing-label">Space 3</span>
+                    <span class="spacing-value">12px / 0.75rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 16px;"></div>
+                    <span class="spacing-label">Space 4</span>
+                    <span class="spacing-value">16px / 1rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 24px;"></div>
+                    <span class="spacing-label">Space 6</span>
+                    <span class="spacing-value">24px / 1.5rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 32px;"></div>
+                    <span class="spacing-label">Space 8</span>
+                    <span class="spacing-value">32px / 2rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 48px;"></div>
+                    <span class="spacing-label">Space 12</span>
+                    <span class="spacing-value">48px / 3rem</span>
+                </div>
+                <div class="spacing-example">
+                    <div class="spacing-visual" style="--size: 64px;"></div>
+                    <span class="spacing-label">Space 16</span>
+                    <span class="spacing-value">64px / 4rem</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Components -->
+        <section class="section">
+            <h2 class="section-title">Component Examples</h2>
+            
+            <div class="component-grid">
+                <!-- Buttons -->
+                <div class="component-example">
+                    <div class="component-title">Buttons</div>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary">Primary</button>
+                            <button class="btn btn-secondary">Secondary</button>
+                            <button class="btn btn-destructive">Destructive</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary btn-sm">Small</button>
+                            <button class="btn btn-primary">Medium</button>
+                            <button class="btn btn-primary btn-lg">Large</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cards -->
+                <div class="component-example">
+                    <div class="component-title">Cards</div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Webhook Configuration</div>
+                            <div class="card-description">Manage your webhook endpoints and settings</div>
+                        </div>
+                        <div class="card-content">
+                            <p style="color: hsl(var(--muted-foreground)); font-size: 14px;">Configure your webhook URL and choose which events you want to receive notifications for.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Elements -->
+                <div class="component-example">
+                    <div class="component-title">Form Elements</div>
+                    <div class="flex flex-col gap-4">
+                        <input class="input" type="text" placeholder="Enter webhook URL" />
+                        <input class="input" type="email" placeholder="Email address" />
+                        <button class="btn btn-primary">Save Configuration</button>
+                    </div>
+                </div>
+
+                <!-- Badges -->
+                <div class="component-example">
+                    <div class="component-title">Status Badges</div>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex gap-2">
+                            <span class="badge badge-success">Active</span>
+                            <span class="badge badge-warning">Pending</span>
+                            <span class="badge badge-destructive">Failed</span>
+                        </div>
+                        <p style="color: hsl(var(--muted-foreground)); font-size: 14px;">Status indicators for webhook states and system health</p>
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div class="component-example">
+                    <div class="component-title">Alert Messages</div>
+                    <div class="flex flex-col gap-4">
+                        <div class="alert alert-success">
+                            <strong>Success!</strong> Your webhook has been configured successfully.
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>Warning!</strong> Your webhook URL appears to be unreachable.
+                        </div>
+                        <div class="alert alert-destructive">
+                            <strong>Error!</strong> Failed to save webhook configuration.
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Info:</strong> Webhook events are processed asynchronously.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Card Example -->
+                <div class="component-example">
+                    <div class="component-title">Dashboard Widget</div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Webhook Delivery Stats</div>
+                            <span class="badge badge-success">Live</span>
+                        </div>
+                        <div class="card-content">
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: center;">
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700; color: hsl(var(--success));">1,234</div>
+                                    <div style="font-size: 12px; color: hsl(var(--muted-foreground));">Successful</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700; color: hsl(var(--warning));">56</div>
+                                    <div style="font-size: 12px; color: hsl(var(--muted-foreground));">Retrying</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 24px; font-weight: 700; color: hsl(var(--destructive));">12</div>
+                                    <div style="font-size: 12px; color: hsl(var(--muted-foreground));">Failed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Border Radius & Shadows -->
+        <section class="section">
+            <h2 class="section-title">Component Tokens</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Border Radius</h3>
+                <div class="grid grid-4">
+                    <div style="background: hsl(var(--primary)); height: 80px; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Small (4px)</div>
+                    <div style="background: hsl(var(--primary)); height: 80px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Medium (6px)</div>
+                    <div style="background: hsl(var(--primary)); height: 80px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">Large (8px)</div>
+                    <div style="background: hsl(var(--primary)); height: 80px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 500;">XL (12px)</div>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Shadow Elevation</h3>
+                <div class="grid grid-4">
+                    <div style="background: hsl(var(--card)); height: 80px; box-shadow: var(--shadow-sm); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-weight: 500;">Small</div>
+                    <div style="background: hsl(var(--card)); height: 80px; box-shadow: var(--shadow-md); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-weight: 500;">Medium</div>
+                    <div style="background: hsl(var(--card)); height: 80px; box-shadow: var(--shadow-lg); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-weight: 500;">Large</div>
+                    <div style="background: hsl(var(--card)); height: 80px; box-shadow: var(--shadow-xl); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-weight: 500;">Extra Large</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Responsive Example -->
+        <section class="section">
+            <h2 class="section-title">Responsive Layout</h2>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Mobile-First Design</div>
+                    <div class="card-description">This design system is built mobile-first and scales beautifully across all screen sizes</div>
+                </div>
+                <div class="card-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div style="background: hsl(var(--muted)); padding: 16px; border-radius: 6px; text-align: center;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">📱 Mobile</div>
+                            <div style="font-size: 14px; color: hsl(var(--muted-foreground));">320px - 767px</div>
+                        </div>
+                        <div style="background: hsl(var(--muted)); padding: 16px; border-radius: 6px; text-align: center;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">📱 Tablet</div>
+                            <div style="font-size: 14px; color: hsl(var(--muted-foreground));">768px - 1023px</div>
+                        </div>
+                        <div style="background: hsl(var(--muted)); padding: 16px; border-radius: 6px; text-align: center;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">💻 Desktop</div>
+                            <div style="font-size: 14px; color: hsl(var(--muted-foreground));">1024px+</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            
+            // Update button text
+            const button = document.querySelector('.theme-toggle');
+            if (document.documentElement.classList.contains('dark')) {
+                button.textContent = '☀️';
+            } else {
+                button.textContent = '🌓';
+            }
+        }
+
+        // Demo animations on load
+        window.addEventListener('load', () => {
+            const cards = document.querySelectorAll('.card, .component-example');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+
+        // Interactive button feedback
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.98)';
+            });
+            
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

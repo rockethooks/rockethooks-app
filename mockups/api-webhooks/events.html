@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Management - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .nav a.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .filters-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.875rem;
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .filter-select {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 80% 55%);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        .events-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .events-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .events-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .event-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .event-item:hover {
+            background: #f8fafc;
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-checkbox {
+            display: flex;
+            align-items: center;
+        }
+
+        .event-info {
+            min-width: 0;
+        }
+
+        .event-type {
+            font-weight: 600;
+            color: #1e293b;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+        }
+
+        .event-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .event-timestamp {
+            color: #64748b;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .event-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-delivered {
+            color: #166534;
+        }
+
+        .status-failed {
+            color: #dc2626;
+        }
+
+        .status-pending {
+            color: #d97706;
+        }
+
+        .status-retrying {
+            color: #0369a1;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-delivered .status-dot { background: #22c55e; }
+        .status-failed .status-dot { background: #ef4444; }
+        .status-pending .status-dot { background: #f59e0b; }
+        .status-retrying .status-dot { background: #3b82f6; }
+
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 0.75rem;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0.25rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+
+        .json-viewer {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+        }
+
+        .json-key { color: #60a5fa; }
+        .json-string { color: #34d399; }
+        .json-number { color: #fbbf24; }
+        .json-boolean { color: #f87171; }
+
+        .attempts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .attempt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+
+        .attempt-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .attempt-number {
+            background: #e2e8f0;
+            color: #64748b;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-info {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .filters-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .event-item { 
+                grid-template-columns: 1fr; 
+                gap: 0.5rem; 
+            }
+            .event-actions { justify-content: flex-start; }
+            .modal { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">🚀 RocketHooks</div>
+            <nav class="nav">
+                <a href="#">Endpoints</a>
+                <a href="#">Webhooks</a>
+                <a href="#" class="active">Events</a>
+                <a href="#">Monitoring</a>
+                <a href="#">Testing</a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📋 Event Management</h1>
+            <p class="page-subtitle">Monitor and manage webhook event deliveries and API interactions</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-value">1,245</div>
+                <div class="stat-label">Total Events (24h)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">97.8%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">28</div>
+                <div class="stat-label">Failed Events</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">156ms</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Event Type</label>
+                    <select class="filter-select">
+                        <option>All Types</option>
+                        <option>user.created</option>
+                        <option>user.updated</option>
+                        <option>user.deleted</option>
+                        <option>payment.created</option>
+                        <option>payment.failed</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-select">
+                        <option>All Status</option>
+                        <option>Delivered</option>
+                        <option>Failed</option>
+                        <option>Pending</option>
+                        <option>Retrying</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Webhook</label>
+                    <select class="filter-select">
+                        <option>All Webhooks</option>
+                        <option>User Events Webhook</option>
+                        <option>Payment Notifications</option>
+                        <option>Admin Alerts</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <select class="filter-select">
+                        <option>Last 24 hours</option>
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Custom range</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="events-section">
+            <div class="events-header">
+                <div class="bulk-actions">
+                    <input type="checkbox" class="checkbox" id="select-all">
+                    <label for="select-all" style="margin-left: 0.5rem; font-weight: 500;">Select All</label>
+                    <button class="btn btn-secondary btn-sm" style="margin-left: 1rem;">🔄 Retry Selected</button>
+                    <button class="btn btn-secondary btn-sm">🗑️ Delete Selected</button>
+                </div>
+                <div>
+                    <button class="btn btn-secondary btn-sm">📊 Export</button>
+                </div>
+            </div>
+
+            <div class="events-list">
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">user.created</div>
+                        <div class="event-description">New user registration: john.doe@example.com</div>
+                    </div>
+                    <div class="event-timestamp">2 min ago</div>
+                    <div class="event-status status-delivered">
+                        <span class="status-dot"></span>
+                        Delivered
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_001')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">payment.failed</div>
+                        <div class="event-description">Payment failed for subscription plan</div>
+                    </div>
+                    <div class="event-timestamp">5 min ago</div>
+                    <div class="event-status status-failed">
+                        <span class="status-dot"></span>
+                        Failed
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_002')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">user.updated</div>
+                        <div class="event-description">Profile update: avatar changed</div>
+                    </div>
+                    <div class="event-timestamp">8 min ago</div>
+                    <div class="event-status status-retrying">
+                        <span class="status-dot"></span>
+                        Retrying (2/5)
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_003')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">⏹️ Stop</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">user.login</div>
+                        <div class="event-description">User login from new device</div>
+                    </div>
+                    <div class="event-timestamp">12 min ago</div>
+                    <div class="event-status status-delivered">
+                        <span class="status-dot"></span>
+                        Delivered
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_004')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">subscription.created</div>
+                        <div class="event-description">New subscription: Pro Plan</div>
+                    </div>
+                    <div class="event-timestamp">15 min ago</div>
+                    <div class="event-status status-pending">
+                        <span class="status-dot"></span>
+                        Pending
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_005')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">user.password_changed</div>
+                        <div class="event-description">Password reset completed</div>
+                    </div>
+                    <div class="event-timestamp">22 min ago</div>
+                    <div class="event-status status-delivered">
+                        <span class="status-dot"></span>
+                        Delivered
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_006')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+
+                <div class="event-item">
+                    <div class="event-checkbox">
+                        <input type="checkbox" class="checkbox">
+                    </div>
+                    <div class="event-info">
+                        <div class="event-type">payment.created</div>
+                        <div class="event-description">Payment processed: $29.99</div>
+                    </div>
+                    <div class="event-timestamp">28 min ago</div>
+                    <div class="event-status status-failed">
+                        <span class="status-dot"></span>
+                        Failed
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="showEventDetail('evt_007')">👁️ View</button>
+                        <button class="btn btn-secondary btn-sm">🔄 Retry</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <div class="pagination-info">
+                    Showing 1-7 of 1,245 events
+                </div>
+                <div class="pagination-controls">
+                    <button class="btn btn-secondary btn-sm" disabled>Previous</button>
+                    <button class="btn btn-secondary btn-sm">1</button>
+                    <button class="btn btn-primary btn-sm">2</button>
+                    <button class="btn btn-secondary btn-sm">3</button>
+                    <button class="btn btn-secondary btn-sm">...</button>
+                    <button class="btn btn-secondary btn-sm">178</button>
+                    <button class="btn btn-secondary btn-sm">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Event Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-section">
+                    <div class="detail-title">Event Information</div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 0.5rem;">
+                        <div>
+                            <strong>Event ID:</strong> evt_001_abc123
+                        </div>
+                        <div>
+                            <strong>Type:</strong> user.created
+                        </div>
+                        <div>
+                            <strong>Timestamp:</strong> 2024-01-20 14:30:15 UTC
+                        </div>
+                        <div>
+                            <strong>Status:</strong> <span style="color: #22c55e;">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Webhook Target</div>
+                    <div style="margin-top: 0.5rem;">
+                        <strong>Name:</strong> User Events Webhook<br>
+                        <strong>URL:</strong> https://app.example.com/webhooks/rockethooks<br>
+                        <strong>Method:</strong> POST
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Event Payload</div>
+                    <div class="json-viewer">
+{
+  <span class="json-key">"event_id"</span>: <span class="json-string">"evt_001_abc123"</span>,
+  <span class="json-key">"event_type"</span>: <span class="json-string">"user.created"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-01-20T14:30:15Z"</span>,
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"user_id"</span>: <span class="json-string">"user_123"</span>,
+    <span class="json-key">"email"</span>: <span class="json-string">"john.doe@example.com"</span>,
+    <span class="json-key">"name"</span>: <span class="json-string">"John Doe"</span>,
+    <span class="json-key">"created_at"</span>: <span class="json-string">"2024-01-20T14:30:15Z"</span>,
+    <span class="json-key">"plan"</span>: <span class="json-string">"free"</span>
+  },
+  <span class="json-key">"metadata"</span>: {
+    <span class="json-key">"source"</span>: <span class="json-string">"RocketHooks"</span>,
+    <span class="json-key">"version"</span>: <span class="json-string">"1.0"</span>
+  }
+}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Response</div>
+                    <div style="margin-top: 0.5rem;">
+                        <strong>Status Code:</strong> 200 OK<br>
+                        <strong>Response Time:</strong> 234ms<br>
+                        <strong>Response Body:</strong>
+                    </div>
+                    <div class="json-viewer" style="margin-top: 0.5rem;">
+{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"Event processed successfully"</span>,
+  <span class="json-key">"processed_at"</span>: <span class="json-string">"2024-01-20T14:30:15.234Z"</span>
+}
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="detail-title">Delivery Attempts</div>
+                    <div class="attempts-list">
+                        <div class="attempt-item">
+                            <div class="attempt-info">
+                                <div class="attempt-number">1</div>
+                                <div>
+                                    <div style="font-weight: 500; color: #22c55e;">Success</div>
+                                    <div style="font-size: 0.875rem; color: #64748b;">2024-01-20 14:30:15 UTC</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.875rem; color: #64748b;">
+                                200 OK • 234ms
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
+                    <button class="btn btn-secondary">🔄 Retry Event</button>
+                    <button class="btn btn-primary">📋 Copy Payload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showEventDetail(eventId) {
+            document.getElementById('event-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('event-modal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('event-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Select all functionality
+        document.getElementById('select-all').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.event-item .checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // Update select all when individual checkboxes change
+        document.querySelectorAll('.event-item .checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allCheckboxes = document.querySelectorAll('.event-item .checkbox');
+                const checkedCheckboxes = document.querySelectorAll('.event-item .checkbox:checked');
+                const selectAll = document.getElementById('select-all');
+                
+                if (checkedCheckboxes.length === 0) {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = false;
+                } else if (checkedCheckboxes.length === allCheckboxes.length) {
+                    selectAll.checked = true;
+                    selectAll.indeterminate = false;
+                } else {
+                    selectAll.checked = false;
+                    selectAll.indeterminate = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

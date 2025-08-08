@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Metrics Detail</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .metrics-detail {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .breadcrumb a {
+            color: hsl(246 80% 60%);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .metrics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .metric-icon {
+            width: 3rem;
+            height: 3rem;
+            background: hsl(246 80% 95%);
+            color: hsl(246 80% 60%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .metrics-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .metrics-subtitle {
+            font-size: 1rem;
+            color: #64748b;
+        }
+
+        .time-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 0.25rem;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-option {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .time-option.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .time-option:hover:not(.active) {
+            background: #f1f5f9;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value.primary { color: hsl(246 80% 60%); }
+        .summary-value.success { color: #16a34a; }
+        .summary-value.warning { color: #d97706; }
+        .summary-value.error { color: #dc2626; }
+
+        .summary-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .summary-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+
+        .change-positive {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .change-negative {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .change-neutral {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .charts-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .line-chart {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 0%, hsl(246 80% 60% / 0.1) 10%, hsl(246 80% 60% / 0.2) 20%, hsl(246 80% 60% / 0.3) 30%, hsl(246 80% 60% / 0.2) 40%, transparent 50%),
+                linear-gradient(90deg, transparent 50%, hsl(246 80% 60% / 0.1) 60%, hsl(246 80% 60% / 0.3) 70%, hsl(246 80% 60% / 0.2) 80%, hsl(246 80% 60% / 0.1) 90%, transparent 100%);
+            position: relative;
+        }
+
+        .chart-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+            background-size: 40px 30px;
+            opacity: 0.3;
+        }
+
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(24, 1fr);
+            gap: 2px;
+            padding: 1rem;
+        }
+
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .heatmap-cell.low { background: hsl(246 80% 95%); }
+        .heatmap-cell.medium { background: hsl(246 80% 80%); }
+        .heatmap-cell.high { background: hsl(246 80% 60%); }
+        .heatmap-cell.very-high { background: hsl(246 80% 40%); }
+
+        .percentile-bars {
+            display: flex;
+            align-items: end;
+            gap: 8px;
+            height: 200px;
+            padding: 1rem;
+        }
+
+        .percentile-bar {
+            flex: 1;
+            background: hsl(246 80% 60%);
+            border-radius: 2px 2px 0 0;
+            min-height: 10px;
+            position: relative;
+            opacity: 0.8;
+        }
+
+        .percentile-bar:nth-child(1) { height: 20%; }
+        .percentile-bar:nth-child(2) { height: 35%; }
+        .percentile-bar:nth-child(3) { height: 50%; }
+        .percentile-bar:nth-child(4) { height: 70%; }
+        .percentile-bar:nth-child(5) { height: 85%; }
+        .percentile-bar:nth-child(6) { height: 95%; }
+        .percentile-bar:nth-child(7) { height: 100%; }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .detail-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .comparison-table th {
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+            font-size: 0.875rem;
+        }
+
+        .comparison-table td {
+            font-size: 0.875rem;
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+        }
+
+        .trend-up {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .trend-down {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .trend-stable {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .threshold-config {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .threshold-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .threshold-label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .threshold-value {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .threshold-input {
+            width: 80px;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            text-align: center;
+        }
+
+        .alert-rules {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .alert-rule {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 0.375rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .rule-info {
+            flex: 1;
+        }
+
+        .rule-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .rule-condition {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .rule-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-inactive {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-detail {
+                padding: 1rem;
+            }
+            
+            .metrics-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .time-controls {
+                justify-content: center;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .heatmap-grid {
+                grid-template-columns: repeat(12, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="metrics-detail">
+        <nav class="breadcrumb">
+            <a href="#dashboard">Dashboard</a>
+            <span>→</span>
+            <a href="#analytics">Analytics</a>
+            <span>→</span>
+            <span>API Response Time</span>
+        </nav>
+
+        <header class="metrics-header">
+            <div class="header-info">
+                <div class="metric-icon">⏱️</div>
+                <div class="header-text">
+                    <h1 class="metrics-title">API Response Time</h1>
+                    <p class="metrics-subtitle">Detailed analysis of endpoint performance metrics</p>
+                </div>
+            </div>
+            <div class="time-controls">
+                <div class="time-selector">
+                    <button class="time-option">1H</button>
+                    <button class="time-option active">24H</button>
+                    <button class="time-option">7D</button>
+                    <button class="time-option">30D</button>
+                </div>
+                <button class="btn btn-secondary">⚙️ Configure</button>
+            </div>
+        </header>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="summary-value primary">245ms</div>
+                <div class="summary-label">Average Response Time</div>
+                <div class="summary-change change-negative">+12ms from yesterday</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value success">156ms</div>
+                <div class="summary-label">Median (P50)</div>
+                <div class="summary-change change-positive">-8ms from yesterday</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value warning">420ms</div>
+                <div class="summary-label">95th Percentile</div>
+                <div class="summary-change change-negative">+23ms from yesterday</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value error">680ms</div>
+                <div class="summary-label">99th Percentile</div>
+                <div class="summary-change change-negative">+45ms from yesterday</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-value primary">67ms</div>
+                <div class="summary-label">Fastest Response</div>
+                <div class="summary-change change-neutral">No change</div>
+            </div>
+        </div>
+
+        <div class="charts-layout">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Response Time Trends</h2>
+                    <div class="time-selector">
+                        <button class="time-option active">Average</button>
+                        <button class="time-option">P95</button>
+                        <button class="time-option">P99</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-grid"></div>
+                    <div class="line-chart"></div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Response Time Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="percentile-bars">
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                        <div class="percentile-bar"></div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0 1rem; font-size: 0.75rem; color: #64748b;">
+                    <span>P10</span>
+                    <span>P25</span>
+                    <span>P50</span>
+                    <span>P75</span>
+                    <span>P90</span>
+                    <span>P95</span>
+                    <span>P99</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card" style="margin-bottom: 2rem;">
+            <div class="chart-header">
+                <h2 class="chart-title">24-Hour Heatmap</h2>
+                <p style="font-size: 0.875rem; color: #64748b;">Response time patterns by hour</p>
+            </div>
+            <div class="heatmap-grid">
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell very-high"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell very-high"></div>
+                <div class="heatmap-cell high"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell medium"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell low"></div>
+                <div class="heatmap-cell low"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 0 1rem; font-size: 0.75rem; color: #64748b;">
+                <span>12 AM</span>
+                <span>6 AM</span>
+                <span>12 PM</span>
+                <span>6 PM</span>
+                <span>11 PM</span>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="detail-section">
+                <h3 class="section-title">Historical Comparison</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Average</th>
+                            <th>P95</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Today</td>
+                            <td>245ms</td>
+                            <td>420ms</td>
+                            <td><span class="trend-indicator trend-down">↗ +5.2%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Yesterday</td>
+                            <td>233ms</td>
+                            <td>397ms</td>
+                            <td><span class="trend-indicator trend-up">↗ +2.1%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Last Week</td>
+                            <td>228ms</td>
+                            <td>385ms</td>
+                            <td><span class="trend-indicator trend-stable">→ -0.5%</span></td>
+                        </tr>
+                        <tr>
+                            <td>Last Month</td>
+                            <td>221ms</td>
+                            <td>378ms</td>
+                            <td><span class="trend-indicator trend-up">↗ +8.3%</span></td>
+                        </tr>
+                        <tr>
+                            <td>3 Months Ago</td>
+                            <td>203ms</td>
+                            <td>342ms</td>
+                            <td><span class="trend-indicator trend-up">↗ +15.2%</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="section-title">Performance Thresholds</h3>
+                <div class="threshold-config">
+                    <div class="threshold-item">
+                        <span class="threshold-label">Warning Threshold</span>
+                        <div class="threshold-value">
+                            <input type="number" class="threshold-input" value="300">
+                            <span>ms</span>
+                        </div>
+                    </div>
+                    <div class="threshold-item">
+                        <span class="threshold-label">Critical Threshold</span>
+                        <div class="threshold-value">
+                            <input type="number" class="threshold-input" value="500">
+                            <span>ms</span>
+                        </div>
+                    </div>
+                    <div class="threshold-item">
+                        <span class="threshold-label">SLA Target</span>
+                        <div class="threshold-value">
+                            <input type="number" class="threshold-input" value="200">
+                            <span>ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-grid" style="margin-top: 2rem;">
+            <div class="detail-section">
+                <h3 class="section-title">Alert Rules</h3>
+                <div class="alert-rules">
+                    <div class="alert-rule">
+                        <div class="rule-info">
+                            <div class="rule-name">High Latency Alert</div>
+                            <div class="rule-condition">Trigger when P95 > 400ms for 5 minutes</div>
+                        </div>
+                        <div class="rule-status status-active">Active</div>
+                    </div>
+                    <div class="alert-rule">
+                        <div class="rule-info">
+                            <div class="rule-name">SLA Breach Warning</div>
+                            <div class="rule-condition">Trigger when average > 250ms for 10 minutes</div>
+                        </div>
+                        <div class="rule-status status-active">Active</div>
+                    </div>
+                    <div class="alert-rule">
+                        <div class="rule-info">
+                            <div class="rule-name">Performance Degradation</div>
+                            <div class="rule-condition">Trigger when response time increases by 50%</div>
+                        </div>
+                        <div class="rule-status status-inactive">Inactive</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3 class="section-title">Top Slow Endpoints</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fef2f2; border-radius: 0.375rem;">
+                        <div>
+                            <div style="font-weight: 500;">/api/v1/analytics/heavy</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Average: 1.2s</div>
+                        </div>
+                        <div style="color: #dc2626; font-weight: 600;">Critical</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fef3c7; border-radius: 0.375rem;">
+                        <div>
+                            <div style="font-weight: 500;">/api/v1/reports/generate</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Average: 580ms</div>
+                        </div>
+                        <div style="color: #d97706; font-weight: 600;">Warning</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #fef3c7; border-radius: 0.375rem;">
+                        <div>
+                            <div style="font-weight: 500;">/api/v1/webhooks/process</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Average: 420ms</div>
+                        </div>
+                        <div style="color: #d97706; font-weight: 600;">Warning</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f8fafc; border-radius: 0.375rem;">
+                        <div>
+                            <div style="font-weight: 500;">/api/v1/users/profile</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">Average: 280ms</div>
+                        </div>
+                        <div style="color: #64748b; font-weight: 600;">Normal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
