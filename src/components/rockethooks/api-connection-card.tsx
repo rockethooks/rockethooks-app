@@ -72,9 +72,9 @@ function APIConnectionCard({
   className,
 }: APIConnectionCardProps) {
   const formatInterval = (seconds: number) => {
-    if (seconds < 60) return `${seconds}s`
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m`
-    return `${Math.floor(seconds / 3600)}h`
+    if (seconds < 60) return `${String(seconds)}s`
+    if (seconds < 3600) return `${String(Math.floor(seconds / 60))}m`
+    return `${String(Math.floor(seconds / 3600))}h`
   }
 
   const getStatusColor = (status: string) => {
@@ -101,10 +101,21 @@ function APIConnectionCard({
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
-            <WebhookStatus status={status as any} />
+            <WebhookStatus
+              status={
+                status as React.ComponentProps<typeof WebhookStatus>['status']
+              }
+            />
             <span className="truncate">{name}</span>
           </CardTitle>
-          <Badge variant={methodVariants[method] as any} size="sm">
+          <Badge
+            variant={
+              methodVariants[method] as React.ComponentProps<
+                typeof Badge
+              >['variant']
+            }
+            size="sm"
+          >
             {method}
           </Badge>
         </div>

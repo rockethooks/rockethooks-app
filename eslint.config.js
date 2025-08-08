@@ -44,7 +44,7 @@ export default tseslint.config(
       'react/react-in-jsx-scope': 'off', // Not needed with new JSX transform
       'react/jsx-uses-react': 'off', // Not needed with new JSX transform
       'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/jsx-props-no-spreading': 'warn',
+      'react/jsx-props-no-spreading': 'off',
       'react/function-component-definition': [
         'error',
         {
