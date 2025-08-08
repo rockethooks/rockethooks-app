@@ -125,11 +125,6 @@ export const Default: Story = {
  * Interactive transformation editor with state management
  */
 export const Interactive: Story = {
-  args: {
-    mode: 'code',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState(basicTransformation)
 
@@ -182,11 +177,6 @@ export const CodeMode: Story = {
  * Complex transformation with nested objects and arrays
  */
 export const ComplexTransformation: Story = {
-  args: {
-    mode: 'code',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState(complexTransformation)
 
@@ -215,11 +205,6 @@ export const ComplexTransformation: Story = {
  * Editor with invalid JSON to show error handling
  */
 export const InvalidSyntax: Story = {
-  args: {
-    mode: 'code',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState(`{
   "user_name": "$.data.user.name",
@@ -254,7 +239,6 @@ export const InputSchemaOnly: Story = {
     mode: 'code',
     value: basicTransformation,
     inputSchema: sampleInputSchema,
-    onChange: () => {},
   },
 }
 
@@ -262,11 +246,6 @@ export const InputSchemaOnly: Story = {
  * Minimal editor without schema or preview
  */
 export const Minimal: Story = {
-  args: {
-    mode: 'visual',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState(`{
   "output_field": "$.input.field",
@@ -297,11 +276,6 @@ export const Minimal: Story = {
  * Empty editor for starting from scratch
  */
 export const Empty: Story = {
-  args: {
-    mode: 'code',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState('')
 
@@ -330,11 +304,6 @@ export const Empty: Story = {
  * Array transformation example
  */
 export const ArrayTransformation: Story = {
-  args: {
-    mode: 'code',
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [value, setValue] = useState(`{
   "items": "$.data.order.items[*].{name: name, total_price: price * quantity}",

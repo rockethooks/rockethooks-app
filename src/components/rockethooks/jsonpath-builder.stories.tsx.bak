@@ -146,6 +146,7 @@ export const Default: Story = {
  */
 export const Interactive: Story = {
   args: {
+    placeholder: 'Enter JSONPath expression',
     value: '$.user.profile.name',
     onChange: () => {},
   },
@@ -176,6 +177,7 @@ export const Interactive: Story = {
  */
 export const ArrayOperations: Story = {
   args: {
+    placeholder: 'e.g., $.posts[*].title',
     value: '$.posts[0].title',
     onChange: () => {},
   },
@@ -205,10 +207,6 @@ export const ArrayOperations: Story = {
  * Builder with complex API response data
  */
 export const ComplexData: Story = {
-  args: {
-    value: '$.data.orders[0].customer.name',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$.data.orders[0].customer.name')
 
@@ -235,10 +233,6 @@ export const ComplexData: Story = {
  * Builder with invalid path to show error state
  */
 export const InvalidPath: Story = {
-  args: {
-    value: '$.invalid..path[',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$.invalid..path[')
 
@@ -266,14 +260,17 @@ export const InvalidPath: Story = {
  * Builder without sample data
  */
 export const NoSampleData: Story = {
-  args: {
-    value: '',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$.property')
 
-    return <JSONPathBuilder {...args} value={path} onChange={setPath} />
+    return (
+      <JSONPathBuilder
+        {...args}
+        value={path}
+        onChange={setPath}
+        sampleData={undefined}
+      />
+    )
   },
   parameters: {
     controls: { disable: true },
@@ -289,10 +286,6 @@ export const NoSampleData: Story = {
  * Builder demonstrating array filtering
  */
 export const ArrayFiltering: Story = {
-  args: {
-    value: '$.posts[?(@.published)]',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$.posts[?(@.status == "published")]')
 
@@ -319,10 +312,6 @@ export const ArrayFiltering: Story = {
  * Root-level access pattern
  */
 export const RootAccess: Story = {
-  args: {
-    value: '$',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$')
 
@@ -349,10 +338,6 @@ export const RootAccess: Story = {
  * Array wildcard access
  */
 export const ArrayWildcard: Story = {
-  args: {
-    value: '$.posts[*].tags[*]',
-    onChange: () => {},
-  },
   render: function RenderFunction(args) {
     const [path, setPath] = useState('$.posts[*].title')
 

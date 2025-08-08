@@ -136,10 +136,6 @@ export const NoPulse: Story = {
  * All status types displayed together for comparison
  */
 export const AllStatuses: Story = {
-  args: {
-    status: 'success',
-    size: 'md',
-  },
   render: function RenderFunction() {
     return (
       <div className="flex flex-col gap-4">
@@ -167,10 +163,6 @@ export const AllStatuses: Story = {
  * Different sizes displayed together for comparison
  */
 export const AllSizes: Story = {
-  args: {
-    status: 'success',
-    size: 'md',
-  },
   render: function RenderFunction() {
     return (
       <div className="flex flex-col gap-6">

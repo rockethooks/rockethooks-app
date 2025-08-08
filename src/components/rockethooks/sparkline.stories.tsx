@@ -229,6 +229,11 @@ export const Steady: Story = {
  * Comparison of different sparkline styles
  */
 export const Comparison: Story = {
+  args: {
+    data: [],
+    width: 100,
+    height: 30,
+  },
   render: function ComparisonRender() {
     return (
       <div className="flex flex-col gap-6 p-4 bg-background">
