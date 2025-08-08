@@ -154,7 +154,9 @@ function JSONPathBuilder({
             <Input
               id="jsonpath-input"
               value={value}
-              onChange={(e) => { onChange(e.target.value); }}
+              onChange={(e) => {
+                onChange(e.target.value)
+              }}
               placeholder="$.property"
               className={cn(
                 'font-mono',
@@ -226,7 +228,9 @@ function JSONPathBuilder({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setShowSampleData(!showSampleData); }}
+              onClick={() => {
+                setShowSampleData(!showSampleData)
+              }}
             >
               {showSampleData ? 'Hide' : 'Show'}
             </Button>

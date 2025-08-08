@@ -165,9 +165,15 @@ export function ComponentsDemo() {
             successRate={98.5}
             avgResponseTime={245}
             sparklineData={sampleSparklineData}
-            onTest={() => { console.log('Test clicked'); }}
-            onEdit={() => { console.log('Edit clicked'); }}
-            onToggle={() => { console.log('Toggle clicked'); }}
+            onTest={() => {
+              console.log('Test clicked')
+            }}
+            onEdit={() => {
+              console.log('Edit clicked')
+            }}
+            onToggle={() => {
+              console.log('Toggle clicked')
+            }}
           />
 
           <APIConnectionCard
@@ -180,9 +186,15 @@ export function ComponentsDemo() {
             changesDetected={0}
             successRate={87.2}
             avgResponseTime={1250}
-            onTest={() => { console.log('Test clicked'); }}
-            onEdit={() => { console.log('Edit clicked'); }}
-            onToggle={() => { console.log('Toggle clicked'); }}
+            onTest={() => {
+              console.log('Test clicked')
+            }}
+            onEdit={() => {
+              console.log('Edit clicked')
+            }}
+            onToggle={() => {
+              console.log('Toggle clicked')
+            }}
           />
         </div>
       </section>
@@ -195,7 +207,9 @@ export function ComponentsDemo() {
             value={jsonPath}
             onChange={setJsonPath}
             sampleData={sampleJSONData}
-            onTest={() => { console.log('Testing JSONPath'); }}
+            onTest={() => {
+              console.log('Testing JSONPath')
+            }}
           />
         </div>
       </section>
@@ -228,7 +242,9 @@ export function ComponentsDemo() {
               <EventTimeline
                 events={sampleEvents}
                 view="compact"
-                onEventClick={(event) => { console.log('Event clicked:', event); }}
+                onEventClick={(event) => {
+                  console.log('Event clicked:', event)
+                }}
               />
             </div>
           </div>
@@ -239,7 +255,9 @@ export function ComponentsDemo() {
               <EventTimeline
                 events={sampleEvents}
                 view="detailed"
-                onEventClick={(event) => { console.log('Event clicked:', event); }}
+                onEventClick={(event) => {
+                  console.log('Event clicked:', event)
+                }}
               />
             </div>
           </div>

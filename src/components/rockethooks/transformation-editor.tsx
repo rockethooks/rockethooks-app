@@ -124,9 +124,9 @@ function TransformationEditor({
           )}
           <Tabs
             value={currentMode}
-            onValueChange={(value) =>
-              { handleModeChange(value as 'visual' | 'code'); }
-            }
+            onValueChange={(value) => {
+              handleModeChange(value as 'visual' | 'code')
+            }}
           >
             <TabsList className="grid w-full grid-cols-2 h-8">
               <TabsTrigger value="visual" className="text-xs">
@@ -181,7 +181,9 @@ function TransformationEditor({
             <Textarea
               id="transformation-code"
               value={value}
-              onChange={(e) => { onChange(e.target.value); }}
+              onChange={(e) => {
+                onChange(e.target.value)
+              }}
               className={cn(
                 'font-mono text-sm min-h-[200px] resize-none',
                 !isValid && 'border-destructive focus:border-destructive'
@@ -199,7 +201,9 @@ function TransformationEditor({
                   key={index}
                   variant="outline"
                   size="sm"
-                  onClick={() => { onChange(sample.transformation); }}
+                  onClick={() => {
+                    onChange(sample.transformation)
+                  }}
                   className="h-auto p-3 justify-start"
                 >
                   <div className="text-left">
