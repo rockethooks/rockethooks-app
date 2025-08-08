@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Logs Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Layout Structure */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 240px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+            background: #666;
+            border-radius: 6px;
+            margin-right: 12px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .org-selector {
+            padding: 8px 12px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .nav-item.active {
+            color: #333;
+            background: #f0f0f0;
+            font-weight: 500;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #666;
+        }
+
+        .nav-icon {
+            width: 18px;
+            height: 18px;
+            background: #999;
+            border-radius: 4px;
+            margin-right: 12px;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: white;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            border-color: #999;
+        }
+
+        /* Filters Bar */
+        .filters-bar {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px 8px 36px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            background: #999;
+            border-radius: 50%;
+        }
+
+        .filter-dropdown {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .filter-dropdown:hover {
+            border-color: #999;
+        }
+
+        .date-range {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .date-icon {
+            width: 16px;
+            height: 16px;
+            background: #999;
+            border-radius: 2px;
+        }
+
+        /* Log Levels */
+        .log-levels {
+            display: flex;
+            gap: 8px;
+            padding: 0 24px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .level-toggle {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 12px 0;
+        }
+
+        .level-toggle:hover {
+            border-color: #999;
+        }
+
+        .level-toggle.active {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .level-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .level-info { background: #2196F3; }
+        .level-warning { background: #FF9800; }
+        .level-error { background: #f44336; }
+        .level-debug { background: #9E9E9E; }
+
+        .level-count {
+            padding: 2px 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        /* Logs Table */
+        .logs-container {
+            flex: 1;
+            background: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logs-table {
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            display: flex;
+            padding: 8px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: start;
+            transition: background 0.1s;
+            cursor: pointer;
+        }
+
+        .log-entry:hover {
+            background: #fafafa;
+        }
+
+        .log-entry.selected {
+            background: #f5f5f5;
+        }
+
+        .log-timestamp {
+            width: 180px;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .log-level {
+            width: 80px;
+            flex-shrink: 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .log-level.info { color: #2196F3; }
+        .log-level.warning { color: #FF9800; }
+        .log-level.error { color: #f44336; }
+        .log-level.debug { color: #9E9E9E; }
+
+        .log-source {
+            width: 150px;
+            color: #666;
+            flex-shrink: 0;
+            font-size: 11px;
+        }
+
+        .log-message {
+            flex: 1;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .log-actions {
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .log-entry:hover .log-actions {
+            opacity: 1;
+        }
+
+        .log-action-btn {
+            width: 24px;
+            height: 24px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .log-action-btn:hover {
+            border-color: #999;
+        }
+
+        /* Log Detail Panel */
+        .log-detail {
+            height: 300px;
+            border-top: 2px solid #e0e0e0;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-header {
+            padding: 16px 24px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detail-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .detail-close {
+            width: 24px;
+            height: 24px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+
+        .detail-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0 24px;
+        }
+
+        .detail-tab {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .detail-tab:hover {
+            color: #333;
+        }
+
+        .detail-tab.active {
+            color: #333;
+            font-weight: 500;
+            border-bottom-color: #333;
+        }
+
+        .detail-content {
+            flex: 1;
+            padding: 16px 24px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .detail-label {
+            width: 120px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+
+        .json-block {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 8px;
+            overflow-x: auto;
+        }
+
+        .stack-trace {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-top: 8px;
+            color: #c62828;
+            white-space: pre-wrap;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            padding: 12px 24px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .stats-info {
+            display: flex;
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-label {
+            font-weight: 500;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .page-btn {
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            border-color: #999;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Live Tail Mode */
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #4CAF50;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #4CAF50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Export Modal */
+        .export-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 400px;
+            display: none;
+        }
+
+        .export-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .export-options {
+            margin-bottom: 20px;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .export-option:hover {
+            border-color: #999;
+        }
+
+        .export-option.selected {
+            border-color: #333;
+            background: #f5f5f5;
+        }
+
+        .export-radio {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .export-option.selected .export-radio {
+            border-color: #333;
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo"></div>
+                    <span class="logo-text">RocketHooks</span>
+                </div>
+                <div class="org-selector">
+                    <span>Acme Corp</span>
+                    <span>▼</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>APIs & Endpoints</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Webhooks</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Transformations</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Events</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>Logs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-row">
+                    <h1 class="page-title">System Logs</h1>
+                    <div class="header-actions">
+                        <div class="live-indicator">
+                            <span class="live-dot"></span>
+                            <span>Live Tail</span>
+                        </div>
+                        <button class="btn btn-secondary">
+                            Export Logs
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="filters-bar">
+                <div class="filter-group">
+                    <div class="search-box">
+                        <span class="search-icon"></span>
+                        <input type="text" class="search-input" placeholder="Search logs...">
+                    </div>
+                    
+                    <select class="filter-dropdown">
+                        <option>All Services</option>
+                        <option>API Poller</option>
+                        <option>Webhook Delivery</option>
+                        <option>Transformer</option>
+                        <option>Auth Service</option>
+                    </select>
+
+                    <select class="filter-dropdown">
+                        <option>All APIs</option>
+                        <option>Payment Gateway</option>
+                        <option>User Management</option>
+                        <option>Inventory</option>
+                    </select>
+
+                    <div class="date-range">
+                        <span class="date-icon"></span>
+                        <span>Last 24 hours</span>
+                        <span>▼</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Level Filters -->
+            <div class="log-levels">
+                <div class="level-toggle active">
+                    <span class="level-dot level-info"></span>
+                    <span>Info</span>
+                    <span class="level-count">2,341</span>
+                </div>
+                <div class="level-toggle active">
+                    <span class="level-dot level-warning"></span>
+                    <span>Warning</span>
+                    <span class="level-count">47</span>
+                </div>
+                <div class="level-toggle active">
+                    <span class="level-dot level-error"></span>
+                    <span>Error</span>
+                    <span class="level-count">3</span>
+                </div>
+                <div class="level-toggle">
+                    <span class="level-dot level-debug"></span>
+                    <span>Debug</span>
+                    <span class="level-count">8,923</span>
+                </div>
+            </div>
+
+            <!-- Logs Container -->
+            <div class="logs-container">
+                <!-- Logs Table -->
+                <div class="logs-table">
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:23.123</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-source">webhook.delivery</span>
+                        <span class="log-message">Successfully delivered webhook to https://app.company.com/webhooks/receive - Status: 200 OK</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:22.892</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-source">api.poller</span>
+                        <span class="log-message">Polling endpoint GET /api/users - Found 3 changes</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry selected">
+                        <span class="log-timestamp">2024-03-15 10:45:21.456</span>
+                        <span class="log-level error">ERROR</span>
+                        <span class="log-source">webhook.delivery</span>
+                        <span class="log-message">Failed to deliver webhook to https://dev.company.com/api/webhooks - Connection timeout after 30s</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:20.234</span>
+                        <span class="log-level warning">WARN</span>
+                        <span class="log-source">rate.limiter</span>
+                        <span class="log-message">Rate limit approaching for Payment Gateway API - 950/1000 requests this hour</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:19.789</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-source">transformer</span>
+                        <span class="log-message">Applied transformation 'User Data Normalizer' to event evt_2hX9kL3m</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:18.567</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-source">auth.service</span>
+                        <span class="log-message">User john@company.com authenticated successfully via OAuth</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:17.345</span>
+                        <span class="log-level warning">WARN</span>
+                        <span class="log-source">webhook.retry</span>
+                        <span class="log-message">Retrying webhook delivery (attempt 2/3) for event evt_8kP2mN4x</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+
+                    <div class="log-entry">
+                        <span class="log-timestamp">2024-03-15 10:45:16.123</span>
+                        <span class="log-level info">INFO</span>
+                        <span class="log-source">api.poller</span>
+                        <span class="log-message">Starting scheduled poll for 8 active endpoints</span>
+                        <div class="log-actions">
+                            <button class="log-action-btn">📋</button>
+                            <button class="log-action-btn">🔍</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Detail Panel -->
+                <div class="log-detail">
+                    <div class="detail-header">
+                        <div class="detail-title">Log Details - ERROR</div>
+                        <button class="detail-close">×</button>
+                    </div>
+
+                    <div class="detail-tabs">
+                        <div class="detail-tab active">Details</div>
+                        <div class="detail-tab">Context</div>
+                        <div class="detail-tab">Stack Trace</div>
+                        <div class="detail-tab">Related Logs</div>
+                    </div>
+
+                    <div class="detail-content">
+                        <div class="detail-row">
+                            <span class="detail-label">Timestamp:</span>
+                            <span class="detail-value">2024-03-15 10:45:21.456 UTC</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Level:</span>
+                            <span class="detail-value" style="color: #f44336; font-weight: 600;">ERROR</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Service:</span>
+                            <span class="detail-value">webhook.delivery</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Event ID:</span>
+                            <span class="detail-value">evt_7hY3kM9p</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">API:</span>
+                            <span class="detail-value">Inventory Management</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Webhook URL:</span>
+                            <span class="detail-value">https://dev.company.com/api/webhooks</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Error:</span>
+                            <span class="detail-value">Connection timeout after 30s</span>
+                        </div>
+
+                        <div class="stack-trace">
+Error: ETIMEDOUT
+    at ClientRequest.&lt;anonymous&gt; (/app/webhook-delivery.js:145:23)
+    at ClientRequest.emit (events.js:315:20)
+    at TLSSocket.socketErrorListener (_http_client.js:426:9)
+    at TLSSocket.emit (events.js:315:20)
+    at emitErrorNT (internal/streams/destroy.js:92:8)
+    at processTicksAndRejections (internal/process/task_queues.js:84:21)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="stats-bar">
+                    <div class="stats-info">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Logs:</span>
+                            <span>11,314</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Filtered:</span>
+                            <span>2,391</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Time Range:</span>
+                            <span>Last 24 hours</span>
+                        </div>
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn" disabled>Previous</button>
+                        <span class="page-info">Page 1 of 96</span>
+                        <button class="page-btn">Next</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
