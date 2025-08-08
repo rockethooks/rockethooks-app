@@ -2,7 +2,37 @@ import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
+export type CardProps = React.ComponentProps<'div'>
+export type CardHeaderProps = React.ComponentProps<'div'>
+export type CardTitleProps = React.ComponentProps<'div'>
+export type CardDescriptionProps = React.ComponentProps<'div'>
+export type CardActionProps = React.ComponentProps<'div'>
+export type CardContentProps = React.ComponentProps<'div'>
+export type CardFooterProps = React.ComponentProps<'div'>
+
+/**
+ * Card component with compound pattern for flexible layouts
+ *
+ * @example
+ * ```tsx
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Card Title</CardTitle>
+ *     <CardDescription>Card description</CardDescription>
+ *     <CardAction>
+ *       <Button size="sm">Action</Button>
+ *     </CardAction>
+ *   </CardHeader>
+ *   <CardContent>
+ *     <p>Card content goes here</p>
+ *   </CardContent>
+ *   <CardFooter>
+ *     <Button>Footer Action</Button>
+ *   </CardFooter>
+ * </Card>
+ * ```
+ */
+function Card({ className, ...props }: CardProps) {
   return (
     <div
       data-slot="card"
@@ -15,7 +45,10 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardHeader component for card titles and actions
+ */
+function CardHeader({ className, ...props }: CardHeaderProps) {
   return (
     <div
       data-slot="card-header"
@@ -28,7 +61,10 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardTitle component for card titles
+ */
+function CardTitle({ className, ...props }: CardTitleProps) {
   return (
     <div
       data-slot="card-title"
@@ -38,7 +74,10 @@ function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardDescription component for card descriptions
+ */
+function CardDescription({ className, ...props }: CardDescriptionProps) {
   return (
     <div
       data-slot="card-description"
@@ -48,7 +87,10 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardAction component for card actions (positioned in header)
+ */
+function CardAction({ className, ...props }: CardActionProps) {
   return (
     <div
       data-slot="card-action"
@@ -61,7 +103,10 @@ function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardContent component for main card content
+ */
+function CardContent({ className, ...props }: CardContentProps) {
   return (
     <div
       data-slot="card-content"
@@ -71,7 +116,10 @@ function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
+/**
+ * CardFooter component for card footer actions
+ */
+function CardFooter({ className, ...props }: CardFooterProps) {
   return (
     <div
       data-slot="card-footer"
