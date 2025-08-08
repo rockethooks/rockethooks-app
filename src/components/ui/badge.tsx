@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { badgeVariants } from './badge-variants'
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends React.HTMLAttributes<HTMLSpanElement>,
     VariantProps<typeof badgeVariants> {}
 
 /**
@@ -21,7 +21,7 @@ export interface BadgeProps
  */
 function Badge({ className, variant, size, ...props }: BadgeProps) {
   return (
-    <div
+    <span
       data-slot="badge"
       className={cn(badgeVariants({ variant, size }), className)}
       {...props}
