@@ -24,11 +24,16 @@ export function AuthSync() {
         ...(user.imageUrl && { imageUrl: user.imageUrl }),
       }
 
-      getToken().then((token) => {
-        if (token) {
-          setAuthenticated(userData, sessionId, token)
-        }
-      })
+      getToken()
+        .then((token) => {
+          if (token) {
+            setAuthenticated(userData, sessionId, token)
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get auth token:', error)
+          setUnauthenticated()
+        })
     } else {
       setUnauthenticated()
     }
