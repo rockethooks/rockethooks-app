@@ -7,7 +7,10 @@ import App from './App.tsx'
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!PUBLISHABLE_KEY) {
-  throw new Error('Add your Clerk Publishable Key to the .env file')
+  const errorMessage = import.meta.env.DEV
+    ? 'Missing VITE_CLERK_PUBLISHABLE_KEY in .env file. Please add your Clerk Publishable Key.'
+    : 'Authentication configuration error. Please contact support.'
+  throw new Error(errorMessage)
 }
 
 const rootElement = document.getElementById('root')

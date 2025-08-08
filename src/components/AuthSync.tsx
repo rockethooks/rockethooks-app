@@ -32,25 +32,32 @@ export function AuthSync() {
     } else {
       setUnauthenticated()
     }
-  }, [authLoaded, userLoaded, isSignedIn, user, sessionId, getToken, setAuthenticated, setUnauthenticated])
+  }, [authLoaded, userLoaded, isSignedIn, user, sessionId])
 
-  // Token refresh
+  // Token refresh with proper cleanup
   useEffect(() => {
     if (!isSignedIn) return
+
+    let isMounted = true
 
     const refreshInterval = setInterval(async () => {
       try {
         const newToken = await getToken()
-        if (newToken) {
+        if (isMounted && newToken) {
           updateToken(newToken)
         }
       } catch (error) {
-        console.error('Failed to refresh token:', error)
+        if (isMounted) {
+          console.error('Failed to refresh token:', error)
+        }
       }
-    }, 50000) // Refresh every 50 seconds
+    }, 55000) // Refresh every 55 seconds (closer to typical token expiration)
 
-    return () => clearInterval(refreshInterval)
-  }, [isSignedIn, getToken, updateToken])
+    return () => {
+      isMounted = false
+      clearInterval(refreshInterval)
+    }
+  }, [isSignedIn])
 
   return null
 }
