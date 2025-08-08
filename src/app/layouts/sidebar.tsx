@@ -1,22 +1,22 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
 import {
-  Home,
-  Webhook,
   Activity,
-  Settings,
-  Users,
   BarChart3,
-  Zap,
   ChevronLeft,
   ChevronRight,
+  Home,
+  Settings,
   User,
+  Users,
+  Webhook,
+  Zap,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ComponentErrorBoundary } from '@/shared/components/error-boundary'
 import { cn } from '@/lib/utils'
+import { ComponentErrorBoundary } from '@/shared/components/error-boundary'
 
 interface SidebarProps {
   collapsed?: boolean

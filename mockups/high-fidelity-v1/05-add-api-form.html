@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Add API</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-5);
+        }
+
+        /* Modal Container */
+        .modal {
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, var(--surface-primary) 0%, var(--surface-secondary) 100%);
+        }
+
+        .modal-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            font-size: var(--text-xl);
+            transition: all var(--transition-fast);
+        }
+
+        .close-btn:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+            color: var(--text-secondary);
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            padding: var(--space-5) var(--space-6);
+            background: var(--surface-secondary);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .steps-container::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-primary);
+            z-index: 1;
+        }
+
+        .steps-container::after {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 0;
+            width: 25%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            z-index: 2;
+            transition: width var(--transition-slow);
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+        }
+
+        .step-circle {
+            width: 48px;
+            height: 48px;
+            background: var(--surface-primary);
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-quaternary);
+            margin-bottom: var(--space-2);
+            transition: all var(--transition-base);
+        }
+
+        .step.active .step-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--text-inverse);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            border-color: var(--success);
+            color: var(--text-inverse);
+        }
+
+        .step.completed .step-circle::before {
+            content: '✓';
+        }
+
+        .step-label {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: var(--font-medium);
+        }
+
+        .step.active .step-label {
+            color: var(--text-primary);
+            font-weight: var(--font-semibold);
+        }
+
+        /* Modal Body */
+        .modal-body {
+            flex: 1;
+            padding: var(--space-6);
+            overflow-y: auto;
+        }
+
+        /* Form Sections */
+        .form-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .section-subtitle {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-5);
+            line-height: var(--leading-relaxed);
+        }
+
+        .section-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-size: var(--text-sm);
+        }
+
+        /* Auth Type Selector */
+        .auth-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .auth-option {
+            padding: var(--space-5);
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            background: var(--surface-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: height var(--transition-base);
+        }
+
+        .auth-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .auth-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .auth-option.selected::before {
+            height: 3px;
+        }
+
+        .auth-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--surface-tertiary);
+            border-radius: var(--radius-xl);
+            margin: 0 auto var(--space-3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            transition: all var(--transition-base);
+        }
+
+        .auth-option.selected .auth-icon {
+            background: var(--primary);
+            color: var(--text-inverse);
+        }
+
+        .auth-label {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: var(--space-4);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-5);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+
+        .alert-info {
+            background: var(--info-light);
+            color: var(--info);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .alert-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-full);
+            background: currentColor;
+            color: var(--text-inverse);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xs);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* Headers Builder */
+        .headers-builder {
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+        }
+
+        .headers-title {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+        }
+
+        .header-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+            align-items: end;
+        }
+
+        .remove-btn {
+            padding: var(--space-2);
+            background: var(--surface-primary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-lg);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+            background: var(--error-light);
+        }
+
+        .add-header-btn {
+            padding: var(--space-3) var(--space-4);
+            background: var(--surface-primary);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-xl);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-weight: var(--font-medium);
+            transition: all var(--transition-fast);
+        }
+
+        .add-header-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Test Connection */
+        .test-section {
+            background: linear-gradient(135deg, var(--info-light) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-5);
+            margin-bottom: var(--space-5);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .test-title {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--info);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .test-btn {
+            padding: var(--space-2) var(--space-4);
+            background: var(--info);
+            color: var(--text-inverse);
+            border: none;
+            border-radius: var(--radius-xl);
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .test-btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .test-result {
+            padding: var(--space-4);
+            background: var(--surface-primary);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            border-radius: var(--radius-xl);
+            font-family: var(--font-family-mono);
+            font-size: var(--text-sm);
+            overflow-x: auto;
+        }
+
+        .test-success {
+            color: var(--success);
+            font-weight: var(--font-semibold);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+        }
+
+        .test-details {
+            color: var(--text-tertiary);
+            line-height: var(--leading-relaxed);
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            padding: var(--space-5) var(--space-6);
+            border-top: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface-secondary);
+        }
+
+        .footer-left {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            font-weight: var(--font-medium);
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Previous step content (collapsed) */
+        .previous-step {
+            margin-bottom: var(--space-6);
+        }
+
+        .previous-step summary {
+            cursor: pointer;
+            padding: var(--space-4);
+            background: var(--surface-tertiary);
+            border-radius: var(--radius-xl);
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .previous-step summary:hover {
+            background: var(--surface-quaternary);
+            color: var(--text-primary);
+        }
+
+        .previous-step[open] summary {
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .previous-content {
+            padding: var(--space-5);
+            background: var(--surface-secondary);
+            border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            border-top: none;
+        }
+
+        .previous-content .input {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-overlay">
+        <div class="modal">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h2 class="modal-title">Add New API</h2>
+                <button class="close-btn">×</button>
+            </div>
+
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="steps-container">
+                    <div class="step completed">
+                        <div class="step-circle">✓</div>
+                        <span class="step-label">Basic Info</span>
+                    </div>
+                    <div class="step active">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">Authentication</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-circle">3</div>
+                        <span class="step-label">Endpoints</span>
+                    </div>
+                    <div class="step">
+                        <div class="step-circle">4</div>
+                        <span class="step-label">Review</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <!-- Step 2: Authentication -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <span class="section-icon">🔐</span>
+                        Authentication Method
+                    </h3>
+                    <p class="section-subtitle">Select how RocketHooks should authenticate with this API</p>
+
+                    <div class="auth-options">
+                        <div class="auth-option">
+                            <div class="auth-icon">🚫</div>
+                            <div class="auth-label">No Auth</div>
+                        </div>
+                        <div class="auth-option selected">
+                            <div class="auth-icon">🔑</div>
+                            <div class="auth-label">API Key</div>
+                        </div>
+                        <div class="auth-option">
+                            <div class="auth-icon">🎫</div>
+                            <div class="auth-label">Bearer Token</div>
+                        </div>
+                        <div class="auth-option">
+                            <div class="auth-icon">👤</div>
+                            <div class="auth-label">Basic Auth</div>
+                        </div>
+                        <div class="auth-option">
+                            <div class="auth-icon">🔐</div>
+                            <div class="auth-label">OAuth 2.0</div>
+                        </div>
+                        <div class="auth-option">
+                            <div class="auth-icon">⚙️</div>
+                            <div class="auth-label">Custom</div>
+                        </div>
+                    </div>
+
+                    <!-- API Key Configuration -->
+                    <div class="alert alert-info">
+                        <div class="alert-icon">ℹ</div>
+                        <div>API Key authentication selected. The key will be included in the request header.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Header Name <span class="required">*</span></label>
+                        <input type="text" class="input" value="X-API-Key" placeholder="e.g., X-API-Key, Authorization">
+                        <span class="help-text">The header name where the API key will be sent</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>API Key Value <span class="required">*</span></label>
+                        <input type="password" class="input" placeholder="Enter your API key" value="sk_live_...">
+                        <span class="help-text">Your API key will be encrypted and stored securely</span>
+                    </div>
+                </div>
+
+                <!-- Custom Headers -->
+                <div class="form-section">
+                    <h3 class="section-title">Custom Headers</h3>
+                    <p class="section-subtitle">Add any additional headers to include with every request</p>
+
+                    <div class="headers-builder">
+                        <div class="headers-title">Request Headers</div>
+                        <div class="header-row">
+                            <div class="form-group">
+                                <label>Header Name</label>
+                                <input type="text" class="input" placeholder="Header name" value="Content-Type">
+                            </div>
+                            <div class="form-group">
+                                <label>Header Value</label>
+                                <input type="text" class="input" placeholder="Header value" value="application/json">
+                            </div>
+                            <button class="remove-btn">×</button>
+                        </div>
+                        <div class="header-row">
+                            <div class="form-group">
+                                <label>Header Name</label>
+                                <input type="text" class="input" placeholder="Header name" value="Accept">
+                            </div>
+                            <div class="form-group">
+                                <label>Header Value</label>
+                                <input type="text" class="input" placeholder="Header value" value="application/json">
+                            </div>
+                            <button class="remove-btn">×</button>
+                        </div>
+                        <button class="add-header-btn">
+                            <span>+</span> Add Header
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Test Connection -->
+                <div class="form-section">
+                    <div class="test-section">
+                        <div class="test-header">
+                            <div class="test-title">
+                                <span>🧪</span>
+                                Test Authentication
+                            </div>
+                            <button class="test-btn">Test Connection</button>
+                        </div>
+                        <div class="test-result">
+                            <div class="test-success">
+                                <span>✓</span> Connection successful!
+                            </div>
+                            <div class="test-details">
+                                Response: 200 OK<br>
+                                Server: nginx/1.21.0<br>
+                                Rate Limit: 1000 requests/hour
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Previous Step Content (collapsed) -->
+                <details class="previous-step">
+                    <summary>
+                        <span>📋</span> Step 1: Basic Information (Completed)
+                    </summary>
+                    <div class="previous-content">
+                        <div class="form-group">
+                            <label>API Name</label>
+                            <input type="text" class="input" value="Payment Gateway API" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Base URL</label>
+                            <input type="url" class="input" value="https://api.payment-provider.com/v2" disabled>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <div class="footer-left">
+                    Step 2 of 4
+                </div>
+                <div class="footer-actions">
+                    <button class="btn btn-secondary">Previous</button>
+                    <button class="btn btn-secondary">Save Draft</button>
+                    <button class="btn btn-primary">Next: Configure Endpoints</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

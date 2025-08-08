@@ -1,5 +1,6 @@
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -8,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface Props {
   children: ReactNode
@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo)
 
     // Report to error tracking service in production
-    if (process.env['NODE_ENV'] === 'production') {
+    if (import.meta.env.PROD) {
       // TODO: Integrate with error tracking service (Sentry, LogRocket, etc.)
       this.reportError(error, errorInfo)
     }
@@ -88,7 +88,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {process.env['NODE_ENV'] === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <Alert variant="destructive">
                 <AlertDescription className="text-sm font-mono">
                   {this.state.error.message}
@@ -125,7 +125,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {process.env['NODE_ENV'] === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <Alert variant="destructive">
                 <AlertDescription className="text-sm font-mono">
                   {this.state.error.message}
@@ -160,7 +160,7 @@ export class ErrorBoundary extends Component<Props, State> {
         <p className="text-sm text-muted-foreground mb-3">
           This component failed to render properly.
         </p>
-        {process.env['NODE_ENV'] === 'development' && this.state.error && (
+        {import.meta.env.DEV && this.state.error && (
           <Alert variant="destructive" className="mb-3">
             <AlertDescription className="text-xs font-mono">
               {this.state.error.message}

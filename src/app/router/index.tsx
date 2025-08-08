@@ -1,8 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { RootLayout } from '@/app/layouts/root-layout'
 import { DashboardLayout } from '@/app/layouts/dashboard-layout'
-import { DashboardPage } from '@/shared/components/page-layout'
+import { RootLayout } from '@/app/layouts/root-layout'
 import { ComponentTest } from '@/pages/component-test'
+import { DashboardPage } from '@/shared/components/page-layout'
 
 // Demo pages for each route
 function HomePage() {

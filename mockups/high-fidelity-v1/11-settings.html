@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        /* Custom settings styles */
+        .settings-layout {
+            display: flex;
+            gap: var(--space-6);
+            height: calc(100vh - 240px);
+            min-height: 600px;
+        }
+
+        /* Settings Sidebar */
+        .settings-sidebar {
+            width: 280px;
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            flex-shrink: 0;
+        }
+
+        .settings-sidebar-header {
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, var(--surface-tertiary) 100%);
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .settings-sidebar-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .settings-nav {
+            padding: var(--space-4) 0;
+        }
+
+        .settings-nav-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .nav-group-title {
+            padding: 0 var(--space-6) var(--space-3);
+            font-size: var(--text-xs);
+            font-weight: var(--font-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+        }
+
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-3) var(--space-6);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            transition: all var(--transition-fast);
+            position: relative;
+            gap: var(--space-3);
+        }
+
+        .settings-nav-item:hover {
+            background: var(--surface-secondary);
+            color: var(--text-primary);
+            transform: translateX(2px);
+        }
+
+        .settings-nav-item.active {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1) 0%, transparent 100%);
+            color: var(--primary);
+            border-right: 3px solid var(--primary);
+        }
+
+        .settings-nav-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-lg);
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .settings-nav-item.active .settings-nav-icon {
+            background: var(--primary);
+        }
+
+        .settings-nav-item:not(.active) .settings-nav-icon {
+            background: var(--surface-tertiary);
+        }
+
+        .nav-item-badge {
+            margin-left: auto;
+            padding: var(--space-1) var(--space-2);
+            background: var(--error-light);
+            color: var(--error);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-bold);
+        }
+
+        /* Settings Content */
+        .settings-content {
+            flex: 1;
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .settings-content-header {
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, var(--surface-tertiary) 100%);
+            padding: var(--space-6) var(--space-8);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .settings-content-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .settings-content-subtitle {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+        }
+
+        .settings-content-body {
+            flex: 1;
+            padding: var(--space-8);
+            overflow-y: auto;
+        }
+
+        /* Success Message */
+        .success-banner {
+            background: linear-gradient(135deg, var(--success-light) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: var(--radius-xl);
+            padding: var(--space-4) var(--space-5);
+            margin-bottom: var(--space-8);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .success-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--success);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-size: var(--text-sm);
+            font-weight: var(--font-bold);
+        }
+
+        .success-text {
+            color: var(--success);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        /* Settings Sections */
+        .settings-section {
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, rgba(248, 250, 252, 0.5) 100%);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .section-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .section-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-base);
+        }
+
+        .section-description {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+            line-height: var(--leading-relaxed);
+        }
+
+        /* Enhanced Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .form-group-enhanced {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .form-label-enhanced {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between);
+        }
+
+        .label-required {
+            color: var(--error);
+            font-size: var(--text-sm);
+            margin-left: var(--space-1);
+        }
+
+        .input-enhanced {
+            padding: var(--space-4) var(--space-5);
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-xl);
+            font-size: var(--text-base);
+            font-family: inherit;
+            line-height: var(--leading-normal);
+            color: var(--text-primary);
+            background: var(--surface-primary);
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .input-enhanced:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            background: var(--surface-primary);
+        }
+
+        .help-text-enhanced {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            line-height: var(--leading-relaxed);
+        }
+
+        /* Toggle Switches */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-5) 0;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .toggle-group:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-info {
+            flex: 1;
+            margin-right: var(--space-4);
+        }
+
+        .toggle-title {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .toggle-description {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            line-height: var(--leading-relaxed);
+        }
+
+        .toggle-switch {
+            width: 52px;
+            height: 32px;
+            background: var(--surface-quaternary);
+            border-radius: var(--radius-full);
+            position: relative;
+            cursor: pointer;
+            transition: background-color var(--transition-base);
+            border: 2px solid var(--border-primary);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+            border-color: var(--success);
+        }
+
+        .toggle-handle {
+            width: 28px;
+            height: 28px;
+            background: var(--surface-primary);
+            border-radius: var(--radius-full);
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            transition: transform var(--transition-base);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-secondary);
+        }
+
+        .toggle-switch.active .toggle-handle {
+            transform: translateX(20px);
+            border-color: var(--success);
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-4);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--border-primary);
+            margin-top: var(--space-8);
+        }
+
+        /* API Keys Section */
+        .api-keys-section {
+            background: var(--surface-primary);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .api-keys-header {
+            background: linear-gradient(135deg, var(--surface-tertiary) 0%, var(--surface-quaternary) 100%);
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .api-keys-title {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .api-key-item {
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .api-key-item:last-child {
+            border-bottom: none;
+        }
+
+        .api-key-info {
+            flex: 1;
+        }
+
+        .api-key-name {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .api-key-value {
+            font-family: var(--font-family-mono);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            background: var(--surface-tertiary);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-lg);
+            display: inline-block;
+        }
+
+        .api-key-meta {
+            display: flex;
+            gap: var(--space-4);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            margin-top: var(--space-2);
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            transition: all var(--transition-fast);
+        }
+
+        .icon-btn:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+            color: var(--text-secondary);
+            transform: scale(1.05);
+        }
+
+        .icon-btn.danger:hover {
+            background: var(--error-light);
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Team Members */
+        .team-member {
+            display: flex;
+            align-items: center;
+            padding: var(--space-5) var(--space-6);
+            background: var(--surface-secondary);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-4);
+            border: 1px solid var(--border-primary);
+            transition: all var(--transition-fast);
+        }
+
+        .team-member:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .member-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-full);
+            margin-right: var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .member-email {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        .member-role {
+            padding: var(--space-2) var(--space-3);
+            background: var(--surface-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-right: var(--space-4);
+            min-width: 100px;
+        }
+
+        /* Billing Section */
+        .billing-card {
+            background: linear-gradient(135deg, var(--surface-tertiary) 0%, var(--surface-quaternary) 100%);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            margin-bottom: var(--space-6);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--space-6);
+        }
+
+        .plan-info {
+            flex: 1;
+        }
+
+        .plan-name {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .plan-description {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+        }
+
+        .plan-price {
+            text-align: right;
+        }
+
+        .price-amount {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .price-period {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+        }
+
+        .usage-meters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .usage-meter {
+            background: var(--surface-primary);
+            padding: var(--space-5);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--border-primary);
+        }
+
+        .usage-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-3);
+            font-weight: var(--font-medium);
+        }
+
+        .usage-bar {
+            height: 10px;
+            background: var(--surface-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success) 0%, var(--primary) 100%);
+            border-radius: var(--radius-full);
+            transition: width var(--transition-base);
+        }
+
+        .usage-fill.warning {
+            background: linear-gradient(90deg, var(--warning) 0%, var(--error) 100%);
+        }
+
+        /* Danger Zone */
+        .danger-zone {
+            background: linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(239, 68, 68, 0.05) 100%);
+            border: 2px solid var(--error-light);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            margin-top: var(--space-8);
+        }
+
+        .danger-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--error);
+            margin-bottom: var(--space-4);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .danger-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--error);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-size: var(--text-base);
+        }
+
+        .danger-description {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: var(--leading-relaxed);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
+            color: var(--text-inverse);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #dc2626 0%, var(--error) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo"></div>
+                    <span class="logo-text">RocketHooks</span>
+                </div>
+                <div class="org-selector">
+                    <span>Acme Corp</span>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>APIs & Endpoints</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Webhooks</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Transformations</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Events</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Logs</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="plan-badge">Developer Plan</div>
+                <div class="usage-bar">
+                    <div class="usage-fill" style="width: 35%"></div>
+                </div>
+                <div class="usage-text">3,500 / 10,000 events</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="search-box">
+                    <span class="search-icon"></span>
+                    <input type="text" class="search-input" placeholder="Search settings...">
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="notification-btn">
+                        <span class="notification-dot"></span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-avatar">JD</span>
+                        <span class="user-name">John D.</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-row">
+                    <div>
+                        <h1 class="page-title">Settings</h1>
+                        <p class="dashboard-subtitle">Configure your organization, team, and preferences</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Layout -->
+            <div class="settings-layout">
+                <!-- Settings Sidebar -->
+                <aside class="settings-sidebar">
+                    <div class="settings-sidebar-header">
+                        <h3 class="settings-sidebar-title">Settings</h3>
+                    </div>
+
+                    <nav class="settings-nav">
+                        <div class="settings-nav-group">
+                            <div class="nav-group-title">General</div>
+                            <a href="#" class="settings-nav-item active">
+                                <span class="settings-nav-icon"></span>
+                                <span>Organization</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Preferences</span>
+                            </a>
+                        </div>
+
+                        <div class="settings-nav-group">
+                            <div class="nav-group-title">Access</div>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>API Keys</span>
+                                <span class="nav-item-badge">2</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Team Members</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Security</span>
+                            </a>
+                        </div>
+
+                        <div class="settings-nav-group">
+                            <div class="nav-group-title">Platform</div>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Notifications</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Integrations</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Billing</span>
+                            </a>
+                        </div>
+
+                        <div class="settings-nav-group">
+                            <div class="nav-group-title">Advanced</div>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Developer Tools</span>
+                            </a>
+                            <a href="#" class="settings-nav-item">
+                                <span class="settings-nav-icon"></span>
+                                <span>Export Data</span>
+                            </a>
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- Settings Content -->
+                <div class="settings-content">
+                    <div class="settings-content-header">
+                        <h2 class="settings-content-title">Organization Settings</h2>
+                        <p class="settings-content-subtitle">Manage your organization's basic information and configuration</p>
+                    </div>
+
+                    <div class="settings-content-body">
+                        <!-- Success Message -->
+                        <div class="success-banner">
+                            <span class="success-icon">✓</span>
+                            <span class="success-text">Settings saved successfully</span>
+                        </div>
+
+                        <!-- Basic Information -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <span class="section-icon">🏢</span>
+                                    Basic Information
+                                </h3>
+                                <p class="section-description">
+                                    Configure your organization's basic information and branding
+                                </p>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">
+                                        Organization Name
+                                        <span class="label-required">*</span>
+                                    </label>
+                                    <input type="text" class="input-enhanced" value="Acme Corp">
+                                    <span class="help-text-enhanced">This is how your organization appears throughout RocketHooks</span>
+                                </div>
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">Organization URL</label>
+                                    <input type="text" class="input-enhanced" value="acme-corp" placeholder="your-org">
+                                    <span class="help-text-enhanced">rockethooks.io/acme-corp</span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">Organization Email</label>
+                                    <input type="email" class="input-enhanced" value="admin@acme-corp.com">
+                                    <span class="help-text-enhanced">Used for important notifications about your account</span>
+                                </div>
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">Timezone</label>
+                                    <select class="input-enhanced">
+                                        <option>UTC</option>
+                                        <option selected>America/New_York (EST)</option>
+                                        <option>America/Los_Angeles (PST)</option>
+                                        <option>Europe/London (GMT)</option>
+                                    </select>
+                                    <span class="help-text-enhanced">Used for scheduling and displaying timestamps</span>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn btn-secondary">Cancel</button>
+                                <button class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+
+                        <!-- Default Settings -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <span class="section-icon">⚙️</span>
+                                    Default Configuration
+                                </h3>
+                                <p class="section-description">
+                                    Configure default values for new APIs, webhooks, and system behavior
+                                </p>
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Auto-retry Failed Webhooks</div>
+                                    <div class="toggle-description">Automatically retry webhook deliveries on failure with exponential backoff</div>
+                                </div>
+                                <div class="toggle-switch active">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Enable HMAC Signing by Default</div>
+                                    <div class="toggle-description">Sign all webhooks with HMAC for enhanced security verification</div>
+                                </div>
+                                <div class="toggle-switch active">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Store Event History</div>
+                                    <div class="toggle-description">Keep a complete history of all processed events for debugging</div>
+                                </div>
+                                <div class="toggle-switch active">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="toggle-group">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Real-time Event Stream</div>
+                                    <div class="toggle-description">Enable live event streaming in the dashboard for real-time monitoring</div>
+                                </div>
+                                <div class="toggle-switch">
+                                    <div class="toggle-handle"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-row" style="margin-top: var(--space-8);">
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">Default Polling Interval</label>
+                                    <select class="input-enhanced">
+                                        <option>30 seconds</option>
+                                        <option selected>1 minute</option>
+                                        <option>5 minutes</option>
+                                        <option>15 minutes</option>
+                                        <option>30 minutes</option>
+                                        <option>1 hour</option>
+                                    </select>
+                                </div>
+                                <div class="form-group-enhanced">
+                                    <label class="form-label-enhanced">Default Webhook Timeout</label>
+                                    <select class="input-enhanced">
+                                        <option>5 seconds</option>
+                                        <option selected>10 seconds</option>
+                                        <option>30 seconds</option>
+                                        <option>60 seconds</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button class="btn btn-secondary">Reset Defaults</button>
+                                <button class="btn btn-primary">Save Configuration</button>
+                            </div>
+                        </div>
+
+                        <!-- API Keys Management -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <span class="section-icon">🔑</span>
+                                    API Keys
+                                </h3>
+                                <p class="section-description">
+                                    Manage API keys for programmatic access to RocketHooks
+                                </p>
+                            </div>
+
+                            <div class="api-keys-section">
+                                <div class="api-keys-header">
+                                    <h4 class="api-keys-title">Active API Keys</h4>
+                                    <button class="btn btn-primary">Generate New Key</button>
+                                </div>
+
+                                <div class="api-key-item">
+                                    <div class="api-key-info">
+                                        <div class="api-key-name">Production Key</div>
+                                        <div class="api-key-value">rh_live_3fD9kL2m...Xy8Z</div>
+                                        <div class="api-key-meta">
+                                            <span>Created: Mar 1, 2024</span>
+                                            <span>Last used: 2 hours ago</span>
+                                        </div>
+                                    </div>
+                                    <div class="api-key-actions">
+                                        <button class="icon-btn" title="View Key">👁</button>
+                                        <button class="icon-btn" title="Copy Key">📋</button>
+                                        <button class="icon-btn danger" title="Delete Key">🗑</button>
+                                    </div>
+                                </div>
+
+                                <div class="api-key-item">
+                                    <div class="api-key-info">
+                                        <div class="api-key-name">Development Key</div>
+                                        <div class="api-key-value">rh_test_8kP2mN4x...Bc7A</div>
+                                        <div class="api-key-meta">
+                                            <span>Created: Mar 5, 2024</span>
+                                            <span>Last used: Yesterday</span>
+                                        </div>
+                                    </div>
+                                    <div class="api-key-actions">
+                                        <button class="icon-btn" title="View Key">👁</button>
+                                        <button class="icon-btn" title="Copy Key">📋</button>
+                                        <button class="icon-btn danger" title="Delete Key">🗑</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Management -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <span class="section-icon">👥</span>
+                                    Team Members
+                                </h3>
+                                <p class="section-description">
+                                    Manage who has access to your organization and their permissions
+                                </p>
+                            </div>
+
+                            <div style="margin-bottom: var(--space-6);">
+                                <button class="btn btn-primary">Invite Team Member</button>
+                            </div>
+
+                            <div class="team-member">
+                                <div class="member-avatar">JD</div>
+                                <div class="member-info">
+                                    <div class="member-name">John Doe</div>
+                                    <div class="member-email">john@acme-corp.com</div>
+                                </div>
+                                <select class="member-role">
+                                    <option>Admin</option>
+                                    <option>Member</option>
+                                    <option>Viewer</option>
+                                </select>
+                                <div class="api-key-actions">
+                                    <button class="icon-btn danger">🗑</button>
+                                </div>
+                            </div>
+
+                            <div class="team-member">
+                                <div class="member-avatar">JS</div>
+                                <div class="member-info">
+                                    <div class="member-name">Jane Smith</div>
+                                    <div class="member-email">jane@acme-corp.com</div>
+                                </div>
+                                <select class="member-role">
+                                    <option>Admin</option>
+                                    <option selected>Member</option>
+                                    <option>Viewer</option>
+                                </select>
+                                <div class="api-key-actions">
+                                    <button class="icon-btn danger">🗑</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Billing & Usage -->
+                        <div class="settings-section">
+                            <div class="section-header">
+                                <h3 class="section-title">
+                                    <span class="section-icon">💳</span>
+                                    Billing & Usage
+                                </h3>
+                                <p class="section-description">
+                                    Manage your subscription and monitor resource usage
+                                </p>
+                            </div>
+
+                            <div class="billing-card">
+                                <div class="plan-header">
+                                    <div class="plan-info">
+                                        <div class="plan-name">Developer Plan</div>
+                                        <div class="plan-description">Perfect for individual developers and small teams</div>
+                                    </div>
+                                    <div class="plan-price">
+                                        <div class="price-amount">$0</div>
+                                        <div class="price-period">per month</div>
+                                    </div>
+                                </div>
+
+                                <div class="usage-meters">
+                                    <div class="usage-meter">
+                                        <div class="usage-label">
+                                            <span>Events This Month</span>
+                                            <span>3,500 / 10,000</span>
+                                        </div>
+                                        <div class="usage-bar">
+                                            <div class="usage-fill" style="width: 35%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="usage-meter">
+                                        <div class="usage-label">
+                                            <span>API Endpoints</span>
+                                            <span>8 / 10</span>
+                                        </div>
+                                        <div class="usage-bar">
+                                            <div class="usage-fill warning" style="width: 80%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="usage-meter">
+                                        <div class="usage-label">
+                                            <span>Webhook Destinations</span>
+                                            <span>5 / 25</span>
+                                        </div>
+                                        <div class="usage-bar">
+                                            <div class="usage-fill" style="width: 20%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary">Upgrade Plan</button>
+                            </div>
+
+                            <div class="form-group-enhanced">
+                                <label class="form-label-enhanced">Payment Method</label>
+                                <div style="display: flex; align-items: center; gap: var(--space-4);">
+                                    <div style="padding: var(--space-4); background: var(--surface-tertiary); border-radius: var(--radius-xl); flex: 1; color: var(--text-tertiary);">
+                                        No payment method on file
+                                    </div>
+                                    <button class="btn btn-secondary">Add Payment Method</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="danger-zone">
+                            <h3 class="danger-title">
+                                <span class="danger-icon">⚠️</span>
+                                Danger Zone
+                            </h3>
+                            <p class="danger-description">
+                                Once you delete your organization, there is no going back. All data including APIs, webhooks, events, and team members will be permanently removed and cannot be recovered.
+                            </p>
+                            <button class="btn btn-danger">Delete Organization</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Include topbar styles -->
+    <style>
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            position: relative;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--error);
+            border-radius: var(--radius-full);
+            border: 2px solid var(--surface-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .notification-btn::before {
+            content: '🔔';
+            font-size: var(--text-sm);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-left: auto;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+        }
+
+        .user-name {
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+        }
+
+        .dropdown-arrow {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+    </style>
+</body>
+</html>
