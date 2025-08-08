@@ -1,14 +1,9 @@
-import { Toaster } from '@/components/ui/sonner'
-import { ComponentTest } from '@/pages/component-test'
+import { RouterProvider } from 'react-router-dom'
+import { router } from '@/app/router'
 import './App.css'
 
 function App() {
-  return (
-    <>
-      <ComponentTest />
-      <Toaster position="bottom-right" richColors />
-    </>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App
