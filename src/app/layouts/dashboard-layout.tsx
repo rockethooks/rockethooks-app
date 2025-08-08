@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { PageErrorBoundary } from '@/shared/components/error-boundary'
 import { Header } from './header'
 import { Sidebar } from './sidebar'
-import { PageErrorBoundary } from '@/shared/components/error-boundary'
-import { cn } from '@/lib/utils'
 
 interface DashboardLayoutProps {
   children?: React.ReactNode

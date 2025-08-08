@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Create Organization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, #f1f5f9 50%, var(--surface-secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: var(--space-5);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+        }
+
+        .onboarding-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .onboarding-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-10);
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border-primary);
+            z-index: 1;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 0;
+            width: 25%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+            z-index: 2;
+            transition: width var(--transition-slow);
+        }
+
+        .progress-step {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            background: var(--surface-primary);
+            border: 2px solid var(--border-primary);
+            position: relative;
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            color: var(--text-quaternary);
+            font-weight: var(--font-semibold);
+            transition: all var(--transition-base);
+        }
+
+        .progress-step.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--text-inverse);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .progress-step.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: var(--text-inverse);
+        }
+
+        .progress-step.completed::before {
+            content: '✓';
+            position: absolute;
+        }
+
+        /* User Welcome */
+        .user-welcome {
+            display: flex;
+            align-items: center;
+            padding: var(--space-4);
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, var(--surface-tertiary) 100%);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            margin-bottom: var(--space-8);
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            margin-right: var(--space-4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: var(--font-semibold);
+            font-size: var(--text-lg);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            margin-bottom: var(--space-1);
+        }
+
+        .user-email {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        /* Form Styles */
+        h1 {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-8);
+            font-size: var(--text-base);
+            line-height: var(--leading-relaxed);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-addon {
+            position: absolute;
+            right: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-tertiary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .slug-preview {
+            margin-top: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+        }
+
+        .slug-preview strong {
+            color: var(--primary);
+            font-weight: var(--font-semibold);
+        }
+
+        /* Use Case Options */
+        .use-case-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+        }
+
+        .use-case-tag {
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            background: var(--surface-primary);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .use-case-tag:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .use-case-tag.selected {
+            background: var(--primary);
+            color: var(--text-inverse);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Plan Selector */
+        .plan-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .plan-option {
+            padding: var(--space-5);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+            background: var(--surface-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            transition: height var(--transition-base);
+        }
+
+        .plan-option:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .plan-option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .plan-option.selected::before {
+            height: 3px;
+        }
+
+        .plan-name {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-1);
+            color: var(--text-primary);
+            position: relative;
+            z-index: 2;
+        }
+
+        .plan-price {
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Annotation */
+        .annotation {
+            position: absolute;
+            background: var(--warning);
+            color: var(--text-inverse);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-lg);
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            box-shadow: var(--shadow-lg);
+            white-space: nowrap;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        .annotation-top {
+            bottom: calc(100% + 12px);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .annotation-top::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid var(--warning);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-8);
+        }
+
+        .btn-secondary {
+            flex: 0 0 auto;
+        }
+
+        .btn-primary {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="onboarding-card">
+            <div class="progress-bar">
+                <div class="progress-step completed">✓</div>
+                <div class="progress-step active">2</div>
+                <div class="progress-step">3</div>
+                <div class="progress-step">4</div>
+            </div>
+
+            <div class="user-welcome">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <div class="user-name">John Developer</div>
+                    <div class="user-email">john@company.com</div>
+                </div>
+            </div>
+
+            <h1>Create your organization</h1>
+            <p class="subtitle">This is where your team will manage APIs and webhooks</p>
+
+            <div class="form-group">
+                <label for="org-name">Organization Name <span class="required">*</span></label>
+                <div class="input-wrapper" style="position: relative;">
+                    <input type="text" id="org-name" class="input" placeholder="e.g., Acme Corp" value="">
+                    <div class="annotation annotation-top">
+                        Auto-populated from OAuth provider
+                    </div>
+                </div>
+                <p class="help-text">This is how your organization will appear throughout RocketHooks</p>
+            </div>
+
+            <div class="form-group">
+                <label for="org-slug">Organization URL <span class="required">*</span></label>
+                <div class="input-wrapper">
+                    <input type="text" id="org-slug" class="input" placeholder="acme-corp" value="" style="padding-right: 140px;">
+                    <span class="input-addon">.rockethooks.io</span>
+                </div>
+                <p class="slug-preview">Your dashboard will be at: <strong>acme-corp.rockethooks.io</strong></p>
+            </div>
+
+            <div class="form-group">
+                <label>What's your primary use case?</label>
+                <div class="use-case-options">
+                    <div class="use-case-tag">Monitor REST APIs</div>
+                    <div class="use-case-tag selected">Legacy system integration</div>
+                    <div class="use-case-tag">Real-time notifications</div>
+                    <div class="use-case-tag">Data synchronization</div>
+                    <div class="use-case-tag">Event streaming</div>
+                    <div class="use-case-tag">Other</div>
+                </div>
+                <p class="help-text">This helps us customize your experience</p>
+            </div>
+
+            <div class="form-group">
+                <label>Select your plan</label>
+                <div class="plan-selector">
+                    <div class="plan-option selected">
+                        <div class="plan-name">Developer</div>
+                        <div class="plan-price">Free forever</div>
+                    </div>
+                    <div class="plan-option">
+                        <div class="plan-name">Startup</div>
+                        <div class="plan-price">$49/month</div>
+                    </div>
+                </div>
+                <p class="help-text">You can upgrade anytime. No credit card required for free tier.</p>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-secondary">Skip for now</button>
+                <button class="btn btn-primary">Create Organization</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

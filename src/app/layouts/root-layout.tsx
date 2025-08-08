@@ -1,8 +1,8 @@
 import { Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/app/providers/theme-provider'
-import { AppErrorBoundary } from '@/shared/components/error-boundary'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { AppErrorBoundary } from '@/shared/components/error-boundary'
 
 interface RootLayoutProps {
   children?: React.ReactNode

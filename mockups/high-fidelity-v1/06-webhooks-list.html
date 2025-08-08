@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Webhook Destinations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        /* Custom webhook list styles */
+        .webhooks-header {
+            margin-bottom: var(--space-6);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: var(--space-5);
+            margin-bottom: var(--space-8);
+        }
+
+        .webhook-stat-card {
+            background: linear-gradient(135deg, var(--surface-primary) 0%, var(--surface-secondary) 100%);
+            padding: var(--space-6);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .webhook-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .webhook-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--success) 0%, var(--primary) 50%, var(--info) 100%);
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--surface-primary);
+            padding: var(--space-5) var(--space-6);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-2);
+            border: 1px solid var(--border-primary);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tabs-nav {
+            display: flex;
+            gap: var(--space-1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            border: none;
+            background: transparent;
+            border-radius: var(--radius-xl);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+
+        .tab-button:hover {
+            color: var(--text-secondary);
+            background: var(--surface-secondary);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-inverse);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tab-badge {
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .tab-button:not(.active) .tab-badge {
+            background: var(--surface-tertiary);
+            color: var(--text-tertiary);
+        }
+
+        .tab-button.active .tab-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--text-inverse);
+        }
+
+        /* Enhanced Table */
+        .webhooks-table-container {
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            border: 1px solid var(--border-primary);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--surface-secondary) 0%, var(--surface-tertiary) 100%);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .table-header-row {
+            display: grid;
+            grid-template-columns: 40px 2fr 1.5fr 140px 120px 100px 80px;
+            padding: var(--space-4) var(--space-5);
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .table-header-cell {
+            font-size: var(--text-xs);
+            font-weight: var(--font-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-tertiary);
+        }
+
+        .table-body {
+            position: relative;
+        }
+
+        .table-body-row {
+            display: grid;
+            grid-template-columns: 40px 2fr 1.5fr 140px 120px 100px 80px;
+            padding: var(--space-5);
+            gap: var(--space-4);
+            align-items: center;
+            border-bottom: 1px solid var(--border-primary);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .table-body-row:hover {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.02) 0%, var(--surface-secondary) 100%);
+            transform: translateX(2px);
+        }
+
+        .table-body-row:last-child {
+            border-bottom: none;
+        }
+
+        .table-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        .table-checkbox:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .webhook-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+            min-width: 0;
+        }
+
+        .webhook-name {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .webhook-url {
+            font-family: var(--font-family-mono);
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: var(--surface-tertiary);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+        }
+
+        .api-connections {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .connection-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .connection-icon {
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+            flex-shrink: 0;
+        }
+
+        .delivery-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .success-rate {
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--success);
+        }
+
+        .success-rate.warning {
+            color: var(--warning);
+        }
+
+        .success-rate.error {
+            color: var(--error);
+        }
+
+        .delivery-count {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .last-delivery {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .webhook-status {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-bold);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            gap: var(--space-1);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: var(--radius-full);
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        .webhook-status.active {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .webhook-status.failed {
+            background: var(--error-light);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .webhook-status.paused {
+            background: var(--warning-light);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .table-actions {
+            position: relative;
+        }
+
+        .actions-menu {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--surface-secondary);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-tertiary);
+            transition: all var(--transition-fast);
+            font-size: var(--text-sm);
+        }
+
+        .actions-menu:hover {
+            background: var(--surface-tertiary);
+            color: var(--text-secondary);
+            transform: scale(1.05);
+        }
+
+        /* Bulk Actions Bar */
+        .bulk-actions-bar {
+            position: fixed;
+            bottom: var(--space-6);
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, var(--text-primary) 0%, #334155 100%);
+            color: var(--text-inverse);
+            padding: var(--space-4) var(--space-6);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            align-items: center;
+            gap: var(--space-6);
+            transition: all var(--transition-base);
+            opacity: 0;
+            pointer-events: none;
+            z-index: var(--z-fixed);
+        }
+
+        .bulk-actions-bar.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bulk-info {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .bulk-btn {
+            padding: var(--space-2) var(--space-4);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            color: var(--text-inverse);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            backdrop-filter: blur(10px);
+        }
+
+        .bulk-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: var(--surface-primary);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-20);
+            text-align: center;
+            margin: var(--space-10) auto;
+            max-width: 500px;
+            border: 1px solid var(--border-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--surface-tertiary) 0%, var(--surface-quaternary) 100%);
+            border-radius: var(--radius-full);
+            margin: 0 auto var(--space-8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-4xl);
+        }
+
+        .empty-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-3);
+        }
+
+        .empty-description {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+            margin-bottom: var(--space-8);
+            line-height: var(--leading-relaxed);
+        }
+
+        /* User menu styles */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo"></div>
+                    <span class="logo-text">RocketHooks</span>
+                </div>
+                <div class="org-selector">
+                    <span>Acme Corp</span>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>APIs & Endpoints</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>Webhooks</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Transformations</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Events</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Logs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"></span>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="plan-badge">Developer Plan</div>
+                <div class="usage-bar">
+                    <div class="usage-fill" style="width: 35%"></div>
+                </div>
+                <div class="usage-text">3,500 / 10,000 events</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <div class="search-box">
+                    <span class="search-icon"></span>
+                    <input type="text" class="search-input" placeholder="Search webhooks...">
+                </div>
+
+                <div class="topbar-actions">
+                    <div class="notification-btn">
+                        <span class="notification-dot"></span>
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-avatar">JD</span>
+                        <span class="user-name">John D.</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-row">
+                    <div>
+                        <h1 class="page-title">Webhook Destinations</h1>
+                        <p class="dashboard-subtitle">Manage and monitor your webhook endpoints</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary">
+                            <span class="btn-icon-element"></span>
+                            Test All
+                        </button>
+                        <button class="btn btn-primary">
+                            <span class="btn-icon-element"></span>
+                            Add Webhook
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="webhook-stat-card">
+                        <div class="stat-label">Total Webhooks</div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change">+2 this week</div>
+                    </div>
+                    <div class="webhook-stat-card">
+                        <div class="stat-label">Deliveries Today</div>
+                        <div class="stat-value">3,847</div>
+                        <div class="stat-change">↑ 23% from yesterday</div>
+                    </div>
+                    <div class="webhook-stat-card">
+                        <div class="stat-label">Success Rate</div>
+                        <div class="stat-value">99.8%</div>
+                        <div class="stat-change">No failures today</div>
+                    </div>
+                    <div class="webhook-stat-card">
+                        <div class="stat-label">Avg Response</div>
+                        <div class="stat-value">142ms</div>
+                        <div class="stat-change">↓ 8ms faster</div>
+                    </div>
+                </div>
+
+                <!-- Filters Section -->
+                <div class="filters-section">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <span class="filter-label">Filter by:</span>
+                            <select class="select">
+                                <option>All APIs</option>
+                                <option>Payment Gateway</option>
+                                <option>User Management</option>
+                                <option>Inventory System</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="select">
+                                <option>All Status</option>
+                                <option>Active Only</option>
+                                <option>Failed Only</option>
+                                <option>Paused Only</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select class="select">
+                                <option>Last 24 Hours</option>
+                                <option>Last Week</option>
+                                <option>Last Month</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary">
+                            <span class="btn-icon-element"></span>
+                            Export
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs Navigation -->
+                <div class="tabs-container">
+                    <div class="tabs-nav">
+                        <button class="tab-button active">
+                            All Webhooks
+                            <span class="tab-badge">12</span>
+                        </button>
+                        <button class="tab-button">
+                            Active
+                            <span class="tab-badge">10</span>
+                        </button>
+                        <button class="tab-button">
+                            Failed
+                            <span class="tab-badge">1</span>
+                        </button>
+                        <button class="tab-button">
+                            Paused
+                            <span class="tab-badge">1</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Webhooks Table -->
+                <div class="webhooks-table-container">
+                    <div class="table-header">
+                        <div class="table-header-row">
+                            <div class="table-checkbox"></div>
+                            <div class="table-header-cell">Webhook Destination</div>
+                            <div class="table-header-cell">Connected APIs</div>
+                            <div class="table-header-cell">Success Rate</div>
+                            <div class="table-header-cell">Last Delivery</div>
+                            <div class="table-header-cell">Status</div>
+                            <div class="table-header-cell">Actions</div>
+                        </div>
+                    </div>
+
+                    <div class="table-body">
+                        <!-- Webhook Row 1 -->
+                        <div class="table-body-row">
+                            <div class="table-checkbox"></div>
+                            <div class="webhook-info">
+                                <div class="webhook-name">Production Webhook</div>
+                                <div class="webhook-url">https://app.company.com/webhooks/receive</div>
+                            </div>
+                            <div class="api-connections">
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>Payment Gateway API</span>
+                                </div>
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>User Management API</span>
+                                </div>
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>+1 more</span>
+                                </div>
+                            </div>
+                            <div class="delivery-metrics">
+                                <div class="success-rate">99.9%</div>
+                                <div class="delivery-count">1,234 today</div>
+                            </div>
+                            <div class="last-delivery">2 min ago</div>
+                            <div>
+                                <div class="webhook-status active">
+                                    <span class="status-dot"></span>
+                                    <span>Active</span>
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="actions-menu">⋮</button>
+                            </div>
+                        </div>
+
+                        <!-- Webhook Row 2 -->
+                        <div class="table-body-row">
+                            <div class="table-checkbox"></div>
+                            <div class="webhook-info">
+                                <div class="webhook-name">Slack Notifications</div>
+                                <div class="webhook-url">https://hooks.slack.com/services/T00000000/B00000000/...</div>
+                            </div>
+                            <div class="api-connections">
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>Inventory System API</span>
+                                </div>
+                            </div>
+                            <div class="delivery-metrics">
+                                <div class="success-rate">100%</div>
+                                <div class="delivery-count">89 today</div>
+                            </div>
+                            <div class="last-delivery">15 min ago</div>
+                            <div>
+                                <div class="webhook-status active">
+                                    <span class="status-dot"></span>
+                                    <span>Active</span>
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="actions-menu">⋮</button>
+                            </div>
+                        </div>
+
+                        <!-- Webhook Row 3 - Failed -->
+                        <div class="table-body-row">
+                            <div class="table-checkbox"></div>
+                            <div class="webhook-info">
+                                <div class="webhook-name">Development Server</div>
+                                <div class="webhook-url">https://dev.company.com/api/webhooks</div>
+                            </div>
+                            <div class="api-connections">
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>User Management API</span>
+                                </div>
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>Payment Gateway API</span>
+                                </div>
+                            </div>
+                            <div class="delivery-metrics">
+                                <div class="success-rate error">0%</div>
+                                <div class="delivery-count">Failed</div>
+                            </div>
+                            <div class="last-delivery">3 hours ago</div>
+                            <div>
+                                <div class="webhook-status failed">
+                                    <span class="status-dot"></span>
+                                    <span>Error</span>
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="actions-menu">⋮</button>
+                            </div>
+                        </div>
+
+                        <!-- Webhook Row 4 - Paused -->
+                        <div class="table-body-row">
+                            <div class="table-checkbox"></div>
+                            <div class="webhook-info">
+                                <div class="webhook-name">Analytics Pipeline</div>
+                                <div class="webhook-url">https://analytics.company.com/ingest</div>
+                            </div>
+                            <div class="api-connections">
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>All APIs</span>
+                                </div>
+                            </div>
+                            <div class="delivery-metrics">
+                                <div class="success-rate">—</div>
+                                <div class="delivery-count">Paused</div>
+                            </div>
+                            <div class="last-delivery">2 days ago</div>
+                            <div>
+                                <div class="webhook-status paused">
+                                    <span class="status-dot"></span>
+                                    <span>Paused</span>
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="actions-menu">⋮</button>
+                            </div>
+                        </div>
+
+                        <!-- Webhook Row 5 -->
+                        <div class="table-body-row">
+                            <div class="table-checkbox"></div>
+                            <div class="webhook-info">
+                                <div class="webhook-name">Backup Endpoint</div>
+                                <div class="webhook-url">https://backup.company.com/webhooks</div>
+                            </div>
+                            <div class="api-connections">
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>Payment Gateway API</span>
+                                </div>
+                                <div class="connection-item">
+                                    <span class="connection-icon"></span>
+                                    <span>Inventory System API</span>
+                                </div>
+                            </div>
+                            <div class="delivery-metrics">
+                                <div class="success-rate warning">98.5%</div>
+                                <div class="delivery-count">456 today</div>
+                            </div>
+                            <div class="last-delivery">8 min ago</div>
+                            <div>
+                                <div class="webhook-status active">
+                                    <span class="status-dot"></span>
+                                    <span>Active</span>
+                                </div>
+                            </div>
+                            <div class="table-actions">
+                                <button class="actions-menu">⋮</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Actions Bar (Hidden by default) -->
+                <div class="bulk-actions-bar">
+                    <div class="bulk-info">3 webhooks selected</div>
+                    <div class="bulk-actions">
+                        <button class="bulk-btn">Pause</button>
+                        <button class="bulk-btn">Test</button>
+                        <button class="bulk-btn">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <style>
+        /* Additional topbar styles to match design */
+        .notification-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            position: relative;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification-btn:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: var(--error);
+            border-radius: var(--radius-full);
+            border: 2px solid var(--surface-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .notification-btn::before {
+            content: '🔔';
+            font-size: var(--text-sm);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-3);
+            background: var(--surface-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu:hover {
+            background: var(--surface-tertiary);
+            border-color: var(--border-secondary);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-inverse);
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+        }
+
+        .user-name {
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+        }
+
+        .dropdown-arrow {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+    </style>
+</body>
+</html>

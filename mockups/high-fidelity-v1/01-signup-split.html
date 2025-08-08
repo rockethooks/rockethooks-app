@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .split-container {
+            display: flex;
+            min-height: 100vh;
+            background: var(--surface-secondary);
+        }
+
+        /* Left Panel - Value Proposition */
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            padding: var(--space-16) var(--space-12);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            color: var(--text-inverse);
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(10px, -10px); }
+            50% { transform: translate(20px, 10px); }
+            75% { transform: translate(-10px, 20px); }
+        }
+
+        .brand-section {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-large {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius-2xl);
+            margin-bottom: var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-4xl);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .brand-name {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: var(--text-xl);
+            color: rgba(255,255,255,0.9);
+            font-weight: var(--font-medium);
+        }
+
+        .hero-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-title {
+            font-size: var(--text-5xl);
+            font-weight: var(--font-bold);
+            line-height: var(--leading-tight);
+            margin-bottom: var(--space-6);
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            color: rgba(255,255,255,0.8);
+            margin-bottom: var(--space-10);
+            line-height: var(--leading-relaxed);
+        }
+
+        .feature-list {
+            list-style: none;
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            font-size: var(--text-lg);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .feature-icon {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius-full);
+            margin-right: var(--space-4);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+        }
+
+        .social-proof {
+            position: relative;
+            z-index: 2;
+            padding: var(--space-6);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .testimonial {
+            font-size: var(--text-lg);
+            font-style: italic;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: var(--space-4);
+            line-height: var(--leading-relaxed);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius-full);
+            margin-right: var(--space-4);
+        }
+
+        .author-name {
+            font-weight: var(--font-semibold);
+            color: var(--text-inverse);
+            font-size: var(--text-base);
+        }
+
+        .author-title {
+            color: rgba(255,255,255,0.7);
+            font-size: var(--text-sm);
+        }
+
+        /* Right Panel - Auth Form */
+        .right-panel {
+            width: 480px;
+            background: var(--surface-primary);
+            padding: var(--space-12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+        }
+
+        .auth-header {
+            margin-bottom: var(--space-10);
+            text-align: center;
+        }
+
+        .auth-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-3);
+            color: var(--text-primary);
+        }
+
+        .auth-subtitle {
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+        }
+
+        .oauth-buttons {
+            margin-bottom: var(--space-8);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .oauth-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: var(--space-4) var(--space-5);
+            border: 1px solid var(--border-secondary);
+            border-radius: var(--radius-xl);
+            background: var(--surface-primary);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: var(--text-base);
+            font-weight: var(--font-medium);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .oauth-button::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform var(--transition-base);
+        }
+
+        .oauth-button:hover::before {
+            transform: translateX(100%);
+        }
+
+        .oauth-button:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .oauth-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: var(--space-3);
+            border-radius: var(--radius-md);
+        }
+
+        .google-icon {
+            background: linear-gradient(135deg, #ea4335 0%, #fbbc04 25%, #34a853 50%, #4285f4 100%);
+        }
+
+        .github-icon {
+            background: #24292e;
+            border-radius: var(--radius-full);
+        }
+
+        .popular-badge {
+            position: absolute;
+            right: var(--space-4);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text-inverse);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-xs);
+            font-weight: var(--font-semibold);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .demo-option {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .demo-link {
+            color: var(--text-tertiary);
+            font-size: var(--text-base);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-fast);
+        }
+
+        .demo-link:hover {
+            color: var(--primary);
+        }
+
+        .arrow-icon {
+            margin-left: var(--space-2);
+            transition: transform var(--transition-fast);
+        }
+
+        .demo-link:hover .arrow-icon {
+            transform: translateX(4px);
+        }
+
+        .terms {
+            text-align: center;
+            font-size: var(--text-sm);
+            color: var(--text-tertiary);
+            line-height: var(--leading-relaxed);
+            margin-bottom: var(--space-8);
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+            padding-top: var(--space-8);
+            border-top: 1px solid var(--border-primary);
+        }
+
+        .trust-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            font-weight: var(--font-medium);
+        }
+
+        .badge-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--surface-tertiary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: var(--text-base);
+            color: var(--text-tertiary);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            font-weight: var(--font-semibold);
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dashboard preview floating */
+        .dashboard-preview {
+            position: absolute;
+            bottom: var(--space-12);
+            right: var(--space-12);
+            width: 420px;
+            height: 280px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-5);
+            box-shadow: var(--shadow-xl);
+            z-index: 3;
+            animation: float-gentle 6s ease-in-out infinite;
+        }
+
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .preview-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-3);
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .preview-icon {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: var(--radius-md);
+            margin-right: var(--space-2);
+        }
+
+        .preview-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .preview-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .preview-chart {
+            background: var(--surface-secondary);
+            border-radius: var(--radius-lg);
+            height: 80px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: end;
+            padding: var(--space-2);
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: end;
+            justify-content: space-around;
+            width: 100%;
+            height: 100%;
+        }
+
+        .bar {
+            width: 8px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-light) 100%);
+            border-radius: var(--radius-sm);
+            animation: grow 2s ease-out;
+        }
+
+        @keyframes grow {
+            from { height: 0; }
+            to { height: var(--bar-height, 40%); }
+        }
+
+        .preview-events {
+            space-y: var(--space-2);
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: var(--space-2);
+            background: var(--surface-secondary);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-2);
+            font-size: var(--text-xs);
+        }
+
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: var(--radius-full);
+            margin-right: var(--space-2);
+            flex-shrink: 0;
+        }
+
+        .event-dot.success {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .event-dot.warning {
+            background: var(--warning);
+        }
+    </style>
+</head>
+<body>
+    <div class="split-container">
+        <!-- Left Panel - Value Proposition -->
+        <div class="left-panel">
+            <div class="brand-section">
+                <div class="logo-large">🚀</div>
+                <div class="brand-name">RocketHooks</div>
+                <div class="tagline">Transform any API into real-time webhooks</div>
+            </div>
+
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Turn legacy APIs into event-driven powerhouses</h1>
+                    <p class="hero-subtitle">
+                        Stop polling. Start reacting. Monitor any REST API and get instant webhooks when data changes.
+                    </p>
+
+                    <ul class="feature-list">
+                        <li class="feature-item">
+                            <span class="feature-icon">⚡</span>
+                            <span><strong>5-minute setup</strong> - No infrastructure required</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">🎯</span>
+                            <span><strong>10,000 free events</strong> monthly on Developer plan</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">🔒</span>
+                            <span><strong>99.9% delivery guarantee</strong> with auto-retry</span>
+                        </li>
+                        <li class="feature-item">
+                            <span class="feature-icon">🧠</span>
+                            <span><strong>Deep-diff detection</strong> - Only real changes trigger events</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dashboard-preview">
+                <div class="preview-header">
+                    <div class="preview-icon"></div>
+                    <span class="preview-title">Live Dashboard Preview</span>
+                </div>
+                <div class="preview-charts">
+                    <div class="preview-chart">
+                        <div class="chart-bars">
+                            <div class="bar" style="--bar-height: 30%; height: 30%;"></div>
+                            <div class="bar" style="--bar-height: 60%; height: 60%;"></div>
+                            <div class="bar" style="--bar-height: 45%; height: 45%;"></div>
+                            <div class="bar" style="--bar-height: 80%; height: 80%;"></div>
+                            <div class="bar" style="--bar-height: 65%; height: 65%;"></div>
+                        </div>
+                    </div>
+                    <div class="preview-chart">
+                        <div class="chart-bars">
+                            <div class="bar" style="--bar-height: 70%; height: 70%;"></div>
+                            <div class="bar" style="--bar-height: 85%; height: 85%;"></div>
+                            <div class="bar" style="--bar-height: 60%; height: 60%;"></div>
+                            <div class="bar" style="--bar-height: 90%; height: 90%;"></div>
+                            <div class="bar" style="--bar-height: 75%; height: 75%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="preview-events">
+                    <div class="event-item">
+                        <span class="event-dot success"></span>
+                        <span>user.updated webhook delivered</span>
+                    </div>
+                    <div class="event-item">
+                        <span class="event-dot success"></span>
+                        <span>inventory.changed webhook delivered</span>
+                    </div>
+                    <div class="event-item">
+                        <span class="event-dot warning"></span>
+                        <span>order.created webhook pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="social-proof">
+                <div class="testimonial">
+                    "We replaced 50+ custom polling scripts with RocketHooks in one afternoon. Game changer for our legacy integrations."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar"></div>
+                    <div class="author-info">
+                        <div class="author-name">Sarah Chen</div>
+                        <div class="author-title">CTO at TechCorp • 1,000+ developers using RocketHooks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Auth Form -->
+        <div class="right-panel">
+            <div class="auth-header">
+                <h2 class="auth-title">Get started free</h2>
+                <p class="auth-subtitle">No credit card required • Setup in minutes</p>
+            </div>
+
+            <div class="oauth-buttons">
+                <button class="oauth-button">
+                    <span class="oauth-icon google-icon"></span>
+                    Continue with Google
+                    <span class="popular-badge">Popular</span>
+                </button>
+                
+                <button class="oauth-button">
+                    <span class="oauth-icon github-icon"></span>
+                    Continue with GitHub
+                </button>
+            </div>
+
+            <div class="demo-option">
+                <a href="#" class="demo-link">
+                    Try a live demo without signing up
+                    <span class="arrow-icon">→</span>
+                </a>
+            </div>
+
+            <p class="terms">
+                By signing up, you agree to our <a href="#">Terms of Service</a>, 
+                <a href="#">Privacy Policy</a>, and <a href="#">Data Processing Agreement</a>
+            </p>
+
+            <div class="trust-badges">
+                <div class="trust-badge">
+                    <div class="badge-icon">🔒</div>
+                    <span>SOC2 Compliant</span>
+                </div>
+                <div class="trust-badge">
+                    <div class="badge-icon">🛡️</div>
+                    <span>GDPR Ready</span>
+                </div>
+                <div class="trust-badge">
+                    <div class="badge-icon">⚡</div>
+                    <span>99.9% Uptime</span>
+                </div>
+            </div>
+
+            <div class="login-link">
+                Already have an account? <a href="#">Sign in</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
