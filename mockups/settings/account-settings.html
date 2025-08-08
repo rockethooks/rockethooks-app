@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Settings - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-item.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .security-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .security-status.warning {
+            background: #fefce8;
+            border-color: #fde047;
+        }
+
+        .security-status.error {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status-text {
+            font-weight: 500;
+        }
+
+        .status-text.success {
+            color: #166534;
+        }
+
+        .status-text.warning {
+            color: #a16207;
+        }
+
+        .status-text.error {
+            color: #dc2626;
+        }
+
+        .two-factor-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .two-factor-info {
+            flex: 1;
+        }
+
+        .two-factor-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .two-factor-description {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: hsl(246 80% 60%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .session-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .session-icon {
+            width: 40px;
+            height: 40px;
+            background: hsl(246 80% 60% / 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .session-details h4 {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .session-details p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .session-current {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 70% 55%);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .danger-zone {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .danger-title {
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 0.5rem;
+        }
+
+        .danger-description {
+            color: #7f1d1d;
+            margin-bottom: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .password-requirements {
+            margin-top: 0.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .requirement.met {
+            color: #059669;
+        }
+
+        .requirement.unmet {
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .two-factor-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .session-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Settings</h1>
+            <p>Manage your account security and authentication preferences</p>
+        </div>
+
+        <div class="settings-layout">
+            <nav class="settings-nav">
+                <div class="nav-section">
+                    <div class="nav-title">Personal</div>
+                    <a href="#" class="nav-item">Profile</a>
+                    <a href="#" class="nav-item active">Account Settings</a>
+                    <a href="#" class="nav-item">Notifications</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Organization</div>
+                    <a href="#" class="nav-item">Organization</a>
+                    <a href="#" class="nav-item">Team Members</a>
+                    <a href="#" class="nav-item">Billing</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Developer</div>
+                    <a href="#" class="nav-item">API Keys</a>
+                    <a href="#" class="nav-item">Integrations</a>
+                    <a href="#" class="nav-item">Webhooks</a>
+                </div>
+            </nav>
+
+            <main class="settings-content">
+                <div class="form-section">
+                    <h3 class="section-title">Email Address</h3>
+                    <p class="section-description">Your email address is used for account notifications and password recovery.</p>
+                    
+                    <div class="security-status">
+                        <svg class="status-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span class="status-text success">Email verified</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="currentEmail">Current Email</label>
+                        <input type="email" id="currentEmail" class="form-input" value="john.doe@techcorp.com" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="newEmail">New Email Address</label>
+                        <input type="email" id="newEmail" class="form-input" placeholder="Enter new email address" />
+                    </div>
+
+                    <button class="btn btn-primary">Update Email</button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Password</h3>
+                    <p class="section-description">Change your password to keep your account secure.</p>
+
+                    <div class="form-group">
+                        <label class="form-label" for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" />
+                        <div class="password-requirements">
+                            <div class="requirement unmet">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                At least 8 characters
+                            </div>
+                            <div class="requirement unmet">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Contains uppercase and lowercase letters
+                            </div>
+                            <div class="requirement unmet">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Contains at least one number
+                            </div>
+                            <div class="requirement unmet">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                </svg>
+                                Contains special characters
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password" />
+                    </div>
+
+                    <button class="btn btn-primary">Change Password</button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Two-Factor Authentication</h3>
+                    <p class="section-description">Add an extra layer of security to your account by enabling two-factor authentication.</p>
+
+                    <div class="security-status warning">
+                        <svg class="status-icon" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                        </svg>
+                        <span class="status-text warning">Two-factor authentication is not enabled</span>
+                    </div>
+
+                    <div class="two-factor-section">
+                        <div class="two-factor-info">
+                            <div class="two-factor-title">Authenticator App</div>
+                            <div class="two-factor-description">Use an authenticator app to generate time-based codes</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="two-factor-section">
+                        <div class="two-factor-info">
+                            <div class="two-factor-title">SMS Authentication</div>
+                            <div class="two-factor-description">Receive authentication codes via text message</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <button class="btn btn-primary">Setup Two-Factor Authentication</button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Active Sessions</h3>
+                    <p class="section-description">Manage your active login sessions across different devices and locations.</p>
+
+                    <div class="session-item session-current">
+                        <div class="session-info">
+                            <div class="session-icon">
+                                <svg width="20" height="20" fill="hsl(246 80% 60%)" viewBox="0 0 24 24">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5zm8 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                                </svg>
+                            </div>
+                            <div class="session-details">
+                                <h4>Current Session (Chrome on macOS)</h4>
+                                <p>San Francisco, CA • Last active: Now</p>
+                            </div>
+                        </div>
+                        <span style="color: #059669; font-weight: 600; font-size: 0.875rem;">Current</span>
+                    </div>
+
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-icon">
+                                <svg width="20" height="20" fill="hsl(246 80% 60%)" viewBox="0 0 24 24">
+                                    <path d="M17 19H2V7h15v12zm0-16H7L5.16 1H0v2h3.5L7 7h10c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2h-1V9H7v12h10V5z"/>
+                                </svg>
+                            </div>
+                            <div class="session-details">
+                                <h4>iPhone Safari</h4>
+                                <p>New York, NY • Last active: 2 hours ago</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger btn-sm">Revoke</button>
+                    </div>
+
+                    <div class="session-item">
+                        <div class="session-info">
+                            <div class="session-icon">
+                                <svg width="20" height="20" fill="hsl(246 80% 60%)" viewBox="0 0 24 24">
+                                    <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5zm8 13.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                                </svg>
+                            </div>
+                            <div class="session-details">
+                                <h4>Firefox on Windows</h4>
+                                <p>Los Angeles, CA • Last active: 1 day ago</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger btn-sm">Revoke</button>
+                    </div>
+
+                    <button class="btn btn-secondary">Revoke All Other Sessions</button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Danger Zone</h3>
+                    <div class="danger-zone">
+                        <h4 class="danger-title">Delete Account</h4>
+                        <p class="danger-description">
+                            Once you delete your account, there is no going back. Please be certain. This action will permanently delete your account, all associated data, webhooks, and cannot be undone.
+                        </p>
+                        <button class="btn btn-danger">Delete My Account</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

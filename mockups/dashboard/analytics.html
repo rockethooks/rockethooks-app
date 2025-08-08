@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RocketHooks - Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .analytics {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .analytics-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 0.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .time-option {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .time-option.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .time-option:hover:not(.active) {
+            background: #f1f5f9;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+
+        .stat-change.positive {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .stat-change.negative {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .line-chart {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 0%, transparent 20%, hsl(246 80% 60% / 0.1) 20%, hsl(246 80% 60% / 0.1) 25%, transparent 25%),
+                linear-gradient(90deg, transparent 30%, hsl(246 80% 60% / 0.2) 35%, hsl(246 80% 60% / 0.3) 45%, hsl(246 80% 60% / 0.2) 55%, transparent 60%),
+                linear-gradient(90deg, transparent 70%, hsl(246 80% 60% / 0.1) 75%, hsl(246 80% 60% / 0.2) 80%, hsl(246 80% 60% / 0.3) 85%, transparent 90%);
+            position: relative;
+        }
+
+        .line-chart::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: hsl(246 80% 60%);
+            transform: translateY(-50%);
+            opacity: 0.6;
+        }
+
+        .donut-chart {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .donut-svg {
+            transform: rotate(-90deg);
+        }
+
+        .donut-segment {
+            fill: none;
+            stroke-width: 20;
+            stroke-linecap: round;
+        }
+
+        .donut-bg {
+            stroke: #f1f5f9;
+        }
+
+        .donut-success {
+            stroke: #16a34a;
+            stroke-dasharray: 251 314;
+            stroke-dashoffset: 0;
+        }
+
+        .donut-warning {
+            stroke: #d97706;
+            stroke-dasharray: 31 314;
+            stroke-dashoffset: -251;
+        }
+
+        .donut-error {
+            stroke: #dc2626;
+            stroke-dasharray: 16 314;
+            stroke-dashoffset: -282;
+        }
+
+        .donut-center {
+            position: absolute;
+            text-align: center;
+        }
+
+        .donut-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .donut-label {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .performance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .performance-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+        }
+
+        .map-container {
+            height: 250px;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .map-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .map-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: hsl(246 80% 60%);
+            animation: pulse 2s infinite;
+        }
+
+        .map-dot:nth-child(1) { top: 30%; left: 20%; }
+        .map-dot:nth-child(2) { top: 40%; left: 70%; }
+        .map-dot:nth-child(3) { top: 60%; left: 45%; }
+        .map-dot:nth-child(4) { top: 25%; left: 85%; }
+        .map-dot:nth-child(5) { top: 70%; left: 15%; }
+
+        .endpoints-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .endpoints-table th,
+        .endpoints-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .endpoints-table th {
+            font-weight: 600;
+            color: #374151;
+            background: #f9fafb;
+            font-size: 0.875rem;
+        }
+
+        .endpoints-table td {
+            font-size: 0.875rem;
+        }
+
+        .endpoint-method {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .method-get {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .method-post {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .method-put {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .method-delete {
+            background: #fecaca;
+            color: #dc2626;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-success {
+            background: #16a34a;
+        }
+
+        .status-warning {
+            background: #d97706;
+        }
+
+        .status-error {
+            background: #dc2626;
+        }
+
+        .response-time-bars {
+            display: flex;
+            gap: 0.25rem;
+            height: 40px;
+            align-items: end;
+        }
+
+        .response-bar {
+            width: 8px;
+            background: hsl(246 80% 60%);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .response-bar:nth-child(1) { height: 20%; }
+        .response-bar:nth-child(2) { height: 35%; }
+        .response-bar:nth-child(3) { height: 60%; }
+        .response-bar:nth-child(4) { height: 45%; }
+        .response-bar:nth-child(5) { height: 80%; }
+        .response-bar:nth-child(6) { height: 30%; }
+        .response-bar:nth-child(7) { height: 55%; }
+        .response-bar:nth-child(8) { height: 40%; }
+
+        .legend {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics {
+                padding: 1rem;
+            }
+            
+            .analytics-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .stats-overview {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="analytics">
+        <header class="analytics-header">
+            <h1 class="analytics-title">Analytics Dashboard</h1>
+            <div class="time-selector">
+                <button class="time-option">1H</button>
+                <button class="time-option active">24H</button>
+                <button class="time-option">7D</button>
+                <button class="time-option">30D</button>
+                <button class="time-option">90D</button>
+            </div>
+        </header>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-value">156.2K</div>
+                <div class="stat-label">Total Requests</div>
+                <div class="stat-change positive">+12.5%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">98.7%</div>
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-change positive">+0.3%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">245ms</div>
+                <div class="stat-label">Avg Response Time</div>
+                <div class="stat-change negative">+15ms</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">1.8MB</div>
+                <div class="stat-label">Data Transferred</div>
+                <div class="stat-change positive">+8.2%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">42</div>
+                <div class="stat-label">Active Endpoints</div>
+                <div class="stat-change positive">+3</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2 class="chart-title">Request Volume Trends</h2>
+                    <div class="time-selector">
+                        <button class="time-option active">Requests</button>
+                        <button class="time-option">Errors</button>
+                        <button class="time-option">Latency</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="line-chart"></div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2 class="chart-title">Status Distribution</h2>
+                </div>
+                <div class="donut-chart">
+                    <svg width="200" height="200" class="donut-svg">
+                        <circle class="donut-segment donut-bg" cx="100" cy="100" r="80"></circle>
+                        <circle class="donut-segment donut-success" cx="100" cy="100" r="80"></circle>
+                        <circle class="donut-segment donut-warning" cx="100" cy="100" r="80"></circle>
+                        <circle class="donut-segment donut-error" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                    <div class="donut-center">
+                        <div class="donut-value">98.7%</div>
+                        <div class="donut-label">Success</div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #16a34a;"></div>
+                        <span>Success (96.8%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #d97706;"></div>
+                        <span>Warning (1.9%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #dc2626;"></div>
+                        <span>Error (1.3%)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Response Time Distribution</h2>
+                </div>
+                <div class="chart-container">
+                    <div class="response-time-bars">
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                        <div class="response-bar"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; font-size: 0.875rem; color: #64748b;">
+                    Average: 245ms | P95: 420ms | P99: 680ms
+                </div>
+            </div>
+
+            <div class="performance-card">
+                <div class="chart-header">
+                    <h2 class="chart-title">Geographic Distribution</h2>
+                </div>
+                <div class="map-container">
+                    <div style="text-align: center; color: #64748b;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌍</div>
+                        <div>Global Request Distribution</div>
+                    </div>
+                    <div class="map-dots">
+                        <div class="map-dot"></div>
+                        <div class="map-dot"></div>
+                        <div class="map-dot"></div>
+                        <div class="map-dot"></div>
+                        <div class="map-dot"></div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; font-size: 0.875rem;">
+                    <div>🇺🇸 US: 45.2%</div>
+                    <div>🇪🇺 EU: 28.1%</div>
+                    <div>🇦🇸 Asia: 18.7%</div>
+                    <div>🌍 Other: 8.0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-header">
+                <h2 class="chart-title">Top API Endpoints</h2>
+            </div>
+            <table class="endpoints-table">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Method</th>
+                        <th>Requests</th>
+                        <th>Success Rate</th>
+                        <th>Avg Response</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>/api/v1/users</td>
+                        <td><span class="endpoint-method method-get">GET</span></td>
+                        <td>24,521</td>
+                        <td>99.2%</td>
+                        <td>156ms</td>
+                        <td><span class="status-indicator status-success"></span>Healthy</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/orders</td>
+                        <td><span class="endpoint-method method-post">POST</span></td>
+                        <td>18,647</td>
+                        <td>98.8%</td>
+                        <td>234ms</td>
+                        <td><span class="status-indicator status-success"></span>Healthy</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/payments</td>
+                        <td><span class="endpoint-method method-post">POST</span></td>
+                        <td>15,328</td>
+                        <td>99.5%</td>
+                        <td>189ms</td>
+                        <td><span class="status-indicator status-success"></span>Healthy</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/webhooks</td>
+                        <td><span class="endpoint-method method-post">POST</span></td>
+                        <td>12,891</td>
+                        <td>97.3%</td>
+                        <td>345ms</td>
+                        <td><span class="status-indicator status-warning"></span>Warning</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/auth/login</td>
+                        <td><span class="endpoint-method method-post">POST</span></td>
+                        <td>8,742</td>
+                        <td>98.9%</td>
+                        <td>267ms</td>
+                        <td><span class="status-indicator status-success"></span>Healthy</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/products</td>
+                        <td><span class="endpoint-method method-get">GET</span></td>
+                        <td>7,531</td>
+                        <td>99.1%</td>
+                        <td>178ms</td>
+                        <td><span class="status-indicator status-success"></span>Healthy</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/notifications</td>
+                        <td><span class="endpoint-method method-put">PUT</span></td>
+                        <td>6,429</td>
+                        <td>96.8%</td>
+                        <td>412ms</td>
+                        <td><span class="status-indicator status-warning"></span>Warning</td>
+                    </tr>
+                    <tr>
+                        <td>/api/v1/analytics</td>
+                        <td><span class="endpoint-method method-get">GET</span></td>
+                        <td>4,321</td>
+                        <td>95.2%</td>
+                        <td>578ms</td>
+                        <td><span class="status-indicator status-error"></span>Critical</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

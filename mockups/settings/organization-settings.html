@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organization Settings - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-item.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .org-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .org-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background: linear-gradient(45deg, hsl(246 80% 60%), hsl(246 60% 70%));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .org-info h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .org-info p {
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .org-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: hsl(246 80% 60%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .member-details h4 {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-details p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .member-role {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .role-badge.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.member {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.viewer {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .invite-section {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .invite-form {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .invite-input {
+            flex: 1;
+        }
+
+        .role-select {
+            width: 150px;
+        }
+
+        .billing-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .billing-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .plan-name {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: hsl(246 80% 60%);
+        }
+
+        .plan-period {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .usage-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: hsl(246 80% 60%);
+            transition: width 0.3s ease;
+        }
+
+        .usage-text {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 70% 55%);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-button {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pending-invite {
+            background: #fef3c7;
+            border-color: #fbbf24;
+        }
+
+        .pending-label {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            background: #f59e0b;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .org-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .org-stats {
+                justify-content: center;
+            }
+
+            .member-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .invite-form {
+                flex-direction: column;
+            }
+
+            .role-select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Organization Settings</h1>
+            <p>Manage your organization details, team members, and billing</p>
+        </div>
+
+        <div class="settings-layout">
+            <nav class="settings-nav">
+                <div class="nav-section">
+                    <div class="nav-title">Personal</div>
+                    <a href="#" class="nav-item">Profile</a>
+                    <a href="#" class="nav-item">Account Settings</a>
+                    <a href="#" class="nav-item">Notifications</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Organization</div>
+                    <a href="#" class="nav-item active">Organization</a>
+                    <a href="#" class="nav-item">Team Members</a>
+                    <a href="#" class="nav-item">Billing</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Developer</div>
+                    <a href="#" class="nav-item">API Keys</a>
+                    <a href="#" class="nav-item">Integrations</a>
+                    <a href="#" class="nav-item">Webhooks</a>
+                </div>
+            </nav>
+
+            <main class="settings-content">
+                <div class="org-header">
+                    <div class="org-logo">TC</div>
+                    <div class="org-info">
+                        <h2>TechCorp</h2>
+                        <p>Building the future of web development</p>
+                        <div class="org-stats">
+                            <div class="stat">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Members</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">45</div>
+                                <div class="stat-label">Projects</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">2.1M</div>
+                                <div class="stat-label">Requests</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Organization Details</h3>
+                    <p class="section-description">Update your organization's basic information and branding.</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label" for="orgName">Organization Name</label>
+                            <input type="text" id="orgName" class="form-input" value="TechCorp" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="orgSlug">Organization Slug</label>
+                            <input type="text" id="orgSlug" class="form-input" value="techcorp" />
+                        </div>
+                        <div class="form-group full-width">
+                            <label class="form-label" for="orgDescription">Description</label>
+                            <textarea id="orgDescription" class="form-input form-textarea" placeholder="Describe your organization...">Building the future of web development with innovative solutions and cutting-edge technology.</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="orgWebsite">Website</label>
+                            <input type="url" id="orgWebsite" class="form-input" value="https://techcorp.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="orgIndustry">Industry</label>
+                            <select id="orgIndustry" class="form-input">
+                                <option>Technology</option>
+                                <option>Finance</option>
+                                <option>Healthcare</option>
+                                <option>E-commerce</option>
+                                <option>Education</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Team Members</h3>
+                    <p class="section-description">Manage your team members and their roles within the organization.</p>
+                    
+                    <div class="invite-section">
+                        <h4 style="margin-bottom: 1rem; font-weight: 600;">Invite New Member</h4>
+                        <div class="invite-form">
+                            <div class="invite-input">
+                                <label class="form-label" for="inviteEmail">Email Address</label>
+                                <input type="email" id="inviteEmail" class="form-input" placeholder="colleague@example.com" />
+                            </div>
+                            <div class="role-select">
+                                <label class="form-label" for="inviteRole">Role</label>
+                                <select id="inviteRole" class="form-input">
+                                    <option value="viewer">Viewer</option>
+                                    <option value="member">Member</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-primary" style="margin-bottom: 0;">Send Invite</button>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-info">
+                            <div class="member-avatar">JD</div>
+                            <div class="member-details">
+                                <h4>John Doe</h4>
+                                <p>john.doe@techcorp.com</p>
+                            </div>
+                        </div>
+                        <div class="member-role">
+                            <span class="role-badge admin">Admin</span>
+                            <div class="dropdown">
+                                <button class="dropdown-button">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-info">
+                            <div class="member-avatar" style="background: #059669;">SM</div>
+                            <div class="member-details">
+                                <h4>Sarah Miller</h4>
+                                <p>sarah.miller@techcorp.com</p>
+                            </div>
+                        </div>
+                        <div class="member-role">
+                            <span class="role-badge member">Member</span>
+                            <div class="dropdown">
+                                <button class="dropdown-button">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="member-item">
+                        <div class="member-info">
+                            <div class="member-avatar" style="background: #dc2626;">MJ</div>
+                            <div class="member-details">
+                                <h4>Mike Johnson</h4>
+                                <p>mike.johnson@external.com</p>
+                            </div>
+                        </div>
+                        <div class="member-role">
+                            <span class="role-badge viewer">Viewer</span>
+                            <div class="dropdown">
+                                <button class="dropdown-button">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="member-item pending-invite">
+                        <div class="member-info">
+                            <div class="member-avatar" style="background: #f59e0b;">EM</div>
+                            <div class="member-details">
+                                <h4>Emily Rodriguez</h4>
+                                <p>emily.rodriguez@freelancer.com</p>
+                            </div>
+                        </div>
+                        <div class="member-role">
+                            <span class="pending-label">Pending</span>
+                            <button class="btn btn-sm btn-secondary">Resend</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Role Permissions</h3>
+                    <p class="section-description">Understand what each role can do within your organization.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div style="background: #f8fafc; border-radius: 8px; padding: 1.5rem;">
+                            <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 1rem;">Admin</h4>
+                            <ul style="list-style: none; color: #64748b; font-size: 0.875rem; line-height: 1.8;">
+                                <li>• Full organization access</li>
+                                <li>• Manage team members</li>
+                                <li>• Billing and subscription</li>
+                                <li>• Delete organization</li>
+                            </ul>
+                        </div>
+                        <div style="background: #f8fafc; border-radius: 8px; padding: 1.5rem;">
+                            <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 1rem;">Member</h4>
+                            <ul style="list-style: none; color: #64748b; font-size: 0.875rem; line-height: 1.8;">
+                                <li>• Create and manage webhooks</li>
+                                <li>• View team projects</li>
+                                <li>• Manage API keys</li>
+                                <li>• Basic reporting access</li>
+                            </ul>
+                        </div>
+                        <div style="background: #f8fafc; border-radius: 8px; padding: 1.5rem;">
+                            <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 1rem;">Viewer</h4>
+                            <ul style="list-style: none; color: #64748b; font-size: 0.875rem; line-height: 1.8;">
+                                <li>• View webhook activity</li>
+                                <li>• Access reports</li>
+                                <li>• View team projects</li>
+                                <li>• Read-only access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Billing Information</h3>
+                    <p class="section-description">Manage your subscription and billing details.</p>
+                    
+                    <div class="billing-card">
+                        <div class="billing-header">
+                            <div>
+                                <div class="plan-name">Pro Plan</div>
+                                <div style="color: #64748b; font-size: 0.875rem;">Perfect for growing teams</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="plan-price">$49<span class="plan-period">/month</span></div>
+                                <div style="color: #64748b; font-size: 0.875rem;">Billed monthly</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.875rem; color: #374151;">Webhook Requests</span>
+                                <span style="font-size: 0.875rem; color: #64748b;">850K / 1M</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 85%;"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.875rem; color: #374151;">Team Members</span>
+                                <span style="font-size: 0.875rem; color: #64748b;">12 / 25</span>
+                            </div>
+                            <div class="usage-bar">
+                                <div class="usage-fill" style="width: 48%;"></div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button class="btn btn-primary">Upgrade Plan</button>
+                            <button class="btn btn-secondary">View Billing</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary">Save Changes</button>
+                    <button class="btn btn-secondary">Cancel</button>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

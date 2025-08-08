@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integrations - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-item.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            background: white;
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            border-color: #d1d5db;
+            color: #374151;
+        }
+
+        .filter-tab.active {
+            background: hsl(246 80% 60%);
+            border-color: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .integrations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .integration-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .integration-card:hover {
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .integration-card.connected {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .integration-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .integration-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .integration-info {
+            flex: 1;
+        }
+
+        .integration-name {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .integration-category {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .integration-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-available {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .integration-description {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .integration-features {
+            margin-bottom: 1rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            font-size: 0.875rem;
+        }
+
+        .feature-list li {
+            color: #64748b;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-list li::before {
+            content: "•";
+            color: hsl(246 80% 60%);
+            font-weight: bold;
+        }
+
+        .integration-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .connected-integration {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .connected-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .connected-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .connected-details h4 {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .connected-details p {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .connection-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .webhook-endpoint {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .endpoint-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .endpoint-url {
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            color: #64748b;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 70% 55%);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #f59e0b;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .card-container {
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-input {
+                max-width: none;
+            }
+
+            .filter-tabs {
+                flex-wrap: wrap;
+            }
+
+            .integrations-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .integration-actions {
+                flex-direction: column;
+            }
+
+            .connection-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Integrations</h1>
+            <p>Connect RocketHooks with your favorite tools and services</p>
+        </div>
+
+        <div class="settings-layout">
+            <nav class="settings-nav">
+                <div class="nav-section">
+                    <div class="nav-title">Personal</div>
+                    <a href="#" class="nav-item">Profile</a>
+                    <a href="#" class="nav-item">Account Settings</a>
+                    <a href="#" class="nav-item">Notifications</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Organization</div>
+                    <a href="#" class="nav-item">Organization</a>
+                    <a href="#" class="nav-item">Team Members</a>
+                    <a href="#" class="nav-item">Billing</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Developer</div>
+                    <a href="#" class="nav-item">API Keys</a>
+                    <a href="#" class="nav-item active">Integrations</a>
+                    <a href="#" class="nav-item">Webhooks</a>
+                </div>
+            </nav>
+
+            <main class="settings-content">
+                <div class="page-header">
+                    <h2 class="page-title">Integrations</h2>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search integrations..." />
+                    <div class="filter-tabs">
+                        <button class="filter-tab active">All</button>
+                        <button class="filter-tab">Connected</button>
+                        <button class="filter-tab">Popular</button>
+                        <button class="filter-tab">Developer Tools</button>
+                        <button class="filter-tab">Communication</button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Connected Services</h3>
+                    <p class="section-description">Manage your active integrations and their configurations.</p>
+                    
+                    <div class="connected-integration">
+                        <div class="connected-header">
+                            <div class="connected-info">
+                                <div class="integration-icon" style="background: #4f46e5;">
+                                    S
+                                </div>
+                                <div class="connected-details">
+                                    <h4>Slack Notifications</h4>
+                                    <p>Connected to #alerts channel • Configured 3 days ago</p>
+                                </div>
+                            </div>
+                            <div class="integration-status status-connected">Connected</div>
+                        </div>
+                        
+                        <div class="connection-stats">
+                            <div class="stat">
+                                <div class="stat-value">147</div>
+                                <div class="stat-label">Messages Sent</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">99.3%</div>
+                                <div class="stat-label">Success Rate</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">23</div>
+                                <div class="stat-label">Channels</div>
+                            </div>
+                        </div>
+
+                        <div class="webhook-endpoint">
+                            <div class="endpoint-label">Webhook URL</div>
+                            <div class="endpoint-url">
+                                <span>https://hooks.slack.com/services/T0...</span>
+                                <button class="btn-icon btn-secondary" title="Copy">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button class="btn btn-sm btn-secondary">Configure</button>
+                            <button class="btn btn-sm btn-danger">Disconnect</button>
+                        </div>
+                    </div>
+
+                    <div class="connected-integration">
+                        <div class="connected-header">
+                            <div class="connected-info">
+                                <div class="integration-icon" style="background: #238636;">
+                                    G
+                                </div>
+                                <div class="connected-details">
+                                    <h4>GitHub Actions</h4>
+                                    <p>Connected to TechCorp/webhook-service • Configured 1 week ago</p>
+                                </div>
+                            </div>
+                            <div class="integration-status status-connected">Connected</div>
+                        </div>
+                        
+                        <div class="connection-stats">
+                            <div class="stat">
+                                <div class="stat-value">89</div>
+                                <div class="stat-label">Workflows</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">95.2%</div>
+                                <div class="stat-label">Success Rate</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">12</div>
+                                <div class="stat-label">Repositories</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button class="btn btn-sm btn-secondary">Configure</button>
+                            <button class="btn btn-sm btn-danger">Disconnect</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Available Integrations</h3>
+                    <p class="section-description">Browse and connect new services to enhance your webhook workflows.</p>
+                    
+                    <div class="integrations-grid">
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="popular-badge">Popular</div>
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #7289da;">
+                                        D
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Discord</div>
+                                        <div class="integration-category">Communication</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Send webhook notifications directly to Discord channels with rich embeds and mentions.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Rich embed messages</li>
+                                        <li>Channel & role mentions</li>
+                                        <li>Custom bot integration</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #ff6900;">
+                                        Z
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Zapier</div>
+                                        <div class="integration-category">Automation</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Trigger automated workflows across 5000+ apps when webhooks fire or fail.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>5000+ app connections</li>
+                                        <li>Multi-step workflows</li>
+                                        <li>Conditional logic</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #0084ff;">
+                                        M
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Microsoft Teams</div>
+                                        <div class="integration-category">Communication</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Post webhook alerts and status updates to Teams channels with adaptive cards.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Adaptive card messages</li>
+                                        <li>Team notifications</li>
+                                        <li>Custom connectors</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="popular-badge">Popular</div>
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #f56565;">
+                                        J
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Jira</div>
+                                        <div class="integration-category">Project Management</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Automatically create issues and update tickets based on webhook events.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Auto-create issues</li>
+                                        <li>Status updates</li>
+                                        <li>Custom field mapping</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #e60012;">
+                                        P
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">PagerDuty</div>
+                                        <div class="integration-category">Incident Management</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Create incidents and alerts when critical webhooks fail or error rates spike.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Incident creation</li>
+                                        <li>Alert escalation</li>
+                                        <li>On-call scheduling</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #0d1117; color: white;">
+                                        D
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Datadog</div>
+                                        <div class="integration-category">Monitoring</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Send webhook metrics and events to Datadog for advanced monitoring and alerting.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Custom metrics</li>
+                                        <li>Event tracking</li>
+                                        <li>Dashboard integration</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #ff6b35;">
+                                        A
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Airtable</div>
+                                        <div class="integration-category">Database</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Store webhook data in Airtable bases for easy tracking and collaboration.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Automatic data sync</li>
+                                        <li>Custom base setup</li>
+                                        <li>Team collaboration</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #00d4aa;">
+                                        N
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Notion</div>
+                                        <div class="integration-category">Documentation</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Log webhook events and create documentation pages automatically in Notion.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Auto-create pages</li>
+                                        <li>Event logging</li>
+                                        <li>Template system</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Connect</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-container">
+                            <div class="integration-card">
+                                <div class="integration-header">
+                                    <div class="integration-icon" style="background: #6d28d9;">
+                                        C
+                                    </div>
+                                    <div class="integration-info">
+                                        <div class="integration-name">Custom Webhook</div>
+                                        <div class="integration-category">Developer Tools</div>
+                                    </div>
+                                    <div class="integration-status status-available">Available</div>
+                                </div>
+                                <div class="integration-description">
+                                    Send webhook events to any custom endpoint with configurable headers and payloads.
+                                </div>
+                                <div class="integration-features">
+                                    <ul class="feature-list">
+                                        <li>Custom endpoints</li>
+                                        <li>Header configuration</li>
+                                        <li>Payload transformation</li>
+                                    </ul>
+                                </div>
+                                <div class="integration-actions">
+                                    <button class="btn btn-primary btn-sm">Configure</button>
+                                    <button class="btn btn-secondary btn-sm">Learn More</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Request an Integration</h3>
+                    <p class="section-description">Don't see the service you need? Let us know and we'll consider adding it.</p>
+                    
+                    <div style="background: #f8fafc; border-radius: 8px; padding: 1.5rem; text-align: center;">
+                        <h4 style="font-weight: 600; color: #0f172a; margin-bottom: 0.5rem;">Missing an Integration?</h4>
+                        <p style="color: #64748b; margin-bottom: 1rem;">We're always adding new integrations based on user feedback.</p>
+                        <button class="btn btn-primary">Request Integration</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

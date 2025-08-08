@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Keys - RocketHooks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+        }
+
+        .settings-nav {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .nav-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            color: #6b7280;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-item.active {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .form-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .api-key-item:hover {
+            border-color: #d1d5db;
+            background: #fafbfc;
+        }
+
+        .api-key-info {
+            flex: 1;
+        }
+
+        .api-key-name {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-key-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-inactive {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .status-limited {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .api-key-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: #0f172a;
+        }
+
+        .api-key-value {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f8fafc;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            font-size: 0.875rem;
+            color: #374151;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .key-hidden {
+            color: #9ca3af;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .usage-chart {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .usage-stat {
+            text-align: center;
+        }
+
+        .usage-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+
+        .usage-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .usage-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: hsl(246 80% 60%);
+            transition: width 0.3s ease;
+        }
+
+        .rate-limit-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .permission-group {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .permission-title {
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 1rem;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .permission-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .permission-label {
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: hsl(246 80% 60%);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: hsl(246 80% 60%);
+            box-shadow: 0 0 0 3px hsl(246 80% 60% / 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: hsl(246 80% 60%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: hsl(246 70% 55%);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+        }
+
+        .btn-icon {
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .security-warning {
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #92400e;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning-text {
+            color: #a16207;
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .api-key-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .api-key-actions {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .api-key-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .usage-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .permissions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>API Keys Management</h1>
+            <p>Create and manage API keys for programmatic access to RocketHooks</p>
+        </div>
+
+        <div class="settings-layout">
+            <nav class="settings-nav">
+                <div class="nav-section">
+                    <div class="nav-title">Personal</div>
+                    <a href="#" class="nav-item">Profile</a>
+                    <a href="#" class="nav-item">Account Settings</a>
+                    <a href="#" class="nav-item">Notifications</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Organization</div>
+                    <a href="#" class="nav-item">Organization</a>
+                    <a href="#" class="nav-item">Team Members</a>
+                    <a href="#" class="nav-item">Billing</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">Developer</div>
+                    <a href="#" class="nav-item active">API Keys</a>
+                    <a href="#" class="nav-item">Integrations</a>
+                    <a href="#" class="nav-item">Webhooks</a>
+                </div>
+            </nav>
+
+            <main class="settings-content">
+                <div class="page-header">
+                    <h2 class="page-title">API Keys</h2>
+                    <button class="btn btn-primary" onclick="showCreateModal()">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Create API Key
+                    </button>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Active API Keys</h3>
+                    <p class="section-description">Manage your API keys and their permissions. Keep your keys secure and rotate them regularly.</p>
+                    
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">
+                                Production API Key
+                                <span class="api-key-status status-active">Active</span>
+                            </div>
+                            <div class="api-key-value">
+                                <span class="key-hidden">rh_live_••••••••••••••••••••••••••••••••4a2b</span>
+                                <button class="btn-icon btn-secondary" title="Copy to clipboard">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="api-key-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Created</span>
+                                    <span class="detail-value">Jan 15, 2024</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Used</span>
+                                    <span class="detail-value">2 hours ago</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Permissions</span>
+                                    <span class="detail-value">Full Access</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Rate Limit</span>
+                                    <span class="detail-value">1000/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary">Edit</button>
+                            <button class="btn btn-sm btn-danger">Revoke</button>
+                        </div>
+                    </div>
+
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">
+                                Development API Key
+                                <span class="api-key-status status-limited">Limited</span>
+                            </div>
+                            <div class="api-key-value">
+                                <span class="key-hidden">rh_test_••••••••••••••••••••••••••••••••7x9c</span>
+                                <button class="btn-icon btn-secondary" title="Copy to clipboard">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="api-key-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Created</span>
+                                    <span class="detail-value">Dec 20, 2023</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Used</span>
+                                    <span class="detail-value">1 day ago</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Permissions</span>
+                                    <span class="detail-value">Read Only</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Rate Limit</span>
+                                    <span class="detail-value">100/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary">Edit</button>
+                            <button class="btn btn-sm btn-danger">Revoke</button>
+                        </div>
+                    </div>
+
+                    <div class="api-key-item">
+                        <div class="api-key-info">
+                            <div class="api-key-name">
+                                CI/CD Pipeline Key
+                                <span class="api-key-status status-inactive">Inactive</span>
+                            </div>
+                            <div class="api-key-value">
+                                <span class="key-hidden">rh_ci_••••••••••••••••••••••••••••••••1m5p</span>
+                                <button class="btn-icon btn-secondary" title="Copy to clipboard">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="api-key-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Created</span>
+                                    <span class="detail-value">Nov 10, 2023</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Last Used</span>
+                                    <span class="detail-value">30 days ago</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Permissions</span>
+                                    <span class="detail-value">Webhooks Only</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Rate Limit</span>
+                                    <span class="detail-value">500/hour</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="api-key-actions">
+                            <button class="btn btn-sm btn-secondary">Activate</button>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">Usage Statistics</h3>
+                    <p class="section-description">Monitor your API usage and rate limits across all active keys.</p>
+                    
+                    <div class="usage-chart">
+                        <div class="usage-stats">
+                            <div class="usage-stat">
+                                <div class="usage-value">2,847</div>
+                                <div class="usage-label">Requests Today</div>
+                            </div>
+                            <div class="usage-stat">
+                                <div class="usage-value">18,432</div>
+                                <div class="usage-label">This Month</div>
+                            </div>
+                            <div class="usage-stat">
+                                <div class="usage-value">99.2%</div>
+                                <div class="usage-label">Success Rate</div>
+                            </div>
+                        </div>
+                        
+                        <div class="usage-bar">
+                            <div class="usage-fill" style="width: 28%;"></div>
+                        </div>
+                        
+                        <div class="rate-limit-info">
+                            <span>Current usage: 847 / 1000 requests per hour</span>
+                            <span>Resets in: 23 minutes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">API Documentation</h3>
+                    <p class="section-description">Quick links to get started with the RocketHooks API.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <a href="#" style="text-decoration: none; color: inherit;">
+                            <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; transition: all 0.2s; height: 100%;">
+                                <div style="font-weight: 600; color: #0f172a; margin-bottom: 0.5rem;">Getting Started</div>
+                                <div style="color: #64748b; font-size: 0.875rem;">Learn the basics of authentication and making your first API call</div>
+                            </div>
+                        </a>
+                        <a href="#" style="text-decoration: none; color: inherit;">
+                            <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; transition: all 0.2s; height: 100%;">
+                                <div style="font-weight: 600; color: #0f172a; margin-bottom: 0.5rem;">API Reference</div>
+                                <div style="color: #64748b; font-size: 0.875rem;">Complete documentation of all available endpoints and parameters</div>
+                            </div>
+                        </a>
+                        <a href="#" style="text-decoration: none; color: inherit;">
+                            <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; transition: all 0.2s; height: 100%;">
+                                <div style="font-weight: 600; color: #0f172a; margin-bottom: 0.5rem;">Code Examples</div>
+                                <div style="color: #64748b; font-size: 0.875rem;">Ready-to-use code snippets in popular programming languages</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Create API Key Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New API Key</h3>
+                <button class="close-btn" onclick="hideCreateModal()">&times;</button>
+            </div>
+            
+            <div class="security-warning">
+                <div class="warning-title">Security Notice</div>
+                <div class="warning-text">
+                    API keys provide access to your account. Store them securely and never share them publicly.
+                </div>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label class="form-label" for="keyName">Key Name</label>
+                    <input type="text" id="keyName" class="form-input" placeholder="e.g., Production API Key" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="keyDescription">Description (Optional)</label>
+                    <textarea id="keyDescription" class="form-input form-textarea" placeholder="Describe the purpose of this API key..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Permissions</label>
+                    <div class="permissions-grid">
+                        <div class="permission-group">
+                            <div class="permission-title">Webhooks</div>
+                            <div class="permission-item">
+                                <span class="permission-label">Read</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="permission-item">
+                                <span class="permission-label">Create</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="permission-item">
+                                <span class="permission-label">Update</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="permission-item">
+                                <span class="permission-label">Delete</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="permission-group">
+                            <div class="permission-title">Analytics</div>
+                            <div class="permission-item">
+                                <span class="permission-label">View Reports</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="permission-item">
+                                <span class="permission-label">Export Data</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="rateLimit">Rate Limit (requests per hour)</label>
+                    <select id="rateLimit" class="form-input">
+                        <option value="100">100 requests/hour</option>
+                        <option value="500">500 requests/hour</option>
+                        <option value="1000" selected>1,000 requests/hour</option>
+                        <option value="5000">5,000 requests/hour</option>
+                        <option value="unlimited">Unlimited</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Create API Key</button>
+                    <button type="button" class="btn btn-secondary" onclick="hideCreateModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showCreateModal() {
+            document.getElementById('createModal').classList.add('active');
+        }
+
+        function hideCreateModal() {
+            document.getElementById('createModal').classList.remove('active');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('createModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideCreateModal();
+            }
+        });
+    </script>
+</body>
+</html>
