@@ -5,10 +5,18 @@ import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
 
-function Label({
-  className,
-  ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+export type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root>
+
+/**
+ * Label component for form inputs with accessibility support
+ *
+ * @example
+ * ```tsx
+ * <Label htmlFor="email">Email Address</Label>
+ * <Input id="email" type="email" />
+ * ```
+ */
+function Label({ className, ...props }: LabelProps) {
   return (
     <LabelPrimitive.Root
       data-slot="label"
