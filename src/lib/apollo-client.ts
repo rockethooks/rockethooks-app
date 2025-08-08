@@ -3,6 +3,7 @@ import { setContext } from '@apollo/client/link/context'
 
 const httpLink = createHttpLink({
   uri:
+    // biome-ignore lint/complexity/useLiteralKeys: TypeScript requires bracket notation for index signatures
     (import.meta.env['VITE_GRAPHQL_ENDPOINT'] as string | undefined) ??
     'http://localhost:4000/graphql',
 })
