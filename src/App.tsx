@@ -8,22 +8,25 @@ function App() {
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
+        <a href="https://vite.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
       </div>
       <h1>RocketHooks + React 19 + Vite 6</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button
+          type="button"
+          onClick={() => {
+            setCount((count) => count + 1)
+          }}
+        >
           count is {count}
         </button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite logo to learn more
-      </p>
+      <p className="read-the-docs">Click on the Vite logo to learn more</p>
     </>
   )
 }
