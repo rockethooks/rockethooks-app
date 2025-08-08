@@ -71,37 +71,72 @@ export function ComponentTest() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Info Alert</AlertTitle>
-              <AlertDescription>
-                This is an info alert using the custom info color variant.
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm font-medium mb-2">Custom Button Variants:</p>
+                <div className="flex gap-2 flex-wrap">
+                  <Button variant="success">
+                    <CheckCircle className="h-4 w-4" />
+                    Success
+                  </Button>
+                  <Button variant="warning">
+                    <AlertTriangle className="h-4 w-4" />
+                    Warning
+                  </Button>
+                  <Button variant="info">
+                    <Info className="h-4 w-4" />
+                    Info
+                  </Button>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-sm font-medium mb-2">Custom Badge Variants:</p>
+                <div className="flex gap-2 flex-wrap">
+                  <Badge variant="success">Success</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="info">Info</Badge>
+                </div>
+              </div>
+            </div>
 
-            <Alert className="border-success text-success">
-              <CheckCircle className="h-4 w-4" />
-              <AlertTitle>Success Alert</AlertTitle>
-              <AlertDescription>
-                This is a success alert using the custom success color variant.
-              </AlertDescription>
-            </Alert>
+            <Separator />
+            
+            <div className="space-y-4">
+              <p className="text-sm font-medium">Alert Components with Custom Colors:</p>
+              
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Info Alert</AlertTitle>
+                <AlertDescription>
+                  This is an info alert using the custom info color variant.
+                </AlertDescription>
+              </Alert>
 
-            <Alert className="border-warning text-warning">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Warning Alert</AlertTitle>
-              <AlertDescription>
-                This is a warning alert using the custom warning color variant.
-              </AlertDescription>
-            </Alert>
+              <Alert className="border-success text-success">
+                <CheckCircle className="h-4 w-4" />
+                <AlertTitle>Success Alert</AlertTitle>
+                <AlertDescription>
+                  This is a success alert using the custom success color variant.
+                </AlertDescription>
+              </Alert>
 
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error Alert</AlertTitle>
-              <AlertDescription>
-                This is an error alert using the destructive variant.
-              </AlertDescription>
-            </Alert>
+              <Alert className="border-warning text-warning">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Warning Alert</AlertTitle>
+                <AlertDescription>
+                  This is a warning alert using the custom warning color variant.
+                </AlertDescription>
+              </Alert>
+
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error Alert</AlertTitle>
+                <AlertDescription>
+                  This is an error alert using the destructive variant.
+                </AlertDescription>
+              </Alert>
+            </div>
           </CardContent>
         </Card>
 
@@ -184,6 +219,7 @@ export function ComponentTest() {
           <CardContent className="space-y-4">
             <div className="flex gap-2 flex-wrap">
               <Button
+                variant="success"
                 onClick={() =>
                   toast.success('Success notification!', {
                     description:
@@ -206,7 +242,18 @@ export function ComponentTest() {
               </Button>
 
               <Button
-                variant="outline"
+                variant="warning"
+                onClick={() =>
+                  toast.warning('Warning notification!', {
+                    description: 'This is a warning message using Sonner toast.',
+                  })
+                }
+              >
+                Test Warning Toast
+              </Button>
+              
+              <Button
+                variant="info"
                 onClick={() =>
                   toast.info('Info notification!', {
                     description: 'This is an info message using Sonner toast.',
@@ -219,7 +266,8 @@ export function ComponentTest() {
 
             <p className="text-sm text-muted-foreground">
               Click the buttons above to test toast notifications and verify the
-              theme is working correctly.
+              theme is working correctly. Notice how the buttons now use the
+              custom color variants that match their purpose.
             </p>
           </CardContent>
         </Card>
