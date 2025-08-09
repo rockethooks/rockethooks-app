@@ -2,7 +2,7 @@ import type { VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
-import { inputVariants } from './input-variants'
+import { inputVariants } from './inputVariants'
 
 export interface InputProps
   extends Omit<React.ComponentProps<'input'>, 'size'>,

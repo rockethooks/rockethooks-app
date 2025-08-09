@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { PageErrorBoundary } from '@/shared/components/ErrorBoundary'
-import { Header } from './header'
-import { Sidebar } from './sidebar'
+import { Header } from './Header'
+import { Sidebar } from './Sidebar'
 
 interface DashboardLayoutProps {
   children?: React.ReactNode

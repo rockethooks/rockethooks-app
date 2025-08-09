@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { Sparkline } from '@/components/rockethooks/sparkline'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Sparkline } from '@/components/rockethooks/Sparkline'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 /**
  * Sparkline component provides lightweight data visualization for showing trends
@@ -31,7 +31,7 @@ quick visual context for metrics like response times, success rates, or activity
 ## Usage
 
 \`\`\`tsx
-import { Sparkline } from '@/components/rockethooks/sparkline'
+import { Sparkline } from '@/components/rockethooks/Sparkline'
 
 // Basic usage
 <Sparkline data={[1, 3, 2, 8, 5, 7, 4]} />

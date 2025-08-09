@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/Card'
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
 
 /**

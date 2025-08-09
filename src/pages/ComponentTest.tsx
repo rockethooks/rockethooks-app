@@ -2,32 +2,32 @@ import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 // Import our custom RocketHooks components
-import { ComponentsDemo } from '@/components/rockethooks/demo'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { ComponentsDemo } from '@/components/rockethooks/Demo'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Progress } from '@/components/ui/progress'
+} from '@/components/ui/Card'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+import { Progress } from '@/components/ui/Progress'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Textarea } from '@/components/ui/textarea'
+} from '@/components/ui/Select'
+import { Separator } from '@/components/ui/Separator'
+import { Switch } from '@/components/ui/Switch'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
+import { Textarea } from '@/components/ui/Textarea'
 
 export function ComponentTest() {
   const [activeTab, setActiveTab] = useState('shadcn')

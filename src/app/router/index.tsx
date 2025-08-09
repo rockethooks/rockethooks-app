@@ -3,7 +3,7 @@ import { DashboardLayout } from '@/app/layouts/DashboardLayout'
 import { RootLayout } from '@/app/layouts/RootLayout'
 import AuthCallback from '@/pages/auth/AuthCallback'
 import { LoginWithErrorBoundary } from '@/pages/auth/Login'
-import { ComponentTest } from '@/pages/component-test'
+import { ComponentTest } from '@/pages/ComponentTest'
 import { DashboardPage } from '@/shared/components/PageLayout'
 
 // Demo pages for each route

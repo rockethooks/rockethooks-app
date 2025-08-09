@@ -1,11 +1,11 @@
 import { formatDistanceToNow } from 'date-fns'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 
-import { Sparkline } from './sparkline'
+import { Sparkline } from './Sparkline'
 import { WebhookStatus } from './WebhookStatus'
 
 const methodVariants = {
