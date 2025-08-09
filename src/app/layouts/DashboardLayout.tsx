@@ -70,8 +70,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="flex h-screen overflow-hidden">
       {/* Mobile sidebar backdrop */}
       {isMobile && mobileSidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden border-0 p-0"
           onClick={() => {
             setMobileSidebarOpen(false)
           }}

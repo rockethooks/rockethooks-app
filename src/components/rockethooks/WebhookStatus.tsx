@@ -39,7 +39,7 @@ const dotVariants = cva('h-2 w-2 rounded-full transition-colors', {
 })
 
 export interface WebhookStatusProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'status'>,
+  extends Omit<React.HTMLAttributes<HTMLOutputElement>, 'status'>,
     VariantProps<typeof statusVariants> {
   status: 'success' | 'pending' | 'retrying' | 'failed' | 'circuit-open'
   size?: 'sm' | 'md' | 'lg'
@@ -77,11 +77,10 @@ function WebhookStatus({
     pulseAnimation && (status === 'pending' || status === 'retrying')
 
   return (
-    <div
+    <output
       data-slot="webhook-status"
       className={cn(statusVariants({ status }), className)}
       aria-label={`Status: ${statusLabels[status]}`}
-      role="status"
       {...props}
     >
       <div
@@ -95,7 +94,7 @@ function WebhookStatus({
       {showLabel && (
         <span className="text-sm font-medium">{statusLabels[status]}</span>
       )}
-    </div>
+    </output>
   )
 }
 

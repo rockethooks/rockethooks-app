@@ -239,7 +239,9 @@ function EventTimeline({
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
+                          aria-hidden="true"
                         >
+                          <title>View details</title>
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
