@@ -2,7 +2,7 @@ import { useAuth } from '@clerk/clerk-react'
 import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const SIGN_IN_URL = import.meta.env['VITE_CLERK_SIGN_IN_URL'] || '/sign-in'
+const SIGN_IN_URL = (import.meta.env.VITE_CLERK_SIGN_IN_URL as string | undefined) ?? '/sign-in'
 
 export function useSessionMonitor() {
   const { isSignedIn, isLoaded } = useAuth()
@@ -16,7 +16,7 @@ export function useSessionMonitor() {
     // Track sign-in state changes
     if (wasSignedInRef.current && !isSignedIn) {
       // User was signed in but now isn't - session ended
-      navigate(SIGN_IN_URL)
+      void navigate(SIGN_IN_URL)
     }
 
     // Update the ref for next render

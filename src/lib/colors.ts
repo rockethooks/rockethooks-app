@@ -235,7 +235,7 @@ function isSemanticColorName(
  */
 function isColorVariant(value: string | number): value is ColorVariant {
   const numValue = typeof value === 'string' ? parseInt(value, 10) : value
-  return !isNaN(numValue) && numValue in PRIMARY_VARIANTS
+  return !Number.isNaN(numValue) && numValue in PRIMARY_VARIANTS
 }
 
 /**
@@ -265,7 +265,7 @@ export function getColorValue(
       if (isColorVariant(colorName)) {
         const numKey =
           typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
-        if (!isNaN(numKey) && numKey in palette.primary) {
+        if (!Number.isNaN(numKey) && numKey in palette.primary) {
           return palette.primary[numKey as ColorVariant]
         }
       }
@@ -274,7 +274,7 @@ export function getColorValue(
       if (isColorVariant(colorName)) {
         const numKey =
           typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
-        if (!isNaN(numKey) && numKey in palette.gray) {
+        if (!Number.isNaN(numKey) && numKey in palette.gray) {
           return palette.gray[numKey as ColorVariant]
         }
       }

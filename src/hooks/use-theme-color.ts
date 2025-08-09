@@ -83,7 +83,7 @@ export function useCSSVariable(cssVariable: string): string {
       window.removeEventListener('theme-change', handleThemeChange)
       unsubscribe()
     }
-  }, [cssVariable, resolvedTheme])
+  }, [cssVariable])
 
   return value
 }
@@ -185,7 +185,7 @@ export function useColorVariants(baseColor: string, variants: number[] = []) {
       window.removeEventListener('theme-change', handleThemeChange)
       unsubscribe()
     }
-  }, [baseColor, variants, resolvedTheme])
+  }, [baseColor, variants])
 
   // Memoize the final color objects to prevent unnecessary re-renders
   return useMemo(() => {

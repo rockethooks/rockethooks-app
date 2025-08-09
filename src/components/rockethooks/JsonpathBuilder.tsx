@@ -131,7 +131,7 @@ function JSONPathBuilder({
 
         if (bracket === '*') {
           return Array.isArray(current) ? current : []
-        } else if (!isNaN(Number(bracket))) {
+        } else if (!Number.isNaN(Number(bracket))) {
           current = current[Number(bracket)]
         }
       } else {

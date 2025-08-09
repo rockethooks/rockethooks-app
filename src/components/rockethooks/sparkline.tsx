@@ -62,7 +62,7 @@ function Sparkline({
     .map((value, index) => {
       const x = (index / (data.length - 1)) * width
       const y = height - ((value - min) / range) * height
-      return `${x},${y}`
+      return `${String(x)},${String(y)}`
     })
     .join(' ')
 
@@ -74,8 +74,8 @@ function Sparkline({
   // Create area path for gradient fill
   const areaD =
     data.length > 1
-      ? `${pathD} L ${width},${height} L 0,${height} Z`
-      : `M 0,${height} L ${width},${height} L ${width},${height / 2} L 0,${height / 2} Z`
+      ? `${pathD} L ${String(width)},${String(height)} L 0,${String(height)} Z`
+      : `M 0,${String(height)} L ${String(width)},${String(height)} L ${String(width)},${String(height / 2)} L 0,${String(height / 2)} Z`
 
   const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
     if (!showTooltip) return
@@ -102,7 +102,7 @@ function Sparkline({
     }
   }
 
-  const gradientId = `sparkline-gradient-${Math.random().toString(36).substr(2, 9)}`
+  const gradientId = `sparkline-gradient-${Math.random().toString(36).substring(2, 11)}`
 
   return (
     <div className={cn('relative inline-block', className)}>
@@ -113,7 +113,7 @@ function Sparkline({
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         role="img"
-        aria-label={`Sparkline chart with ${data.length} data points ranging from ${min.toFixed(1)} to ${max.toFixed(1)}`}
+        aria-label={`Sparkline chart with ${String(data.length)} data points ranging from ${min.toFixed(1)} to ${max.toFixed(1)}`}
       >
         {gradient && (
           <defs>

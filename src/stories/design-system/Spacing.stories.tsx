@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
+import type React from 'react'
 
 /**
  * Spacing system documentation showing the design tokens and their usage
