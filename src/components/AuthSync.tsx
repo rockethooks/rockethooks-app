@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-react'
 import { useEffect } from 'react'
-import { useAuthStore } from '@/app/store/auth.store'
+import { initializeNewUser, useAuthStore } from '@/app/store/auth.store'
 
 export function AuthSync() {
   const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth()
@@ -24,6 +24,13 @@ export function AuthSync() {
         .then((token) => {
           if (token) {
             setAuthenticated(userData, sessionId, token)
+
+            // Initialize profile, preferences, and onboarding for new or returning users
+            try {
+              initializeNewUser()
+            } catch (error) {
+              console.error('Failed to initialize user profile:', error)
+            }
           }
         })
         .catch((error: unknown) => {

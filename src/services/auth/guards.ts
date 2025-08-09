@@ -1,4 +1,6 @@
 // src/services/auth/guards.ts
+
+import { useAuthStore } from '@/app/store/auth.store'
 import type { RouteGuard } from '@/types/auth'
 
 export const requireAuth: RouteGuard = (context) => {
@@ -13,26 +15,44 @@ export const requireAuth: RouteGuard = (context) => {
 }
 
 export const requireOnboarding: RouteGuard = (context) => {
-  // Skip for new users currently in onboarding
-  if (context.isNewUser && context.currentPath.startsWith('/onboarding')) {
+  // Import the auth store state to check initialization and onboarding status
+  const authState = useAuthStore.getState()
+
+  // If not fully initialized yet, show loading
+  if (!authState.isInitialized || !authState.isOnboardingLoaded) {
+    return {
+      allowed: false,
+      showLoading: true,
+      reason: 'Loading user data...',
+    }
+  }
+
+  // Skip for users currently in onboarding flow
+  if (context.currentPath.startsWith('/onboarding')) {
     return { allowed: true }
   }
 
-  if (!context.onboardingComplete) {
+  // Check onboarding completion from the auth store
+  const isOnboardingComplete = authState.onboarding?.isCompleted ?? false
+
+  if (!isOnboardingComplete) {
     return {
       allowed: false,
       redirectTo: '/onboarding/1',
       reason: 'Please complete onboarding',
     }
   }
+
   return { allowed: true }
 }
 
 export const publicOnly: RouteGuard = (context) => {
   if (context.isAuthenticated) {
-    const redirectTo = context.onboardingComplete
-      ? '/dashboard'
-      : '/onboarding/1'
+    // Check auth store for onboarding completion
+    const authState = useAuthStore.getState()
+    const isOnboardingComplete = authState.onboarding?.isCompleted ?? false
+
+    const redirectTo = isOnboardingComplete ? '/dashboard' : '/onboarding/1'
     return {
       allowed: false,
       redirectTo,

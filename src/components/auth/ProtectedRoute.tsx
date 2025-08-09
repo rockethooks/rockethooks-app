@@ -119,8 +119,17 @@ export function ProtectedRoute({
     )
   }
 
-  // Check guard results
+  // Check guard results - show loading if guard explicitly requests it
   if (guardsResult && !guardsResult.allowed) {
+    if (guardsResult.showLoading) {
+      return (
+        loadingComponent ?? (
+          <div className="min-h-screen flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        )
+      )
+    }
     return <Navigate to={guardsResult.redirectTo ?? fallbackPath} replace />
   }
 
