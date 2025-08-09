@@ -5,11 +5,7 @@ import { useAuthStore } from '@/stores/auth.store'
 export function AuthSync() {
   const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth()
   const { isLoaded: userLoaded, user } = useUser()
-  const { 
-    setAuthenticated, 
-    setUnauthenticated, 
-    updateToken 
-  } = useAuthStore()
+  const { setAuthenticated, setUnauthenticated, updateToken } = useAuthStore()
 
   // Sync authentication state
   useEffect(() => {

@@ -8,7 +8,7 @@ interface AuthStoreState {
   user: User | null
   sessionId: string | null
   token: string | null
-  
+
   // Actions
   setAuthenticated: (user: User, sessionId: string, token: string) => void
   setUnauthenticated: () => void
@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthStoreState>()(
       user: null,
       sessionId: null,
       token: null,
-      
+
       // Actions
       setAuthenticated: (user, sessionId, token) => {
         set({
@@ -34,7 +34,7 @@ export const useAuthStore = create<AuthStoreState>()(
           token,
         })
       },
-      
+
       setUnauthenticated: () => {
         set({
           isAuthenticated: false,
@@ -43,14 +43,14 @@ export const useAuthStore = create<AuthStoreState>()(
           token: null,
         })
       },
-      
+
       updateToken: (token) => {
         set((state) => ({
           ...state,
           token,
         }))
       },
-      
+
       clearAuth: () => {
         set({
           isAuthenticated: false,

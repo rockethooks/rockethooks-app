@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { DashboardLayout } from '@/app/layouts/dashboard-layout'
 import { RootLayout } from '@/app/layouts/root-layout'
+import { LoginWithErrorBoundary } from '@/pages/auth/Login'
 import { ComponentTest } from '@/pages/component-test'
 import { DashboardPage } from '@/shared/components/page-layout'
 
@@ -127,6 +128,12 @@ export const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
+      // Authentication routes (outside dashboard layout)
+      {
+        path: 'login',
+        element: <LoginWithErrorBoundary />,
+      },
+      // Dashboard routes
       {
         path: '/',
         element: <DashboardLayout />,
