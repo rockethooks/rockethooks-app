@@ -39,7 +39,7 @@ function Sparkline({
     y: number
   } | null>(null)
 
-  if (!data || data.length === 0) {
+  if (data.length === 0) {
     return (
       <div
         className={cn(
@@ -69,7 +69,7 @@ function Sparkline({
   const pathD =
     data.length > 1
       ? `M ${points.split(' ').join(' L ')}`
-      : `M 0,${height / 2} L ${width},${height / 2}`
+      : `M 0,${String(height / 2)} L ${String(width)},${String(height / 2)}`
 
   // Create area path for gradient fill
   const areaD =

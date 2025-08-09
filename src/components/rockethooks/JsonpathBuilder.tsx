@@ -75,7 +75,7 @@ function JSONPathBuilder({
   className,
 }: JSONPathBuilderProps) {
   const [isValid, setIsValid] = useState(true)
-  const [testResult, setTestResult] = useState<any>(null)
+  const [testResult, setTestResult] = useState<string | object | null>(null)
   const [showSampleData, setShowSampleData] = useState(false)
 
   // Basic JSONPath validation
@@ -103,7 +103,7 @@ function JSONPathBuilder({
       // Simple JSONPath evaluation for demo purposes
       // In a real implementation, you'd use a proper JSONPath library like jsonpath-plus
       const result = evaluateSimpleJSONPath(sampleData, value)
-      setTestResult(result)
+      setTestResult(result as string | object | null)
       onTest?.()
     } catch (error) {
       setTestResult(
@@ -113,7 +113,7 @@ function JSONPathBuilder({
   }
 
   // Simplified JSONPath evaluator for demo purposes
-  const evaluateSimpleJSONPath = (data: any, path: string): any => {
+  const evaluateSimpleJSONPath = (data: unknown, path: string): unknown => {
     if (path === '$') return data
 
     const parts = path.slice(2).split('.') // Remove '$.' prefix
@@ -127,15 +127,21 @@ function JSONPathBuilder({
         const prop = part.substring(0, bracketIndex)
         const bracket = part.substring(bracketIndex + 1, part.length - 1)
 
-        if (prop) current = current[prop]
+        if (prop && typeof current === 'object' && current !== null) {
+          current = (current as Record<string, unknown>)[prop]
+        }
 
         if (bracket === '*') {
           return Array.isArray(current) ? current : []
         } else if (!Number.isNaN(Number(bracket))) {
-          current = current[Number(bracket)]
+          if (Array.isArray(current)) {
+            current = current[Number(bracket)]
+          }
         }
       } else {
-        current = current?.[part]
+        if (typeof current === 'object' && current !== null) {
+          current = (current as Record<string, unknown>)[part]
+        }
       }
 
       if (current === undefined) break
@@ -189,8 +195,8 @@ function JSONPathBuilder({
             <SelectValue placeholder="Select a pattern..." />
           </SelectTrigger>
           <SelectContent>
-            {commonPatterns.map((pattern, index) => (
-              <SelectItem key={index} value={pattern.pattern}>
+            {commonPatterns.map((pattern) => (
+              <SelectItem key={pattern.pattern} value={pattern.pattern}>
                 <div className="flex flex-col gap-1">
                   <div className="font-medium">{pattern.label}</div>
                   <code className="text-xs text-muted-foreground">
@@ -263,7 +269,7 @@ function JSONPathBuilder({
             <code>[*]</code> - All array elements
           </li>
           <li>
-            <code>[?(@.key == "value")]</code> - Filter expression
+            <code>[?(@.key == &quot;value&quot;)]</code> - Filter expression
           </li>
         </ul>
       </div>

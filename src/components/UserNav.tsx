@@ -48,7 +48,7 @@ export function UserNav() {
     .filter(Boolean)
     .join('')
     .toUpperCase()
-  const userInitials = nameInitials || emailFirst?.toUpperCase() || 'U'
+  const userInitials = (nameInitials || emailFirst?.toUpperCase()) ?? 'U'
 
   const displayName =
     [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email

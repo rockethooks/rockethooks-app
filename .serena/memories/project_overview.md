@@ -1,28 +1,37 @@
-# Project Overview
+# RocketHooks Frontend - Project Overview
 
 ## Purpose
-RocketHooks frontend - React-based SaaS platform for API monitoring and webhook management.
+RocketHooks is a React-based SaaS platform for API monitoring and webhook management. It provides real-time monitoring, webhook handling, and comprehensive API management features for developers and teams.
 
 ## Tech Stack
 - **Frontend Framework**: React 19 with TypeScript
-- **Build Tool**: Vite 6
-- **Package Manager**: Yarn
-- **Authentication**: Clerk (OAuth with Google and GitHub)
-- **Data Fetching**: GraphQL APIs with Apollo Client
-- **Styling**: Tailwind CSS
+- **Build Tool**: Vite 6.0
+- **Styling**: Tailwind CSS v4.1.11 (CRITICAL: Not v3!)
+- **UI Components**: ShadCN/UI components library
+- **State Management**: Zustand 5.0
+- **Routing**: React Router DOM 7.8
+- **Authentication**: Clerk (OAuth with Google/GitHub)
+- **API Client**: Apollo Client 3.13 with GraphQL
+- **Forms**: React Hook Form 7.62 with Zod validation
 - **Testing**: Playwright for E2E testing
-- **Linting**: ESLint 9 with TypeScript strict rules
-- **Development**: Hot Module Replacement (HMR) with Vite
+- **Component Development**: Storybook 8.6
 
 ## Architecture
-- Modern React application with strict TypeScript configuration
-- GraphQL API integration for backend communication
-- Organization-based access control
-- Real-time features with Apollo Client
+- GraphQL APIs with real-time capabilities via Apollo Client
+- Clerk authentication with OAuth providers
+- Component-based architecture with ShadCN UI system
 - Mobile-first responsive design
-- Primary color: Indigo Blue (#6366f1)
-- Font: Inter family
+- Path aliases using `@/*` for src imports
 
-## Repository
-- GitHub: https://github.com/rockethooks/rockethooks-app
-- Location: /Users/adnene/Projects/RocketHooks/applications/rockethooks-app
+## Key Features
+- API monitoring and webhook management
+- Real-time data updates via GraphQL subscriptions
+- OAuth authentication (Google, GitHub)
+- Organization-based access control
+- Multi-step onboarding process
+- Dashboard with analytics
+
+## Related Projects
+- Backend API: `/Users/adnene/Projects/RocketHooks/services/api-service`
+- Data Models: `/Users/adnene/Projects/RocketHooks/03_Back/data-model`
+- GitHub Repo: https://github.com/rockethooks/rockethooks-app

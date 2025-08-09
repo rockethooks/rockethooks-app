@@ -44,7 +44,7 @@ export function PageLayout({
   contentClassName,
   fullWidth = false,
 }: PageLayoutProps) {
-  const hasHeader = Boolean(title || description || actions || breadcrumb)
+  const hasHeader = Boolean(title ?? description ?? actions ?? breadcrumb)
 
   return (
     <ComponentErrorBoundary>

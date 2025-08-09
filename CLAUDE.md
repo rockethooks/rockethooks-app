@@ -126,7 +126,9 @@ Detailed documentation available in `docs/` directory:
 ## File Naming Conventions
 
 - **React Components**: Use PascalCase for all component files (e.g., `AuthCallback.tsx`, `DashboardLayout.tsx`, `UserNav.tsx`)
-- **Non-component TypeScript/JavaScript**: Use kebab-case for utilities and non-component files (e.g., `apollo-client.ts`, `use-theme.ts`)
+- **Hooks**: Use camelCase for custom hooks (e.g., `useAuth.ts`, `useOnboarding.ts`)
+- **Context Files**: Use PascalCase for context files (e.g., `AuthContext.tsx`, `OnboardingContext.tsx`)
+- **Non-component TypeScript/JavaScript**: Use camelCase for utility functions and non-component files (e.g., `formatDate.ts`, `generateId.ts`)
 - **Style Files**: Use kebab-case for CSS files (e.g., `themes.css`, `index.css`)
 - **Test Files**: Match the component name with `.test.tsx` or `.spec.tsx` suffix
 - **Story Files**: Use PascalCase matching the component name with `.stories.tsx` suffix (e.g., `Button.stories.tsx`)

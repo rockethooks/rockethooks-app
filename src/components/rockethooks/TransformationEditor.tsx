@@ -80,7 +80,7 @@ function TransformationEditor({
 
   const formatCode = () => {
     try {
-      const parsed = JSON.parse(value)
+      const parsed = JSON.parse(value) as unknown
       const formatted = JSON.stringify(parsed, null, 2)
       onChange(formatted)
     } catch {
@@ -196,9 +196,9 @@ function TransformationEditor({
           <div className="space-y-2">
             <Label className="text-sm">Sample Transformations</Label>
             <div className="grid gap-2">
-              {sampleTransformations.map((sample, index) => (
+              {sampleTransformations.map((sample) => (
                 <Button
-                  key={index}
+                  key={sample.name}
                   variant="outline"
                   size="sm"
                   onClick={() => {
@@ -248,16 +248,20 @@ function TransformationEditor({
         <p className="font-medium mb-1">Transformation Syntax:</p>
         <ul className="list-disc list-inside space-y-1 text-xs">
           <li>
-            <code>"field": "$.input.path"</code> - Map input field to output
+            <code>&quot;field&quot;: &quot;$.input.path&quot;</code> - Map input
+            field to output
           </li>
           <li>
-            <code>"field": "static_value"</code> - Set static value
+            <code>&quot;field&quot;: &quot;static_value&quot;</code> - Set
+            static value
           </li>
           <li>
-            <code>"field": "$.input.array[*]"</code> - Transform arrays
+            <code>&quot;field&quot;: &quot;$.input.array[*]&quot;</code> -
+            Transform arrays
           </li>
           <li>
-            <code>"field": "$.input.value * 2"</code> - Apply calculations
+            <code>&quot;field&quot;: &quot;$.input.value * 2&quot;</code> -
+            Apply calculations
           </li>
         </ul>
       </div>

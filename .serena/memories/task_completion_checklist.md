@@ -1,70 +1,110 @@
 # Task Completion Checklist
 
-## Before Completing Any Task
+## Before Marking Any Task Complete
 
 ### 1. Code Quality Checks
 ```bash
-# Type checking - must pass
+# Run the comprehensive quality check
+yarn quality
+```
+This runs:
+- TypeScript type checking (`yarn type-check`)
+- Biome checks (`yarn check`)
+- ESLint (`yarn lint`)
+
+### 2. Fix Any Issues
+```bash
+# Fix linting issues
+yarn lint:fix
+
+# Fix Biome issues (formatting + linting)
+yarn check:fix
+
+# Format code
+yarn format
+```
+
+### 3. TypeScript Validation
+```bash
+# Ensure no TypeScript errors
 yarn type-check
+```
+- Fix ALL TypeScript errors, even non-blocking ones
+- Check for proper type definitions
+- Ensure no `any` types without justification
 
-# Linting - fix all issues
-yarn lint
+### 4. Component Testing (if UI changes)
+```bash
+# Start Storybook to verify components
+yarn storybook
+```
+- Verify component renders correctly
+- Check all component states
+- Test responsive behavior
 
-# Build verification - must succeed
+### 5. Build Verification
+```bash
+# Ensure production build works
 yarn build
 ```
+- Must complete without errors
+- Check for any build warnings
 
-### 2. Testing Requirements
+### 6. React-Specific Checks
+- [ ] No infinite re-render risks in useEffect dependencies
+- [ ] Error boundaries implemented for new features
+- [ ] Proper cleanup in useEffect returns
+- [ ] No memory leaks in event listeners
+
+### 7. Tailwind CSS v4 Compatibility
+- [ ] Only use Tailwind v4 syntax (NOT v3)
+- [ ] Verify styles work with ShadCN components
+- [ ] Check responsive design on mobile-first approach
+
+### 8. GraphQL/Apollo Checks (if applicable)
+- [ ] Error handling with policy 'all'
+- [ ] Proper loading states
+- [ ] Optimistic updates where appropriate
+- [ ] Cache updates if needed
+
+### 9. Documentation Updates
+- [ ] Update relevant docs in `docs/` directory
+- [ ] Update CLAUDE.md if adding new patterns
+- [ ] Add JSDoc comments for complex functions
+- [ ] Update README if adding new features
+
+### 10. Git Commit
 ```bash
-# Run E2E tests if UI changes made
-yarn test:e2e
-
-# Verify development server still works
-yarn dev
-```
-
-### 3. File Validation
-- Ensure no TypeScript errors (`npx tsc --noEmit`)
-- Verify all imports are correctly typed
-- Check that no unused variables exist
-- Confirm all React hooks follow rules of hooks
-
-### 4. Git Workflow
-```bash
-# Check git status
-git status
-
 # Stage changes
 git add .
 
-# Create conventional commit
+# Commit with conventional message
 git commit -m "type: description"
+```
+- Use conventional commit format
+- Let lefthook run pre-commit checks
+- NEVER use `--no-verify`
+- Fix any issues that prevent commit
 
-# Push to remote
-git push origin branch-name
+### 11. Final Verification
+- [ ] All automated checks pass
+- [ ] Manual testing completed
+- [ ] No console errors or warnings
+- [ ] Performance acceptable (no obvious lag)
+- [ ] Accessibility maintained
+
+## Quick Command Sequence
+```bash
+# Full validation sequence
+yarn quality        # Run all checks
+yarn build         # Verify build
+git add .
+git commit -m "feat: description"
 ```
 
-### 5. Performance Considerations
-- Verify HMR still works after changes
-- Check that build size hasn't significantly increased
-- Ensure no console errors in development
-
-### 6. Documentation Updates
-- Update CLAUDE.md if project structure changes
-- Add comments for complex logic
-- Update README if user-facing changes
-
 ## Common Issues to Check
-- Port conflicts (use `yarn debug` for port 8080)
-- Auth configuration in .env file
-- GraphQL endpoint connectivity
-- TypeScript strict mode compliance
-- React 19 compatibility
-
-## Pre-Push Checklist
-- [ ] All tests pass
-- [ ] No TypeScript errors
-- [ ] No ESLint errors
-- [ ] Build succeeds
-- [ ] Development server starts properly
-- [ ] Git commit messages follow convention
+- Port 8080 conflicts (use `lsof -i :8080`)
+- Missing environment variables (.env file)
+- Clerk authentication keys configured
+- GraphQL endpoint accessible
+- No hardcoded values that should be in env vars
