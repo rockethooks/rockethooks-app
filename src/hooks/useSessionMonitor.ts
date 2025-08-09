@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
 import { useAuth } from '@clerk/clerk-react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const SIGN_IN_URL = import.meta.env.VITE_CLERK_SIGN_IN_URL || '/sign-in'
+const SIGN_IN_URL = import.meta.env['VITE_CLERK_SIGN_IN_URL'] || '/sign-in'
 
 export function useSessionMonitor() {
   const { isSignedIn, isLoaded } = useAuth()

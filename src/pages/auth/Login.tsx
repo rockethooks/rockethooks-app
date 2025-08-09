@@ -102,7 +102,7 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
 
     return (OAUTH_ERROR_MESSAGES[error] ??
       errorDescription ??
-      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
+      OAUTH_ERROR_MESSAGES['oauth_unknown_error']) as string
   }
 
   if (clerkError) {
@@ -115,7 +115,7 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
     )
 
     return (clerkErrorDescription ??
-      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
+      OAUTH_ERROR_MESSAGES['oauth_unknown_error']) as string
   }
 
   return null
