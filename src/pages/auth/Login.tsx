@@ -49,17 +49,21 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
 }
 
 // Log error with contextual information for debugging
-const logError = (error: any, context: string) => {
+const logError = (error: unknown, context: string) => {
   const errorInfo = {
     timestamp: new Date().toISOString(),
     context,
     error: {
-      message: error?.message || 'Unknown error',
-      code: error?.code || 'UNKNOWN',
-      name: error?.name || 'Error',
-      stack: error?.stack,
-      ...(error?.status && { status: error.status }),
-      ...(error?.statusText && { statusText: error.statusText }),
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as { code?: string }).code ?? 'UNKNOWN',
+      name: error instanceof Error ? error.name : 'Error',
+      stack: error instanceof Error ? error.stack : undefined,
+      ...((error as { status?: number }).status && {
+        status: (error as { status: number }).status,
+      }),
+      ...((error as { statusText?: string }).statusText && {
+        statusText: (error as { statusText: string }).statusText,
+      }),
     },
     userAgent: navigator.userAgent,
     url: window.location.href,
@@ -96,9 +100,9 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
       'OAuth URL Error Parameter'
     )
 
-    return (OAUTH_ERROR_MESSAGES[error] ||
-      errorDescription ||
-      OAUTH_ERROR_MESSAGES['oauth_unknown_error']) as string
+    return (OAUTH_ERROR_MESSAGES[error] ??
+      errorDescription ??
+      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
   }
 
   if (clerkError) {
@@ -110,8 +114,8 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
       'Clerk URL Error Parameter'
     )
 
-    return (clerkErrorDescription ||
-      OAUTH_ERROR_MESSAGES['oauth_unknown_error']) as string
+    return (clerkErrorDescription ??
+      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
   }
 
   return null
@@ -145,11 +149,11 @@ export function Login() {
     }
   }, [searchParams, setSearchParams, hasProcessedError])
 
-  // Redirect if already signed in
+  // Redirect if already signed in - now goes to auth callback for proper handling
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      const redirectTo = searchParams.get('redirect_url') || '/dashboard'
-      navigate(redirectTo, { replace: true })
+      const redirectTo = searchParams.get('redirect_url') ?? '/auth/callback'
+      void navigate(redirectTo, { replace: true })
     }
   }, [isLoaded, isSignedIn, navigate, searchParams])
 
@@ -233,11 +237,9 @@ export function Login() {
                     footerAction: 'hidden',
                   },
                 }}
-                redirectUrl="/dashboard"
                 signUpUrl="/sign-up"
-                forceRedirectUrl="/dashboard"
-                fallbackRedirectUrl="/dashboard"
-                afterSignInUrl="/dashboard"
+                forceRedirectUrl="/auth/callback"
+                fallbackRedirectUrl="/auth/callback"
                 routing="hash"
               />
 
@@ -264,7 +266,7 @@ export function Login() {
         {/* Help Text */}
         <div className="text-center text-sm text-muted-foreground">
           <p>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Button
               variant="link"
               className="p-0 h-auto"
