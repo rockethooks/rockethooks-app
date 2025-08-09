@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import { useAuth, useUser } from '@clerk/clerk-react'
+import { useEffect } from 'react'
 import { useAuthStore } from '@/app/store/auth.store'
 
 export function AuthSync() {
@@ -33,7 +33,16 @@ export function AuthSync() {
     } else {
       setUnauthenticated()
     }
-  }, [authLoaded, userLoaded, isSignedIn, user, sessionId, getToken, setAuthenticated, setUnauthenticated])
+  }, [
+    authLoaded,
+    userLoaded,
+    isSignedIn,
+    user,
+    sessionId,
+    getToken,
+    setAuthenticated,
+    setUnauthenticated,
+  ])
 
   // Token refresh with proper cleanup
   useEffect(() => {
@@ -43,16 +52,16 @@ export function AuthSync() {
 
     const refreshInterval = setInterval(() => {
       void (async () => {
-      try {
-        const newToken = await getToken()
-        if (isMounted && newToken) {
-          updateToken(newToken)
+        try {
+          const newToken = await getToken()
+          if (isMounted && newToken) {
+            updateToken(newToken)
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.error('Failed to refresh token:', error)
+          }
         }
-      } catch (error) {
-        if (isMounted) {
-          console.error('Failed to refresh token:', error)
-        }
-      }
       })()
     }, 55000) // Refresh every 55 seconds (closer to typical token expiration)
 

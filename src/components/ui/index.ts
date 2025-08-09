@@ -54,15 +54,13 @@ export {
   Label,
   type LabelProps,
 } from './label'
-
+// Skeleton Group
+export { SkeletonGroup } from './SkeletonGroup'
 // Skeleton Components
 export {
   Skeleton,
   type SkeletonProps,
 } from './skeleton'
-
-// Skeleton Group
-export { SkeletonGroup } from './SkeletonGroup'
 
 // Skeleton Variants
 export { skeletonVariants } from './skeleton-variants'

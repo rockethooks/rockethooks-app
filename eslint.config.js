@@ -6,7 +6,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'vite.config.ts'] },
+  { ignores: ['dist', 'node_modules', 'vite.config.ts', '.storybook/**/*'] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     files: ['**/*.{ts,tsx}'],
@@ -77,6 +77,26 @@ export default tseslint.config(
       ],
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
+    },
+  },
+  // Overrides for story files
+  {
+    files: ['**/*.stories.tsx'],
+    rules: {
+      'react/function-component-definition': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react/jsx-no-comment-textnodes': 'off',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
+    },
+  },
+  // Overrides for route files
+  {
+    files: ['**/router/**/*.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   }
 )

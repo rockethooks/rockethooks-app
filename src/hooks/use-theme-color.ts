@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useTheme } from '@/app/providers/theme-provider'
+import { useTheme } from '@/app/providers/use-theme'
 
 // Global MutationObserver instance to prevent multiple observers
 class GlobalThemeObserver {
