@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -12,12 +11,9 @@ import {
 } from '@/components/ui/card'
 import {
   DetailPage,
-  PageActions,
-  PageContent,
-  PageHeader,
   PageLayout,
   SettingsPage,
-} from '@/shared/components/page-layout'
+} from '@/shared/components/PageLayout'
 
 /**
  * PageLayout component provides a consistent structure for application pages
@@ -46,7 +42,7 @@ It includes automatic header generation, breadcrumb support, and flexible conten
 ## Usage
 
 \`\`\`tsx
-import { PageLayout, PageHeader, PageContent, PageActions } from '@/shared/components/page-layout'
+import { PageLayout, PageHeader, PageContent, PageActions } from '@/shared/components/PageLayout'
 
 <PageLayout
   title="Page Title"
@@ -332,6 +328,7 @@ export const FullWidth: Story = {
  * Settings page layout with specialized styling
  */
 export const SettingsLayout: Story = {
+  args: { children: null },
   render: () => (
     <SettingsPage
       title="Account Settings"
@@ -425,6 +422,7 @@ export const SettingsLayout: Story = {
  * Detail page layout with entity actions
  */
 export const DetailLayout: Story = {
+  args: { children: null },
   render: () => (
     <DetailPage
       title="User Profile API"
@@ -525,7 +523,7 @@ export const DetailLayout: Story = {
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                  className="flex items-center justify-between py-2 border-b last:border-0"
                 >
                   <div>
                     <div className="text-sm font-medium">

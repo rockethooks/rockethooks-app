@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { ComponentErrorBoundary } from './error-boundary'
+import { ComponentErrorBoundary } from './ErrorBoundary'
 
 interface PageLayoutProps {
   children: React.ReactNode

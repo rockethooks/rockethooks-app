@@ -1,10 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { DashboardLayout } from '@/app/layouts/dashboard-layout'
-import { RootLayout } from '@/app/layouts/root-layout'
+import { DashboardLayout } from '@/app/layouts/DashboardLayout'
+import { RootLayout } from '@/app/layouts/RootLayout'
 import AuthCallback from '@/pages/auth/AuthCallback'
 import { LoginWithErrorBoundary } from '@/pages/auth/Login'
 import { ComponentTest } from '@/pages/component-test'
-import { DashboardPage } from '@/shared/components/page-layout'
+import { DashboardPage } from '@/shared/components/PageLayout'
 
 // Demo pages for each route
 function HomePage() {

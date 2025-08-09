@@ -62,7 +62,7 @@ export {
 } from './skeleton'
 
 // Skeleton Group
-export { SkeletonGroup } from './skeleton-group'
+export { SkeletonGroup } from './SkeletonGroup'
 
 // Skeleton Variants
 export { skeletonVariants } from './skeleton-variants'

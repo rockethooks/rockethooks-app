@@ -14,6 +14,8 @@ Reading this file first ensures consistency and prevents duplication of common p
 RocketHooks frontend - React-based SaaS platform for API monitoring and webhook management.
 
 **Architecture**: GraphQL APIs with Clerk authentication and Apollo Client for real-time features.
+** CSS ** Tailwind v4 for styling, ShadCN components for UI consistency, use Context7 MCP and Shadcn MCP before making any change.
+The project had Tailwind CSS v4.1.11 installed DO NEVER USE v3 configuration patterns, this will cause a complete CSS failure.
 
 ## Github Repository
 - [RocketHooks Frontend Webapp](https://github.com/rockethooks/rockethooks-app)
@@ -22,6 +24,7 @@ RocketHooks frontend - React-based SaaS platform for API monitoring and webhook 
 ## Authentication Integration
 
 ### Clerk Setup
+**IMPORTANT**: Always use web fetch tool to read Clerk documentation when implementing authentication features: [Clerk React documentation](https://clerk.com/docs/quickstarts/react)
 
 - OAuth with Google and GitHub
 - User context and protected routes
@@ -101,7 +104,7 @@ Detailed documentation available in `docs/` directory:
   - Run the server in parallel mode
   - Turn off the server once the task is completed
 
-IMPORTANT: Always use web fetch tool to read Clerk documentation when implementing authentication features: <https://clerk.com/docs/quickstarts/react>
+
 
 ## Library Usage Guidelines
 
@@ -114,3 +117,14 @@ IMPORTANT: Always use web fetch tool to read Clerk documentation when implementi
 ## React Development Notes
 
 - When creating or editing hooks, useEffect, or any other React features make sure the dependency can not cause infinite re-renders
+- Always fix typescript errors even if they are not blocking
+
+## File Naming Conventions
+
+- **React Components**: Use PascalCase for all component files (e.g., `AuthCallback.tsx`, `DashboardLayout.tsx`, `UserNav.tsx`)
+- **Non-component TypeScript/JavaScript**: Use kebab-case for utilities and non-component files (e.g., `apollo-client.ts`, `use-theme.ts`)
+- **Style Files**: Use kebab-case for CSS files (e.g., `themes.css`, `index.css`)
+- **Test Files**: Match the component name with `.test.tsx` or `.spec.tsx` suffix
+- **Story Files**: Use PascalCase matching the component name with `.stories.tsx` suffix (e.g., `Button.stories.tsx`)
+- **Index Files**: Always use lowercase `index.ts` or `index.tsx`
+- Whenever you change a css make sure it's compatible with Tailwind v4 and ShadCN components

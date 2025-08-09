@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { ComponentErrorBoundary } from '@/shared/components/error-boundary'
+import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
 
 interface SidebarProps {
   collapsed?: boolean

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useAuth, useUser } from '@clerk/clerk-react'
-import { useAuthStore } from '@/stores/auth.store'
+import { useAuthStore } from '@/app/store/auth.store'
 
 export function AuthSync() {
   const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth()
@@ -14,7 +14,7 @@ export function AuthSync() {
     if (isSignedIn && user && sessionId) {
       const userData = {
         id: user.id,
-        email: user.primaryEmailAddress?.emailAddress || '',
+        email: user.primaryEmailAddress?.emailAddress ?? '',
         ...(user.firstName && { firstName: user.firstName }),
         ...(user.lastName && { lastName: user.lastName }),
         ...(user.imageUrl && { imageUrl: user.imageUrl }),
@@ -26,14 +26,14 @@ export function AuthSync() {
             setAuthenticated(userData, sessionId, token)
           }
         })
-        .catch((error) => {
+        .catch((error: unknown) => {
           console.error('Failed to get auth token:', error)
           setUnauthenticated()
         })
     } else {
       setUnauthenticated()
     }
-  }, [authLoaded, userLoaded, isSignedIn, user, sessionId])
+  }, [authLoaded, userLoaded, isSignedIn, user, sessionId, getToken, setAuthenticated, setUnauthenticated])
 
   // Token refresh with proper cleanup
   useEffect(() => {
@@ -41,7 +41,8 @@ export function AuthSync() {
 
     let isMounted = true
 
-    const refreshInterval = setInterval(async () => {
+    const refreshInterval = setInterval(() => {
+      void (async () => {
       try {
         const newToken = await getToken()
         if (isMounted && newToken) {
@@ -52,13 +53,14 @@ export function AuthSync() {
           console.error('Failed to refresh token:', error)
         }
       }
+      })()
     }, 55000) // Refresh every 55 seconds (closer to typical token expiration)
 
     return () => {
       isMounted = false
       clearInterval(refreshInterval)
     }
-  }, [isSignedIn])
+  }, [isSignedIn, getToken, updateToken])
 
   return null
 }

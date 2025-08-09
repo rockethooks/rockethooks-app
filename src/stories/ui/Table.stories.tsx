@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { WebhookStatus } from '@/components/rockethooks/webhook-status'
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 
 /**
  * Table component providing consistent data presentation with proper semantic structure.

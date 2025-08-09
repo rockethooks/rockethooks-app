@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
-import { WebhookStatus } from './webhook-status'
+import { WebhookStatus } from './WebhookStatus'
 
 export interface WebhookEvent {
   id: string
@@ -53,9 +53,7 @@ function EventTimeline({
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .forEach((event) => {
         const dayKey = format(event.timestamp, 'yyyy-MM-dd')
-        if (!groups[dayKey]) {
-          groups[dayKey] = []
-        }
+        groups[dayKey] ??= []
         groups[dayKey].push(event)
       })
 

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { WebhookStatus } from '@/components/rockethooks/webhook-status'
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 
 /**
  * WebhookStatus component provides visual status indicators for webhook delivery states.
@@ -40,7 +40,7 @@ visual feedback about webhook processing status.
 ## Usage
 
 \`\`\`tsx
-import { WebhookStatus } from '@/components/rockethooks/webhook-status'
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 
 // Basic usage
 <WebhookStatus status="success" />
@@ -101,6 +101,7 @@ export const Default: Story = {
  * All webhook status types
  */
 export const AllStatuses: Story = {
+  args: { status: 'success' },
   render: () => (
     <div className="space-y-4">
       <div className="grid gap-4">
@@ -144,6 +145,7 @@ export const AllStatuses: Story = {
  * Status indicators with labels
  */
 export const WithLabels: Story = {
+  args: { status: 'success' },
   render: () => (
     <div className="space-y-3">
       <WebhookStatus status="success" showLabel />
@@ -166,6 +168,7 @@ export const WithLabels: Story = {
  * Different sizes for various UI contexts
  */
 export const Sizes: Story = {
+  args: { status: 'success' },
   render: () => (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -212,6 +215,7 @@ export const Sizes: Story = {
  * Animation control demonstration
  */
 export const Animations: Story = {
+  args: { status: 'success' },
   render: () => (
     <div className="space-y-6">
       <div className="space-y-3">
@@ -248,6 +252,7 @@ export const Animations: Story = {
  * Event table integration
  */
 export const EventTable: Story = {
+  args: { status: 'success' },
   render: () => (
     <Card>
       <CardHeader>
@@ -371,6 +376,7 @@ export const EventTable: Story = {
  * Dashboard status cards
  */
 export const DashboardCards: Story = {
+  args: { status: 'success' },
   render: () => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -456,6 +462,7 @@ export const DashboardCards: Story = {
  * Status summary with counts
  */
 export const StatusSummary: Story = {
+  args: { status: 'success' },
   render: () => (
     <Card>
       <CardHeader>
@@ -537,12 +544,15 @@ export const StatusSummary: Story = {
  * Real-time status updates simulation
  */
 export const RealTimeUpdates: Story = {
+  args: { status: 'success' },
   render: () => {
-    const [statuses, setStatuses] = React.useState([
-      { id: 1, status: 'success' as const, timestamp: '2m ago' },
-      { id: 2, status: 'pending' as const, timestamp: '3m ago' },
-      { id: 3, status: 'retrying' as const, timestamp: '5m ago' },
-      { id: 4, status: 'success' as const, timestamp: '7m ago' },
+    const [statuses, setStatuses] = React.useState<
+      Array<{ id: number; status: 'success' | 'pending' | 'retrying' | 'failed'; timestamp: string }>
+    >([
+      { id: 1, status: 'success', timestamp: '2m ago' },
+      { id: 2, status: 'pending', timestamp: '3m ago' },
+      { id: 3, status: 'retrying', timestamp: '5m ago' },
+      { id: 4, status: 'success', timestamp: '7m ago' },
     ])
 
     React.useEffect(() => {
@@ -550,15 +560,15 @@ export const RealTimeUpdates: Story = {
         setStatuses((prev) =>
           prev.map((item) => {
             if (item.status === 'pending' && Math.random() > 0.7) {
-              return { ...item, status: 'success' as const }
+              return { ...item, status: 'success' }
             }
             if (item.status === 'retrying' && Math.random() > 0.8) {
               return {
                 ...item,
                 status:
                   Math.random() > 0.5
-                    ? ('success' as const)
-                    : ('failed' as const),
+                    ? 'success'
+                    : 'failed',
               }
             }
             return item

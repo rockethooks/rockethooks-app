@@ -10,7 +10,7 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
-import { useTheme } from '@/app/providers/theme-provider'
+import { useTheme } from '@/app/providers/use-theme'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -24,9 +24,9 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/components/ui/DropdownMenu'
 import { Input } from '@/components/ui/input'
-import { ComponentErrorBoundary } from '@/shared/components/error-boundary'
+import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
 
 interface HeaderProps {
   onMenuToggle?: () => void
@@ -53,7 +53,7 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
 
   return (
     <ComponentErrorBoundary>
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-gray-200/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 max-w-screen-2xl items-center">
           {/* Mobile menu button */}
           {showMenuButton && (

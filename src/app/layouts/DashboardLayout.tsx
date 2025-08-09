@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { PageErrorBoundary } from '@/shared/components/error-boundary'
+import { PageErrorBoundary } from '@/shared/components/ErrorBoundary'
 import { Header } from './header'
 import { Sidebar } from './sidebar'
 
@@ -115,7 +115,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 !isMobile && !sidebarCollapsed && 'ml-0'
               )}
             >
-              {children || <Outlet />}
+              {children ?? <Outlet />}
             </div>
           </PageErrorBoundary>
         </main>

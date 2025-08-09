@@ -8,14 +8,14 @@
 export {
   APIConnectionCard,
   type APIConnectionCardProps,
-} from './api-connection-card'
+} from './ApiConnectionCard'
 // Re-export the WebhookEvent type from event-timeline
-export type { WebhookEvent } from './event-timeline'
-export { EventTimeline, type EventTimelineProps } from './event-timeline'
-export { JSONPathBuilder, type JSONPathBuilderProps } from './jsonpath-builder'
+export type { WebhookEvent } from './EventTimeline'
+export { EventTimeline, type EventTimelineProps } from './EventTimeline'
+export { JSONPathBuilder, type JSONPathBuilderProps } from './JsonpathBuilder'
 export { Sparkline, type SparklineProps } from './sparkline'
 export {
   TransformationEditor,
   type TransformationEditorProps,
-} from './transformation-editor'
-export { WebhookStatus, type WebhookStatusProps } from './webhook-status'
+} from './TransformationEditor'
+export { WebhookStatus, type WebhookStatusProps } from './WebhookStatus'
