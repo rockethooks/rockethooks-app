@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Sparkline } from '@/components/rockethooks/sparkline'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 /**
  * Sparkline component provides lightweight data visualization for showing trends
@@ -124,6 +123,7 @@ export const Default: Story = {
  * Different chart sizes for various use cases
  */
 export const Sizes: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -177,6 +177,7 @@ export const Sizes: Story = {
  * Color variations for different metric types
  */
 export const Colors: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => (
     <div className="grid grid-cols-2 gap-6">
       <div className="space-y-3">
@@ -253,6 +254,7 @@ export const Colors: Story = {
  * Interactive sparklines with tooltips
  */
 export const Interactive: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => (
     <div className="space-y-6">
       <Card className="p-4">
@@ -312,6 +314,7 @@ export const Interactive: Story = {
  * Dashboard integration showing multiple metrics
  */
 export const DashboardMetrics: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
@@ -420,6 +423,7 @@ export const DashboardMetrics: Story = {
  * Edge cases and data scenarios
  */
 export const EdgeCases: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => (
     <div className="space-y-6">
       <div className="space-y-4">
@@ -500,6 +504,7 @@ export const EdgeCases: Story = {
  * Real-time data simulation
  */
 export const RealTimeData: Story = {
+  args: { data: [10, 20, 15, 25, 30, 22, 28] },
   render: () => {
     const [data, setData] = React.useState([
       120, 135, 158, 142, 167, 189, 203, 178,

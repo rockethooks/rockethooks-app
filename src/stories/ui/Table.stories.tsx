@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 
 /**
  * Table component providing consistent data presentation with proper semantic structure.

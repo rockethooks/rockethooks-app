@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
 
 /**
  * WebhookStatus component provides visual status indicators for webhook delivery states.
@@ -547,7 +546,11 @@ export const RealTimeUpdates: Story = {
   args: { status: 'success' },
   render: () => {
     const [statuses, setStatuses] = React.useState<
-      Array<{ id: number; status: 'success' | 'pending' | 'retrying' | 'failed'; timestamp: string }>
+      Array<{
+        id: number
+        status: 'success' | 'pending' | 'retrying' | 'failed'
+        timestamp: string
+      }>
     >([
       { id: 1, status: 'success', timestamp: '2m ago' },
       { id: 2, status: 'pending', timestamp: '3m ago' },
@@ -565,10 +568,7 @@ export const RealTimeUpdates: Story = {
             if (item.status === 'retrying' && Math.random() > 0.8) {
               return {
                 ...item,
-                status:
-                  Math.random() > 0.5
-                    ? 'success'
-                    : 'failed',
+                status: Math.random() > 0.5 ? 'success' : 'failed',
               }
             }
             return item
