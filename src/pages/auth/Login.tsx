@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/card'
 
 // Define OAuth error codes and their user-friendly messages
-const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+const OAUTH_ERROR_MESSAGES = {
   oauth_access_denied:
     'Access was denied. Please try again or use a different account.',
   oauth_email_domain_blocked:
@@ -46,7 +46,7 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
     'Authentication service is temporarily unavailable. Please try again later.',
   oauth_unknown_error:
     'An unknown error occurred during authentication. Please try again.',
-}
+} as const
 
 // Log error with contextual information for debugging
 const logError = (error: unknown, context: string) => {
@@ -100,9 +100,11 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
       'OAuth URL Error Parameter'
     )
 
-    return (OAUTH_ERROR_MESSAGES[error] ??
-      errorDescription ??
-      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
+    const message =
+      error in OAUTH_ERROR_MESSAGES
+        ? OAUTH_ERROR_MESSAGES[error as keyof typeof OAUTH_ERROR_MESSAGES]
+        : (errorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error)
+    return message
   }
 
   if (clerkError) {
@@ -114,8 +116,7 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
       'Clerk URL Error Parameter'
     )
 
-    return (clerkErrorDescription ??
-      OAUTH_ERROR_MESSAGES.oauth_unknown_error) as string
+    return clerkErrorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error
   }
 
   return null

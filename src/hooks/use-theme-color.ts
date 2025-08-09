@@ -54,7 +54,6 @@ const globalThemeObserver = new GlobalThemeObserver()
  * @returns The current value of the CSS variable
  */
 export function useCSSVariable(cssVariable: string): string {
-  const { resolvedTheme } = useTheme()
   const [value, setValue] = useState<string>('')
 
   useEffect(() => {

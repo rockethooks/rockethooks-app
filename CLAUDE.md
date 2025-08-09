@@ -84,6 +84,9 @@ The project uses Playwright for comprehensive E2E testing covering authenticatio
 
 Detailed documentation available in `docs/` directory:
 
+### Authentication & Security
+- `authentication-flow-guide.md` - Complete guide to authentication flows, route guards, and user journey
+
 ### General Documentation
 - `legacy-docs/` - Folder containing legacy documentation, which is no longer maintained but may contain useful information
 
