@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Card, CardContent } from '@/components/ui/Card'
+import { useReturnUrl } from '@/hooks/auth/useReturnUrl'
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
 
 /**
@@ -11,10 +12,12 @@ import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
  * - Detects if user is new (created within last minute)
  * - Shows welcome toast for new users
  * - Redirects to appropriate destination based on user status
+ * - Handles return URLs for redirecting users to their intended destination
  */
 export function AuthCallback() {
   const { isLoaded, isSignedIn } = useAuth()
   const navigate = useNavigate()
+  const { getReturnUrl, clearReturnUrl } = useReturnUrl()
   const {
     isLoading: onboardingLoading,
     isNewUser,
@@ -59,8 +62,15 @@ export function AuthCallback() {
     if (shouldRedirectToOnboarding) {
       void navigate('/onboarding/1', { replace: true })
     } else {
-      // For existing users, redirect to dashboard or their intended destination
-      void navigate('/dashboard', { replace: true })
+      // Check for return URL for existing users
+      const returnUrl = getReturnUrl()
+      if (returnUrl) {
+        clearReturnUrl()
+        void navigate(returnUrl, { replace: true })
+      } else {
+        // Default to dashboard if no return URL
+        void navigate('/dashboard', { replace: true })
+      }
     }
   }, [
     isLoaded,
@@ -70,6 +80,8 @@ export function AuthCallback() {
     shouldRedirectToOnboarding,
     error,
     navigate,
+    getReturnUrl,
+    clearReturnUrl,
   ])
 
   // Show loading state while processing
