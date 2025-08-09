@@ -6,6 +6,7 @@ export interface GuardContext {
   user: UserResource | null | undefined
   isNewUser: boolean
   onboardingComplete: boolean
+  currentPath: string
   // Future: organizationId, organizationRole, permissions
 }
 

@@ -14,7 +14,7 @@ export const requireAuth: RouteGuard = (context) => {
 
 export const requireOnboarding: RouteGuard = (context) => {
   // Skip for new users currently in onboarding
-  if (context.isNewUser && window.location.pathname.startsWith('/onboarding')) {
+  if (context.isNewUser && context.currentPath.startsWith('/onboarding')) {
     return { allowed: true }
   }
 

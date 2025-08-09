@@ -1,8 +1,8 @@
 // src/components/auth/ProtectedRoute.tsx
 import { useAuth, useUser } from '@clerk/clerk-react'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
 import type { GuardResult, RouteGuard } from '@/types/auth'
 
@@ -22,9 +22,27 @@ export function ProtectedRoute({
   const { isLoaded: authLoaded, isSignedIn } = useAuth()
   const { user, isLoaded: userLoaded } = useUser()
   const { isNewUser, shouldRedirectToOnboarding } = useOnboardingStatus()
+  const location = useLocation()
 
   const [guardsResult, setGuardsResult] = useState<GuardResult | null>(null)
   const [guardsLoading, setGuardsLoading] = useState(false)
+
+  // Create stable reference for guards to prevent infinite re-renders
+  const guardsRef = useRef<RouteGuard[]>([])
+  const guardsHashRef = useRef<string>('')
+
+  // Create a hash of the guards functions to detect changes
+  const guardsHash = useMemo(() => {
+    return `${guards.map((guard) => guard.toString()).join('|')}:${guards.length.toString()}`
+  }, [guards])
+
+  // Update guards ref only when the hash changes
+  useEffect(() => {
+    if (guardsHashRef.current !== guardsHash) {
+      guardsRef.current = guards
+      guardsHashRef.current = guardsHash
+    }
+  }, [guards, guardsHash])
 
   // Build guard context
   const context = useMemo(
@@ -33,8 +51,9 @@ export function ProtectedRoute({
       user,
       isNewUser,
       onboardingComplete: !shouldRedirectToOnboarding,
+      currentPath: location.pathname,
     }),
-    [isSignedIn, user, isNewUser, shouldRedirectToOnboarding]
+    [isSignedIn, user, isNewUser, shouldRedirectToOnboarding, location.pathname]
   )
 
   // Evaluate guards asynchronously
@@ -43,7 +62,7 @@ export function ProtectedRoute({
       return
     }
 
-    if (guards.length === 0) {
+    if (guardsRef.current.length === 0) {
       setGuardsResult(null)
       return
     }
@@ -52,7 +71,7 @@ export function ProtectedRoute({
       setGuardsLoading(true)
 
       try {
-        for (const guard of guards) {
+        for (const guard of guardsRef.current) {
           const result = await Promise.resolve(guard(context))
           if (!result.allowed) {
             setGuardsResult(result)
@@ -76,7 +95,7 @@ export function ProtectedRoute({
     }
 
     void evaluateGuards()
-  }, [guards, context, fallbackPath, authLoaded, userLoaded])
+  }, [context, fallbackPath, authLoaded, userLoaded])
 
   // Show loading while Clerk initializes
   if (!authLoaded || !userLoaded) {
@@ -106,7 +125,7 @@ export function ProtectedRoute({
   }
 
   // Default auth check if no guards provided
-  if (guards.length === 0 && !isSignedIn) {
+  if (guardsRef.current.length === 0 && !isSignedIn) {
     return <Navigate to={fallbackPath} replace />
   }
 
