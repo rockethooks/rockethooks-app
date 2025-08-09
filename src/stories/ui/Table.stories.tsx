@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/components/ui/Table'
 
 /**
  * Table component providing consistent data presentation with proper semantic structure.
@@ -39,7 +39,7 @@ It includes proper table structure with header, body, and cell components.
 ## Usage
 
 \`\`\`tsx
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/Table'
 
 <Table>
   <TableHeader>

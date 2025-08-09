@@ -1,9 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { DashboardLayout } from '@/app/layouts/DashboardLayout'
 import { RootLayout } from '@/app/layouts/RootLayout'
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+import { PublicRoute } from '@/components/auth/PublicRoute'
 import AuthCallback from '@/pages/auth/AuthCallback'
 import { LoginWithErrorBoundary } from '@/pages/auth/Login'
-import { ComponentTest } from '@/pages/component-test'
+import { ComponentTest } from '@/pages/ComponentTest'
+import {
+  combineGuards,
+  requireAuth,
+  requireOnboarding,
+} from '@/services/auth/guards'
 import { DashboardPage } from '@/shared/components/PageLayout'
 
 // Demo pages for each route
@@ -147,24 +154,38 @@ export const router = createBrowserRouter([
     path: '/',
     element: <RootLayout />,
     children: [
-      // Authentication routes (outside dashboard layout)
+      // Public routes
       {
         path: 'login',
-        element: <LoginWithErrorBoundary />,
+        element: (
+          <PublicRoute>
+            <LoginWithErrorBoundary />
+          </PublicRoute>
+        ),
       },
       {
         path: 'auth/callback',
-        element: <AuthCallback />,
+        element: <AuthCallback />, // Handles its own redirects
       },
-      // Onboarding routes (outside dashboard layout)
+      // Onboarding (requires auth only)
       {
         path: 'onboarding/:step',
-        element: <OnboardingPage />,
+        element: (
+          <ProtectedRoute guards={[requireAuth]}>
+            <OnboardingPage />
+          </ProtectedRoute>
+        ),
       },
-      // Dashboard routes
+      // Protected dashboard routes
       {
         path: '/',
-        element: <DashboardLayout />,
+        element: (
+          <ProtectedRoute
+            guards={[combineGuards(requireAuth, requireOnboarding)]}
+          >
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
         children: [
           {
             index: true,

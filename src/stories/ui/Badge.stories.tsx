@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/Badge'
 
 /**
  * Badge component for displaying status, labels, and categorical information.
@@ -27,7 +27,7 @@ or categorical data. It's designed to be compact and visually distinct.
 ## Usage
 
 \`\`\`tsx
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/components/ui/Badge'
 
 // Basic usage
 <Badge>New</Badge>

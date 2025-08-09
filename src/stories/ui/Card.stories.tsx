@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/Card'
 
 /**
  * Card component providing a flexible container for content with header, body, and footer sections.
@@ -36,7 +36,7 @@ It provides a consistent structure with optional header, content, and footer sec
 ## Usage
 
 \`\`\`tsx
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
 
 <Card>
   <CardHeader>

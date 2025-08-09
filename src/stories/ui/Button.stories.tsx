@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 /**
  * The Button component is a versatile interactive element that supports multiple variants,
@@ -32,7 +32,7 @@ It supports multiple variants for different semantic meanings and use cases.
 ## Usage
 
 \`\`\`tsx
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 
 // Basic usage
 <Button onClick={handleClick}>Save Changes</Button>

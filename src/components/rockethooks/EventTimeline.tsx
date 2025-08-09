@@ -1,8 +1,8 @@
 import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns'
 import { useMemo } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/Badge'
+import { Card, CardContent } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 
 import { WebhookStatus } from './WebhookStatus'

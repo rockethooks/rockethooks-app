@@ -12,9 +12,9 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+import { Button } from '@/components/ui/Button'
+import { Separator } from '@/components/ui/Separator'
 import { cn } from '@/lib/utils'
 import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
 

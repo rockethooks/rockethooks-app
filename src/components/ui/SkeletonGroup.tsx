@@ -1,6 +1,6 @@
 import type * as React from 'react'
 import { cn } from '@/lib/utils'
-import { Skeleton } from './skeleton'
+import { Skeleton } from './Skeleton'
 
 /**
  * Skeleton group for common loading patterns

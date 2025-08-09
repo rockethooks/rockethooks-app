@@ -2,7 +2,7 @@ import type { VariantProps } from 'class-variance-authority'
 import type * as React from 'react'
 
 import { cn } from '@/lib/utils'
-import { skeletonVariants } from './skeleton-variants'
+import { skeletonVariants } from './skeletonVariants'
 
 export interface SkeletonProps
   extends React.HTMLAttributes<HTMLDivElement>,

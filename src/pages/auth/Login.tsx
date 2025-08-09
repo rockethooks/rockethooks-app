@@ -3,15 +3,15 @@ import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/Button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/Card'
 
 // Define OAuth error codes and their user-friendly messages
 const OAUTH_ERROR_MESSAGES = {

@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom'
 import { ThemeProvider } from '@/app/providers/ThemeProvider'
-import { Toaster } from '@/components/ui/sonner'
-import { TooltipProvider } from '@/components/ui/tooltip'
+import { Toaster } from '@/components/ui/Sonner'
+import { TooltipProvider } from '@/components/ui/Tooltip'
 import { AppErrorBoundary } from '@/shared/components/ErrorBoundary'
 
 interface RootLayoutProps {

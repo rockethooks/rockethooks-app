@@ -13,7 +13,7 @@ export {
 export type { WebhookEvent } from './EventTimeline'
 export { EventTimeline, type EventTimelineProps } from './EventTimeline'
 export { JSONPathBuilder, type JSONPathBuilderProps } from './JsonpathBuilder'
-export { Sparkline, type SparklineProps } from './sparkline'
+export { Sparkline, type SparklineProps } from './Sparkline'
 export {
   TransformationEditor,
   type TransformationEditorProps,

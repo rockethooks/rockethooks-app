@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/Badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 
 /**
  * WebhookStatus component provides visual status indicators for webhook delivery states.

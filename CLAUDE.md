@@ -3,7 +3,7 @@
 ## 🚨 CRITICAL: Load CLAUDE_CONTEXT.md First
 **MANDATORY REQUIREMENT**: Before working with any RocketHooks project, you MUST first read and load the shared development guidelines from:
 
-**`/Users/adnene/Projects/RocketHooks/specification/CLAUDE_CONTEXT.md`**
+**`@/Users/adnene/Projects/RocketHooks/specification/CLAUDE_CONTEXT.md`**
 
 This template contains essential shared patterns, standards, and guidelines that apply across ALL RocketHooks services and projects.
 Reading this file first ensures consistency and prevents duplication of common patterns.

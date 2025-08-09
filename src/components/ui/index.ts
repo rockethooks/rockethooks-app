@@ -11,16 +11,16 @@
 export {
   Badge,
   type BadgeProps,
-} from './badge'
-// Badge Variants
-export { badgeVariants } from './badge-variants'
+} from './Badge'
 // Button Component
 export {
   Button,
   type ButtonProps,
-} from './button'
+} from './Button'
+// Badge Variants
+export { badgeVariants } from './badgeVariants'
 // Button Variants
-export { buttonVariants } from './button-variants'
+export { buttonVariants } from './buttonVariants'
 
 // Card Components (Compound Pattern)
 export {
@@ -38,29 +38,29 @@ export {
   type CardProps,
   CardTitle,
   type CardTitleProps,
-} from './card'
+} from './Card'
 
 // Input Component
 export {
   Input,
   type InputProps,
-} from './input'
+} from './Input'
 
 // Input Variants
-export { inputVariants } from './input-variants'
+export { inputVariants } from './inputVariants'
 
 // Label Component
 export {
   Label,
   type LabelProps,
-} from './label'
-// Skeleton Group
-export { SkeletonGroup } from './SkeletonGroup'
+} from './Label'
 // Skeleton Components
 export {
   Skeleton,
   type SkeletonProps,
-} from './skeleton'
+} from './Skeleton'
+// Skeleton Group
+export { SkeletonGroup } from './SkeletonGroup'
 
 // Skeleton Variants
-export { skeletonVariants } from './skeleton-variants'
+export { skeletonVariants } from './skeletonVariants'

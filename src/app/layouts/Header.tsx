@@ -10,10 +10,10 @@ import {
   User,
 } from 'lucide-react'
 import { useState } from 'react'
-import { useTheme } from '@/app/providers/use-theme'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useTheme } from '@/app/providers/useTheme'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/DropdownMenu'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/components/ui/Input'
 import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
 
 interface HeaderProps {

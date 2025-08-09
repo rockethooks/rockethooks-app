@@ -1,14 +1,14 @@
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/Button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/Card'
 
 interface Props {
   children: ReactNode
