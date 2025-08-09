@@ -196,7 +196,9 @@ export const MetricCard: Story = {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
+                <title>Trending up</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -213,7 +215,9 @@ export const MetricCard: Story = {
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
+              <title>Analytics chart</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -305,16 +309,26 @@ export const FormCard: Story = {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Endpoint URL</label>
+          <label htmlFor="endpoint-url" className="text-sm font-medium">
+            Endpoint URL
+          </label>
           <input
+            id="endpoint-url"
             type="url"
             placeholder="https://api.example.com/endpoint"
             className="w-full px-3 py-2 border border-input rounded-md text-sm"
+            aria-describedby="endpoint-url-help"
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">HTTP Method</label>
-          <select className="w-full px-3 py-2 border border-input rounded-md text-sm">
+          <label htmlFor="http-method" className="text-sm font-medium">
+            HTTP Method
+          </label>
+          <select
+            id="http-method"
+            className="w-full px-3 py-2 border border-input rounded-md text-sm"
+            aria-describedby="http-method-help"
+          >
             <option>GET</option>
             <option>POST</option>
             <option>PUT</option>
@@ -322,8 +336,14 @@ export const FormCard: Story = {
           </select>
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Polling Interval</label>
-          <select className="w-full px-3 py-2 border border-input rounded-md text-sm">
+          <label htmlFor="polling-interval" className="text-sm font-medium">
+            Polling Interval
+          </label>
+          <select
+            id="polling-interval"
+            className="w-full px-3 py-2 border border-input rounded-md text-sm"
+            aria-describedby="polling-interval-help"
+          >
             <option>Every 30 seconds</option>
             <option>Every minute</option>
             <option>Every 5 minutes</option>
@@ -371,7 +391,9 @@ export const CardGrid: Story = {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
+                <title>Lightning bolt</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -399,7 +421,9 @@ export const CardGrid: Story = {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
+                <title>Send arrow</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -427,7 +451,9 @@ export const CardGrid: Story = {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
+                <title>Check circle</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -504,7 +530,9 @@ export const EmptyState: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Add icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -524,7 +552,9 @@ export const EmptyState: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Add icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

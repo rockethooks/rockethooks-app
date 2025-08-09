@@ -154,7 +154,10 @@ export const WithIcons: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-labelledby="check-icon-title"
+          role="img"
         >
+          <title id="check-icon-title">Check mark icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -170,7 +173,10 @@ export const WithIcons: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-labelledby="warning-icon-title"
+          role="img"
         >
+          <title id="warning-icon-title">Warning icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -186,7 +192,10 @@ export const WithIcons: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-labelledby="close-icon-title"
+          role="img"
         >
+          <title id="close-icon-title">Close icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -202,7 +211,10 @@ export const WithIcons: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-labelledby="info-icon-title"
+          role="img"
         >
+          <title id="info-icon-title">Information icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -391,7 +403,10 @@ export const Interactive: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-labelledby="remove-filter-icon-title"
+          role="img"
         >
+          <title id="remove-filter-icon-title">Remove filter icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"

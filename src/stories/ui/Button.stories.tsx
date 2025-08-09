@@ -161,13 +161,14 @@ export const Sizes: Story = {
 export const WithIcons: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Button>
+      <Button type="button">
         <svg
           className="size-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Add icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -177,13 +178,14 @@ export const WithIcons: Story = {
         </svg>
         Add Item
       </Button>
-      <Button variant="outline">
+      <Button variant="outline" type="button">
         <svg
           className="size-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Edit icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -193,13 +195,14 @@ export const WithIcons: Story = {
         </svg>
         Edit
       </Button>
-      <Button variant="destructive">
+      <Button variant="destructive" type="button">
         <svg
           className="size-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Delete icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -234,6 +237,7 @@ export const IconOnly: Story = {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Edit icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -249,6 +253,7 @@ export const IconOnly: Story = {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Delete icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -264,6 +269,7 @@ export const IconOnly: Story = {
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
+          <title>Settings icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -353,6 +359,7 @@ export const SemanticVariants: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Check icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -369,6 +376,7 @@ export const SemanticVariants: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Warning icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -385,6 +393,7 @@ export const SemanticVariants: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Information icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -428,6 +437,7 @@ export const ButtonGroups: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Add icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -444,6 +454,7 @@ export const ButtonGroups: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Edit icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -460,6 +471,7 @@ export const ButtonGroups: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Copy icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -476,6 +488,7 @@ export const ButtonGroups: Story = {
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
+            <title>Delete icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

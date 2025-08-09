@@ -480,7 +480,9 @@ export const SortableHeaders: Story = {
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
+                <title>Sort direction</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -593,6 +595,7 @@ export const RowSelection: Story = {
                   checked={selectedRows.size === 3}
                   onChange={handleSelectAll}
                   className="rounded"
+                  aria-label="Select all rows"
                 />
               </TableHead>
               <TableHead>API Endpoint</TableHead>
@@ -634,6 +637,7 @@ export const RowSelection: Story = {
                       handleRowSelect(item.id)
                     }}
                     className="rounded"
+                    aria-label={`Select ${item.name}`}
                   />
                 </TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>
@@ -714,7 +718,9 @@ export const EmptyState: Story = {
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
+                    <title>Document icon</title>
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

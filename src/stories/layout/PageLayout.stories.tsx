@@ -89,10 +89,10 @@ function SampleContent() {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i}>
+        {Array.from({ length: 6 }, (_, i) => i).map((num) => (
+          <Card key={`sample-card-${num}`}>
             <CardHeader>
-              <CardTitle>Card {i + 1}</CardTitle>
+              <CardTitle>Card {num + 1}</CardTitle>
               <CardDescription>
                 Sample card content for layout demonstration
               </CardDescription>
@@ -215,7 +215,9 @@ export const FullWidth: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Export icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -231,7 +233,9 @@ export const FullWidth: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Filter icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -247,7 +251,9 @@ export const FullWidth: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Refresh icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -283,8 +289,11 @@ export const FullWidth: Story = {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i} className="hover:bg-muted/25">
+                  {Array.from({ length: 8 }, (_, i) => i).map((rowNum) => (
+                    <tr
+                      key={`event-row-${rowNum}`}
+                      className="hover:bg-muted/25"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium">webhook.delivered</div>
                         <div className="text-sm text-muted-foreground">
@@ -299,18 +308,22 @@ export const FullWidth: Story = {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge
                           variant={
-                            i % 3 === 0
+                            rowNum % 3 === 0
                               ? 'success'
-                              : i % 3 === 1
+                              : rowNum % 3 === 1
                                 ? 'warning'
                                 : 'destructive'
                           }
                         >
-                          {i % 3 === 0 ? '200' : i % 3 === 1 ? '202' : '500'}
+                          {rowNum % 3 === 0
+                            ? '200'
+                            : rowNum % 3 === 1
+                              ? '202'
+                              : '500'}
                         </Badge>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                        {i + 1} min ago
+                        {rowNum + 1} min ago
                       </td>
                     </tr>
                   ))}
@@ -346,16 +359,22 @@ export const SettingsLayout: Story = {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">First Name</label>
+                <label htmlFor="firstName" className="text-sm font-medium">
+                  First Name
+                </label>
                 <input
+                  id="firstName"
                   type="text"
                   defaultValue="John"
                   className="w-full px-3 py-2 border border-input rounded-md text-sm"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Last Name</label>
+                <label htmlFor="lastName" className="text-sm font-medium">
+                  Last Name
+                </label>
                 <input
+                  id="lastName"
                   type="text"
                   defaultValue="Doe"
                   className="w-full px-3 py-2 border border-input rounded-md text-sm"
@@ -363,8 +382,11 @@ export const SettingsLayout: Story = {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Email Address</label>
+              <label htmlFor="emailAddress" className="text-sm font-medium">
+                Email Address
+              </label>
               <input
+                id="emailAddress"
                 type="email"
                 defaultValue="john@example.com"
                 className="w-full px-3 py-2 border border-input rounded-md text-sm"
@@ -444,7 +466,9 @@ export const DetailLayout: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Connection test icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -520,9 +544,9 @@ export const DetailLayout: Story = {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
+              {Array.from({ length: 5 }, (_, i) => i).map((activityNum) => (
                 <div
-                  key={i}
+                  key={`activity-${activityNum}`}
                   className="flex items-center justify-between py-2 border-b last:border-0"
                 >
                   <div>
@@ -530,7 +554,7 @@ export const DetailLayout: Story = {
                       Change detected in user data
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {i + 1} minute{i !== 0 ? 's' : ''} ago
+                      {activityNum + 1} minute{activityNum !== 0 ? 's' : ''} ago
                     </div>
                   </div>
                   <Badge variant="success" className="text-xs">
@@ -568,7 +592,9 @@ export const EmptyState: Story = {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
+          aria-hidden="true"
         >
+          <title>Add icon</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -587,7 +613,9 @@ export const EmptyState: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Connection icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -607,7 +635,9 @@ export const EmptyState: Story = {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
+            <title>Add icon</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

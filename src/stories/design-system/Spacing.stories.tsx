@@ -174,6 +174,7 @@ function SpacingComponent() {
 
             <div className="flex gap-3">
               <button
+                type="button"
                 className="px-4 py-2 rounded-lg text-sm font-medium"
                 style={{
                   backgroundColor: 'var(--primary)',
@@ -183,6 +184,7 @@ function SpacingComponent() {
                 Primary Action
               </button>
               <button
+                type="button"
                 className="px-4 py-2 rounded-lg text-sm font-medium border"
                 style={{
                   backgroundColor: 'var(--surface-primary)',
@@ -216,12 +218,14 @@ function SpacingComponent() {
           >
             <div className="mb-5">
               <label
+                htmlFor="email-input"
                 className="block text-sm font-medium mb-2"
                 style={{ color: 'var(--text-primary)' }}
               >
                 Email Address
               </label>
               <input
+                id="email-input"
                 type="email"
                 placeholder="Enter your email"
                 className="w-full px-4 py-2 border rounded-lg text-sm"
@@ -235,12 +239,14 @@ function SpacingComponent() {
 
             <div className="mb-5">
               <label
+                htmlFor="password-input"
                 className="block text-sm font-medium mb-2"
                 style={{ color: 'var(--text-primary)' }}
               >
                 Password
               </label>
               <input
+                id="password-input"
                 type="password"
                 placeholder="Enter your password"
                 className="w-full px-4 py-2 border rounded-lg text-sm"
@@ -253,8 +259,13 @@ function SpacingComponent() {
             </div>
 
             <div className="flex items-center gap-2 mb-6">
-              <input type="checkbox" className="rounded" />
+              <input
+                id="remember-checkbox"
+                type="checkbox"
+                className="rounded"
+              />
               <label
+                htmlFor="remember-checkbox"
                 className="text-sm"
                 style={{ color: 'var(--text-primary)' }}
               >
@@ -263,6 +274,7 @@ function SpacingComponent() {
             </div>
 
             <button
+              type="button"
               className="w-full py-3 rounded-lg text-sm font-medium"
               style={{
                 backgroundColor: 'var(--primary)',
@@ -294,12 +306,27 @@ function SpacingComponent() {
             }}
           >
             {[
-              { title: 'User Profile API', status: 'Active', time: '2m ago' },
-              { title: 'Payment Gateway', status: 'Error', time: '5m ago' },
-              { title: 'Analytics API', status: 'Active', time: '1m ago' },
+              {
+                id: 'user-profile-api',
+                title: 'User Profile API',
+                status: 'Active',
+                time: '2m ago',
+              },
+              {
+                id: 'payment-gateway',
+                title: 'Payment Gateway',
+                status: 'Error',
+                time: '5m ago',
+              },
+              {
+                id: 'analytics-api',
+                title: 'Analytics API',
+                status: 'Active',
+                time: '1m ago',
+              },
             ].map((item, index) => (
               <div
-                key={index}
+                key={item.id}
                 className={`p-4 flex items-center justify-between ${
                   index < 2 ? 'border-b' : ''
                 }`}
@@ -396,9 +423,12 @@ function SpacingComponent() {
               Component Grid
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              {Array.from({ length: 4 }).map((_, i) => (
+              {Array.from({ length: 4 }, (_, i) => ({
+                id: `card-${i + 1}`,
+                number: i + 1,
+              })).map((card) => (
                 <div
-                  key={i}
+                  key={card.id}
                   className="p-3 rounded-lg border text-center"
                   style={{
                     backgroundColor: 'var(--surface-primary)',
@@ -409,7 +439,7 @@ function SpacingComponent() {
                     className="text-sm font-medium"
                     style={{ color: 'var(--text-primary)' }}
                   >
-                    Card {i + 1}
+                    Card {card.number}
                   </div>
                 </div>
               ))}

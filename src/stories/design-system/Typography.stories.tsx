@@ -368,7 +368,7 @@ function TypographyComponent() {
           }}
         >
           <div style={{ color: 'var(--text-tertiary)' }}>
-            // CSS Usage Examples
+            {'/* CSS Usage Examples */'}
           </div>
           <div style={{ color: 'var(--text-primary)' }}>.heading {'{'}</div>
           <div style={{ color: 'var(--text-primary)', paddingLeft: '1rem' }}>
