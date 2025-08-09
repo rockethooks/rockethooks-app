@@ -108,22 +108,22 @@ export const AllStatuses: Story = {
           <span className="text-sm font-medium">Success</span>
           <WebhookStatus status="success" />
         </div>
-        
+
         <div className="flex items-center justify-between p-3 border rounded">
           <span className="text-sm font-medium">Pending</span>
           <WebhookStatus status="pending" />
         </div>
-        
+
         <div className="flex items-center justify-between p-3 border rounded">
           <span className="text-sm font-medium">Retrying</span>
           <WebhookStatus status="retrying" />
         </div>
-        
+
         <div className="flex items-center justify-between p-3 border rounded">
           <span className="text-sm font-medium">Failed</span>
           <WebhookStatus status="failed" />
         </div>
-        
+
         <div className="flex items-center justify-between p-3 border rounded">
           <span className="text-sm font-medium">Circuit Open</span>
           <WebhookStatus status="circuit-open" />
@@ -276,57 +276,81 @@ export const EventTable: Story = {
               <tr className="hover:bg-muted/25">
                 <td className="px-4 py-3">
                   <div className="font-medium">user.created</div>
-                  <div className="text-sm text-muted-foreground">POST /webhooks/users</div>
+                  <div className="text-sm text-muted-foreground">
+                    POST /webhooks/users
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <WebhookStatus status="success" size="sm" />
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="success" className="text-xs">200</Badge>
+                  <Badge variant="success" className="text-xs">
+                    200
+                  </Badge>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">2m ago</td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  2m ago
+                </td>
               </tr>
-              
+
               <tr className="hover:bg-muted/25">
                 <td className="px-4 py-3">
                   <div className="font-medium">order.updated</div>
-                  <div className="text-sm text-muted-foreground">POST /webhooks/orders</div>
+                  <div className="text-sm text-muted-foreground">
+                    POST /webhooks/orders
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <WebhookStatus status="retrying" size="sm" />
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="warning" className="text-xs">429</Badge>
+                  <Badge variant="warning" className="text-xs">
+                    429
+                  </Badge>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">5m ago</td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  5m ago
+                </td>
               </tr>
-              
+
               <tr className="hover:bg-muted/25">
                 <td className="px-4 py-3">
                   <div className="font-medium">payment.failed</div>
-                  <div className="text-sm text-muted-foreground">POST /webhooks/payments</div>
+                  <div className="text-sm text-muted-foreground">
+                    POST /webhooks/payments
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <WebhookStatus status="failed" size="sm" />
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="destructive" className="text-xs">500</Badge>
+                  <Badge variant="destructive" className="text-xs">
+                    500
+                  </Badge>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">12m ago</td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  12m ago
+                </td>
               </tr>
-              
+
               <tr className="hover:bg-muted/25">
                 <td className="px-4 py-3">
                   <div className="font-medium">inventory.updated</div>
-                  <div className="text-sm text-muted-foreground">POST /webhooks/inventory</div>
+                  <div className="text-sm text-muted-foreground">
+                    POST /webhooks/inventory
+                  </div>
                 </td>
                 <td className="px-4 py-3">
                   <WebhookStatus status="pending" size="sm" />
                 </td>
                 <td className="px-4 py-3">
-                  <Badge variant="secondary" className="text-xs">-</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    -
+                  </Badge>
                 </td>
-                <td className="px-4 py-3 text-sm text-muted-foreground">15m ago</td>
+                <td className="px-4 py-3 text-sm text-muted-foreground">
+                  15m ago
+                </td>
               </tr>
             </tbody>
           </table>
@@ -351,7 +375,9 @@ export const DashboardCards: Story = {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Active Webhooks</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Active Webhooks
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -366,7 +392,9 @@ export const DashboardCards: Story = {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Pending Deliveries</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Pending Deliveries
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -381,7 +409,9 @@ export const DashboardCards: Story = {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Retrying</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Retrying
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -396,7 +426,9 @@ export const DashboardCards: Story = {
 
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Failed Today</CardTitle>
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Failed Today
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
@@ -413,7 +445,8 @@ export const DashboardCards: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Dashboard cards featuring webhook status indicators with metrics.',
+        story:
+          'Dashboard cards featuring webhook status indicators with metrics.',
       },
     },
   },
@@ -440,7 +473,7 @@ export const StatusSummary: Story = {
               <div className="text-xs text-muted-foreground">last 24h</div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <WebhookStatus status="pending" size="md" />
@@ -451,7 +484,7 @@ export const StatusSummary: Story = {
               <div className="text-xs text-muted-foreground">in queue</div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <WebhookStatus status="retrying" size="md" />
@@ -462,7 +495,7 @@ export const StatusSummary: Story = {
               <div className="text-xs text-muted-foreground">auto-retry</div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <WebhookStatus status="failed" size="md" />
@@ -470,10 +503,12 @@ export const StatusSummary: Story = {
             </div>
             <div className="text-right">
               <div className="font-bold">12</div>
-              <div className="text-xs text-muted-foreground">need attention</div>
+              <div className="text-xs text-muted-foreground">
+                need attention
+              </div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <WebhookStatus status="circuit-open" size="md" />
@@ -491,7 +526,8 @@ export const StatusSummary: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Status summary showing counts and descriptions for each webhook state.',
+        story:
+          'Status summary showing counts and descriptions for each webhook state.',
       },
     },
   },
@@ -508,23 +544,33 @@ export const RealTimeUpdates: Story = {
       { id: 3, status: 'retrying' as const, timestamp: '5m ago' },
       { id: 4, status: 'success' as const, timestamp: '7m ago' },
     ])
-    
+
     React.useEffect(() => {
       const interval = setInterval(() => {
-        setStatuses(prev => prev.map(item => {
-          if (item.status === 'pending' && Math.random() > 0.7) {
-            return { ...item, status: 'success' as const }
-          }
-          if (item.status === 'retrying' && Math.random() > 0.8) {
-            return { ...item, status: Math.random() > 0.5 ? 'success' as const : 'failed' as const }
-          }
-          return item
-        }))
+        setStatuses((prev) =>
+          prev.map((item) => {
+            if (item.status === 'pending' && Math.random() > 0.7) {
+              return { ...item, status: 'success' as const }
+            }
+            if (item.status === 'retrying' && Math.random() > 0.8) {
+              return {
+                ...item,
+                status:
+                  Math.random() > 0.5
+                    ? ('success' as const)
+                    : ('failed' as const),
+              }
+            }
+            return item
+          })
+        )
       }, 2000)
-      
-      return () => clearInterval(interval)
+
+      return () => {
+        clearInterval(interval)
+      }
     }, [])
-    
+
     return (
       <Card>
         <CardHeader>
@@ -536,12 +582,17 @@ export const RealTimeUpdates: Story = {
         <CardContent>
           <div className="space-y-3">
             {statuses.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2 border rounded">
+              <div
+                key={item.id}
+                className="flex items-center justify-between p-2 border rounded"
+              >
                 <div className="flex items-center gap-3">
                   <WebhookStatus status={item.status} size="sm" />
                   <span className="text-sm">Event #{item.id}</span>
                 </div>
-                <span className="text-xs text-muted-foreground">{item.timestamp}</span>
+                <span className="text-xs text-muted-foreground">
+                  {item.timestamp}
+                </span>
               </div>
             ))}
           </div>
@@ -552,7 +603,8 @@ export const RealTimeUpdates: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Simulation of real-time status updates as webhook events are processed.',
+        story:
+          'Simulation of real-time status updates as webhook events are processed.',
       },
     },
   },

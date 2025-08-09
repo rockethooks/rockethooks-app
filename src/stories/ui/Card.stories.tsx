@@ -3,7 +3,14 @@ import React from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 
 /**
  * Card component providing a flexible container for content with header, body, and footer sections.
@@ -78,18 +85,21 @@ export const Default: Story = {
       <CardHeader>
         <CardTitle>Card Title</CardTitle>
         <CardDescription>
-          This is a description of what this card contains and what the user can do with it.
+          This is a description of what this card contains and what the user can
+          do with it.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          This is the main content area of the card. You can put any content here including
-          text, forms, charts, or other components.
+          This is the main content area of the card. You can put any content
+          here including text, forms, charts, or other components.
         </p>
       </CardContent>
       <CardFooter>
         <Button>Action</Button>
-        <Button variant="outline" className="ml-2">Cancel</Button>
+        <Button variant="outline" className="ml-2">
+          Cancel
+        </Button>
       </CardFooter>
     </Card>
   ),
@@ -115,7 +125,8 @@ export const SimpleCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'A minimal card structure with just header and content sections.',
+        story:
+          'A minimal card structure with just header and content sections.',
       },
     },
   },
@@ -135,9 +146,7 @@ export const StatusCard: Story = {
             Active
           </Badge>
         </div>
-        <CardDescription>
-          https://api.example.com/users
-        </CardDescription>
+        <CardDescription>https://api.example.com/users</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
@@ -153,14 +162,17 @@ export const StatusCard: Story = {
       </CardContent>
       <CardFooter>
         <Button size="sm">Test Connection</Button>
-        <Button variant="outline" size="sm" className="ml-2">Edit</Button>
+        <Button variant="outline" size="sm" className="ml-2">
+          Edit
+        </Button>
       </CardFooter>
     </Card>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'A status card showing API endpoint information with metrics and actions.',
+        story:
+          'A status card showing API endpoint information with metrics and actions.',
       },
     },
   },
@@ -180,15 +192,35 @@ export const MetricCard: Story = {
             </p>
             <p className="text-2xl font-bold">1,234,567</p>
             <p className="text-xs text-green-600 flex items-center mt-1">
-              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              <svg
+                className="w-3 h-3 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 10l7-7m0 0l7 7m-7-7v18"
+                />
               </svg>
               12.5% vs last month
             </p>
           </div>
           <div className="p-3 bg-blue-50 rounded-full">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            <svg
+              className="w-6 h-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              />
             </svg>
           </div>
         </div>
@@ -198,7 +230,8 @@ export const MetricCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'A metric card for displaying key performance indicators on dashboards.',
+        story:
+          'A metric card for displaying key performance indicators on dashboards.',
       },
     },
   },
@@ -213,12 +246,14 @@ export const EventCard: Story = {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-base font-medium">Webhook Delivered</CardTitle>
-            <CardDescription className="text-xs">
-              2 minutes ago
-            </CardDescription>
+            <CardTitle className="text-base font-medium">
+              Webhook Delivered
+            </CardTitle>
+            <CardDescription className="text-xs">2 minutes ago</CardDescription>
           </div>
-          <Badge variant="success" className="text-xs">200</Badge>
+          <Badge variant="success" className="text-xs">
+            200
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
@@ -250,7 +285,8 @@ export const EventCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'An event card showing webhook delivery information with detailed metadata.',
+        story:
+          'An event card showing webhook delivery information with detailed metadata.',
       },
     },
   },
@@ -271,8 +307,8 @@ export const FormCard: Story = {
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Endpoint URL</label>
-          <input 
-            type="url" 
+          <input
+            type="url"
             placeholder="https://api.example.com/endpoint"
             className="w-full px-3 py-2 border border-input rounded-md text-sm"
           />
@@ -298,14 +334,17 @@ export const FormCard: Story = {
       </CardContent>
       <CardFooter>
         <Button>Create Connection</Button>
-        <Button variant="outline" className="ml-2">Cancel</Button>
+        <Button variant="outline" className="ml-2">
+          Cancel
+        </Button>
       </CardFooter>
     </Card>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'A form card containing input elements for creating new resources.',
+        story:
+          'A form card containing input elements for creating new resources.',
       },
     },
   },
@@ -328,8 +367,18 @@ export const CardGrid: Story = {
               <p className="text-2xl font-bold">24</p>
             </div>
             <div className="p-2 bg-green-50 rounded-lg">
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                className="w-5 h-5 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </div>
           </div>
@@ -346,8 +395,18 @@ export const CardGrid: Story = {
               <p className="text-2xl font-bold">1,456</p>
             </div>
             <div className="p-2 bg-blue-50 rounded-lg">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <svg
+                className="w-5 h-5 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                />
               </svg>
             </div>
           </div>
@@ -364,8 +423,18 @@ export const CardGrid: Story = {
               <p className="text-2xl font-bold">98.5%</p>
             </div>
             <div className="p-2 bg-purple-50 rounded-lg">
-              <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-5 h-5 text-purple-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
           </div>
@@ -392,9 +461,7 @@ export const InteractiveCard: Story = {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>User Registration API</CardTitle>
-            <CardDescription>
-              Monitors new user sign-ups
-            </CardDescription>
+            <CardDescription>Monitors new user sign-ups</CardDescription>
           </div>
           <Badge variant="success">Active</Badge>
         </div>
@@ -433,17 +500,38 @@ export const EmptyState: Story = {
     <Card className="w-96">
       <CardContent className="p-8 text-center">
         <div className="w-12 h-12 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-          <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          <svg
+            className="w-6 h-6 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
         </div>
         <CardTitle className="mb-2">No API Connections</CardTitle>
         <CardDescription className="mb-4">
-          Get started by creating your first API connection to monitor for changes.
+          Get started by creating your first API connection to monitor for
+          changes.
         </CardDescription>
         <Button>
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            />
           </svg>
           Add API Connection
         </Button>
@@ -473,13 +561,15 @@ export const Playground: Story = {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">
-          This is a playground card where you can test different properties
-          and configurations using the Storybook controls.
+          This is a playground card where you can test different properties and
+          configurations using the Storybook controls.
         </p>
       </CardContent>
       <CardFooter>
         <Button>Primary Action</Button>
-        <Button variant="outline" className="ml-2">Secondary</Button>
+        <Button variant="outline" className="ml-2">
+          Secondary
+        </Button>
       </CardFooter>
     </Card>
   ),

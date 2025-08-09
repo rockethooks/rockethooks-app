@@ -16,7 +16,10 @@ const TypeSample: React.FC<{
 }> = ({ title, description, cssClass, style, children }) => (
   <div className="mb-6">
     <div className="mb-2">
-      <span className="font-medium text-sm" style={{ color: 'var(--text-primary)' }}>
+      <span
+        className="font-medium text-sm"
+        style={{ color: 'var(--text-primary)' }}
+      >
         {title}
       </span>
       <span className="text-xs ml-2" style={{ color: 'var(--text-tertiary)' }}>
@@ -29,60 +32,64 @@ const TypeSample: React.FC<{
   </div>
 )
 
-const TypographyComponent = () => {
+function TypographyComponent() {
   return (
-    <div 
+    <div
       className="max-w-4xl mx-auto p-8 min-h-screen"
       style={{ backgroundColor: 'var(--surface-secondary)' }}
     >
       <div className="mb-8">
-        <h1 
+        <h1
           className="text-3xl font-bold mb-4"
           style={{
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
+            background:
+              'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
           }}
         >
           Typography System
         </h1>
         <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-          A consistent typographic system using Inter for interface text and JetBrains Mono
-          for code and technical content.
+          A consistent typographic system using Inter for interface text and
+          JetBrains Mono for code and technical content.
         </p>
       </div>
 
       {/* Font Families */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Font Families
         </h2>
-        
+
         <TypeSample
           title="Sans Serif - Inter"
           description="Primary font for interface text"
-          style={{ 
+          style={{
             fontFamily: 'var(--font-family-sans)',
             fontSize: 'var(--text-lg)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
-          The quick brown fox jumps over the lazy dog. Inter provides excellent readability
-          and works well across different sizes and weights.
+          The quick brown fox jumps over the lazy dog. Inter provides excellent
+          readability and works well across different sizes and weights.
         </TypeSample>
 
         <TypeSample
           title="Monospace - JetBrains Mono"
           description="Font for code, technical content, and data"
-          style={{ 
+          style={{
             fontFamily: 'var(--font-family-mono)',
             fontSize: 'var(--text-base)',
             color: 'var(--text-primary)',
             backgroundColor: 'var(--surface-primary)',
             padding: 'var(--space-3)',
             borderRadius: 'var(--radius-lg)',
-            border: '1px solid var(--border-primary)'
+            border: '1px solid var(--border-primary)',
           }}
         >
           {`const webhook = {
@@ -95,10 +102,13 @@ const TypographyComponent = () => {
 
       {/* Font Sizes */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Font Sizes
         </h2>
-        
+
         <TypeSample
           title="Extra Small (12px)"
           description="--text-xs"
@@ -174,17 +184,20 @@ const TypographyComponent = () => {
 
       {/* Font Weights */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Font Weights
         </h2>
-        
+
         <TypeSample
           title="Normal (400)"
           description="--font-normal"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
             fontWeight: 'var(--font-normal)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
           Normal weight for body text and default content
@@ -193,10 +206,10 @@ const TypographyComponent = () => {
         <TypeSample
           title="Medium (500)"
           description="--font-medium"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
             fontWeight: 'var(--font-medium)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
           Medium weight for emphasized text and labels
@@ -205,10 +218,10 @@ const TypographyComponent = () => {
         <TypeSample
           title="Semibold (600)"
           description="--font-semibold"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
             fontWeight: 'var(--font-semibold)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
           Semibold weight for headings and important content
@@ -217,10 +230,10 @@ const TypographyComponent = () => {
         <TypeSample
           title="Bold (700)"
           description="--font-bold"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
             fontWeight: 'var(--font-bold)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
           Bold weight for strong emphasis and display headings
@@ -229,16 +242,19 @@ const TypographyComponent = () => {
 
       {/* Text Colors */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Text Color Hierarchy
         </h2>
-        
+
         <TypeSample
           title="Primary Text"
           description="--text-primary"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
-            color: 'var(--text-primary)'
+            color: 'var(--text-primary)',
           }}
         >
           Used for headings, body text, and primary content
@@ -247,9 +263,9 @@ const TypographyComponent = () => {
         <TypeSample
           title="Secondary Text"
           description="--text-secondary"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
-            color: 'var(--text-secondary)'
+            color: 'var(--text-secondary)',
           }}
         >
           Used for subheadings and secondary information
@@ -258,9 +274,9 @@ const TypographyComponent = () => {
         <TypeSample
           title="Tertiary Text"
           description="--text-tertiary"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
-            color: 'var(--text-tertiary)'
+            color: 'var(--text-tertiary)',
           }}
         >
           Used for captions, metadata, and supporting text
@@ -269,24 +285,24 @@ const TypographyComponent = () => {
         <TypeSample
           title="Quaternary Text"
           description="--text-quaternary"
-          style={{ 
+          style={{
             fontSize: 'var(--text-base)',
-            color: 'var(--text-quaternary)'
+            color: 'var(--text-quaternary)',
           }}
         >
           Used for placeholders and disabled text
         </TypeSample>
 
-        <div 
+        <div
           className="p-4 rounded-lg"
           style={{ backgroundColor: 'var(--primary)' }}
         >
           <TypeSample
             title="Inverse Text"
             description="--text-inverse"
-            style={{ 
+            style={{
               fontSize: 'var(--text-base)',
-              color: 'var(--text-inverse)'
+              color: 'var(--text-inverse)',
             }}
           >
             Used for text on dark backgrounds and primary buttons
@@ -296,62 +312,65 @@ const TypographyComponent = () => {
 
       {/* Usage Examples */}
       <div className="mb-12">
-        <h2 className="text-2xl font-semibold mb-6" style={{ color: 'var(--text-primary)' }}>
+        <h2
+          className="text-2xl font-semibold mb-6"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Common Patterns
         </h2>
 
-        <div 
+        <div
           className="p-6 rounded-xl border mb-6"
           style={{
             backgroundColor: 'var(--surface-primary)',
-            borderColor: 'var(--border-primary)'
+            borderColor: 'var(--border-primary)',
           }}
         >
-          <h3 
+          <h3
             className="font-semibold mb-2"
-            style={{ 
+            style={{
               fontSize: 'var(--text-xl)',
-              color: 'var(--text-primary)'
+              color: 'var(--text-primary)',
             }}
           >
             Card Heading
           </h3>
-          <p 
+          <p
             className="mb-3"
-            style={{ 
+            style={{
               fontSize: 'var(--text-base)',
               color: 'var(--text-secondary)',
-              lineHeight: 'var(--leading-normal)'
+              lineHeight: 'var(--leading-normal)',
             }}
           >
             Body text with proper line height for readability. This demonstrates
             the typical content hierarchy used in cards.
           </p>
-          <p 
-            style={{ 
+          <p
+            style={{
               fontSize: 'var(--text-xs)',
               color: 'var(--text-tertiary)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              fontWeight: 'var(--font-medium)'
+              fontWeight: 'var(--font-medium)',
             }}
           >
             Metadata • Last updated 5 minutes ago
           </p>
         </div>
 
-        <div 
+        <div
           className="font-mono p-4 rounded-lg border"
           style={{
             backgroundColor: 'var(--surface-primary)',
             borderColor: 'var(--border-primary)',
-            fontSize: 'var(--text-sm)'
+            fontSize: 'var(--text-sm)',
           }}
         >
-          <div style={{ color: 'var(--text-tertiary)' }}>// CSS Usage Examples</div>
-          <div style={{ color: 'var(--text-primary)' }}>
-            .heading {'{'}
+          <div style={{ color: 'var(--text-tertiary)' }}>
+            // CSS Usage Examples
           </div>
+          <div style={{ color: 'var(--text-primary)' }}>.heading {'{'}</div>
           <div style={{ color: 'var(--text-primary)', paddingLeft: '1rem' }}>
             font-size: var(--text-2xl);
           </div>
@@ -361,29 +380,36 @@ const TypographyComponent = () => {
           <div style={{ color: 'var(--text-primary)', paddingLeft: '1rem' }}>
             color: var(--text-primary);
           </div>
-          <div style={{ color: 'var(--text-primary)' }}>
-            {'}'}
-          </div>
+          <div style={{ color: 'var(--text-primary)' }}>{'}'}</div>
         </div>
       </div>
 
       {/* Guidelines */}
-      <div 
+      <div
         className="p-6 rounded-xl border"
         style={{
           backgroundColor: 'var(--surface-primary)',
-          borderColor: 'var(--border-primary)'
+          borderColor: 'var(--border-primary)',
         }}
       >
-        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Typography Guidelines
         </h3>
         <div className="grid md:grid-cols-2 gap-6 text-sm">
           <div>
-            <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h4
+              className="font-medium mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Hierarchy
             </h4>
-            <ul className="space-y-1" style={{ color: 'var(--text-secondary)' }}>
+            <ul
+              className="space-y-1"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               <li>• Establish clear information hierarchy</li>
               <li>• Use consistent heading levels (h1, h2, h3)</li>
               <li>• Limit font sizes to avoid visual chaos</li>
@@ -391,10 +417,16 @@ const TypographyComponent = () => {
             </ul>
           </div>
           <div>
-            <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h4
+              className="font-medium mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Readability
             </h4>
-            <ul className="space-y-1" style={{ color: 'var(--text-secondary)' }}>
+            <ul
+              className="space-y-1"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               <li>• Use appropriate line heights (1.4-1.6)</li>
               <li>• Ensure sufficient contrast ratios</li>
               <li>• Limit line length to 45-75 characters</li>

@@ -63,14 +63,18 @@
 
   /* Shadows - Light Theme */
   --shadow-color: 220 3% 15%;
-  --shadow-elevation-low: 0px 1px 2px hsl(var(--shadow-color) / 0.08),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.05);
-  --shadow-elevation-medium: 0px 2px 4px hsl(var(--shadow-color) / 0.08),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.05);
-  --shadow-elevation-high: 0px 4px 8px hsl(var(--shadow-color) / 0.08),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.05);
-  --shadow-elevation-highest: 0px 8px 16px hsl(var(--shadow-color) / 0.15),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.05);
+  --shadow-elevation-low:
+    0px 1px 2px hsl(var(--shadow-color) / 0.08), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.05);
+  --shadow-elevation-medium:
+    0px 2px 4px hsl(var(--shadow-color) / 0.08), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.05);
+  --shadow-elevation-high:
+    0px 4px 8px hsl(var(--shadow-color) / 0.08), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.05);
+  --shadow-elevation-highest:
+    0px 8px 16px hsl(var(--shadow-color) / 0.15), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.05);
 
   /* Radius */
   --radius: 0.5rem;
@@ -141,41 +145,49 @@
 
   /* Shadows - Dark Theme */
   --shadow-color: 0 0% 0%;
-  --shadow-elevation-low: 0px 1px 2px hsl(var(--shadow-color) / 0.3),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.15);
-  --shadow-elevation-medium: 0px 2px 4px hsl(var(--shadow-color) / 0.3),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.15);
-  --shadow-elevation-high: 0px 4px 8px hsl(var(--shadow-color) / 0.3),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.15);
-  --shadow-elevation-highest: 0px 8px 16px hsl(var(--shadow-color) / 0.4),
-    0px 0px 0px 1px hsl(var(--shadow-color) / 0.15);
+  --shadow-elevation-low:
+    0px 1px 2px hsl(var(--shadow-color) / 0.3), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.15);
+  --shadow-elevation-medium:
+    0px 2px 4px hsl(var(--shadow-color) / 0.3), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.15);
+  --shadow-elevation-high:
+    0px 4px 8px hsl(var(--shadow-color) / 0.3), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.15);
+  --shadow-elevation-highest:
+    0px 8px 16px hsl(var(--shadow-color) / 0.4), 0px 0px 0px 1px
+    hsl(var(--shadow-color) / 0.15);
 }
 
 /* Theme-aware utilities */
 .theme-transition {
-  transition: background-color 0.2s ease-in-out,
+  transition:
+    background-color 0.2s ease-in-out,
     border-color 0.2s ease-in-out,
     color 0.2s ease-in-out;
 }
 
 /* Gradient utilities */
 .gradient-primary {
-  background: linear-gradient(135deg, 
-    hsl(var(--primary-400)), 
+  background: linear-gradient(
+    135deg,
+    hsl(var(--primary-400)),
     hsl(var(--primary-600))
   );
 }
 
 .gradient-secondary {
-  background: linear-gradient(135deg, 
-    hsl(var(--gray-100)), 
+  background: linear-gradient(
+    135deg,
+    hsl(var(--gray-100)),
     hsl(var(--gray-200))
   );
 }
 
 .dark .gradient-secondary {
-  background: linear-gradient(135deg, 
-    hsl(var(--gray-700)), 
+  background: linear-gradient(
+    135deg,
+    hsl(var(--gray-700)),
     hsl(var(--gray-600))
   );
 }

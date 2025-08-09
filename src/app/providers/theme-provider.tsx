@@ -49,10 +49,10 @@ export function ThemeProvider({
 
       root.classList.add(effectiveTheme)
       setResolvedTheme(effectiveTheme)
-      
+
       // Dispatch theme change event for other components to listen to
-      const event = new CustomEvent('theme-change', { 
-        detail: { theme: effectiveTheme } 
+      const event = new CustomEvent('theme-change', {
+        detail: { theme: effectiveTheme },
       })
       window.dispatchEvent(event)
     }

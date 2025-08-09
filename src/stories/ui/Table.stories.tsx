@@ -4,7 +4,14 @@ import React from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { WebhookStatus } from '@/components/rockethooks/webhook-status'
 
 /**
@@ -150,7 +157,9 @@ export const APIEndpoints: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant="success" className="font-mono text-xs">GET</Badge>
+              <Badge variant="success" className="font-mono text-xs">
+                GET
+              </Badge>
             </TableCell>
             <TableCell>
               <Badge variant="success">
@@ -162,12 +171,16 @@ export const APIEndpoints: Story = {
             <TableCell>99.8%</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm">Test</Button>
-                <Button variant="outline" size="sm">Edit</Button>
+                <Button variant="outline" size="sm">
+                  Test
+                </Button>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
               </div>
             </TableCell>
           </TableRow>
-          
+
           <TableRow>
             <TableCell>
               <div>
@@ -178,7 +191,9 @@ export const APIEndpoints: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant="info" className="font-mono text-xs">POST</Badge>
+              <Badge variant="info" className="font-mono text-xs">
+                POST
+              </Badge>
             </TableCell>
             <TableCell>
               <Badge variant="destructive">
@@ -190,8 +205,12 @@ export const APIEndpoints: Story = {
             <TableCell>12.5%</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm">Test</Button>
-                <Button variant="outline" size="sm">Edit</Button>
+                <Button variant="outline" size="sm">
+                  Test
+                </Button>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
               </div>
             </TableCell>
           </TableRow>
@@ -206,7 +225,9 @@ export const APIEndpoints: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <Badge variant="success" className="font-mono text-xs">GET</Badge>
+              <Badge variant="success" className="font-mono text-xs">
+                GET
+              </Badge>
             </TableCell>
             <TableCell>
               <Badge variant="warning">
@@ -218,8 +239,12 @@ export const APIEndpoints: Story = {
             <TableCell>97.2%</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm">Test</Button>
-                <Button variant="outline" size="sm">Edit</Button>
+                <Button variant="outline" size="sm">
+                  Test
+                </Button>
+                <Button variant="outline" size="sm">
+                  Edit
+                </Button>
               </div>
             </TableCell>
           </TableRow>
@@ -230,7 +255,8 @@ export const APIEndpoints: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Table showing API endpoints with status indicators and action buttons.',
+        story:
+          'Table showing API endpoints with status indicators and action buttons.',
       },
     },
   },
@@ -264,18 +290,20 @@ export const WebhookEvents: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <div className="font-mono text-sm">
-                POST /webhooks/users
-              </div>
+              <div className="font-mono text-sm">POST /webhooks/users</div>
             </TableCell>
             <TableCell>
               <WebhookStatus status="success" size="sm" />
             </TableCell>
             <TableCell>
-              <Badge variant="success" className="text-xs">200</Badge>
+              <Badge variant="success" className="text-xs">
+                200
+              </Badge>
             </TableCell>
             <TableCell>142ms</TableCell>
-            <TableCell className="text-muted-foreground text-sm">2m ago</TableCell>
+            <TableCell className="text-muted-foreground text-sm">
+              2m ago
+            </TableCell>
           </TableRow>
 
           <TableRow>
@@ -288,18 +316,20 @@ export const WebhookEvents: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <div className="font-mono text-sm">
-                POST /webhooks/orders
-              </div>
+              <div className="font-mono text-sm">POST /webhooks/orders</div>
             </TableCell>
             <TableCell>
               <WebhookStatus status="retrying" size="sm" />
             </TableCell>
             <TableCell>
-              <Badge variant="warning" className="text-xs">429</Badge>
+              <Badge variant="warning" className="text-xs">
+                429
+              </Badge>
             </TableCell>
             <TableCell>850ms</TableCell>
-            <TableCell className="text-muted-foreground text-sm">5m ago</TableCell>
+            <TableCell className="text-muted-foreground text-sm">
+              5m ago
+            </TableCell>
           </TableRow>
 
           <TableRow>
@@ -312,18 +342,20 @@ export const WebhookEvents: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <div className="font-mono text-sm">
-                POST /webhooks/payments
-              </div>
+              <div className="font-mono text-sm">POST /webhooks/payments</div>
             </TableCell>
             <TableCell>
               <WebhookStatus status="failed" size="sm" />
             </TableCell>
             <TableCell>
-              <Badge variant="destructive" className="text-xs">500</Badge>
+              <Badge variant="destructive" className="text-xs">
+                500
+              </Badge>
             </TableCell>
             <TableCell>3,200ms</TableCell>
-            <TableCell className="text-muted-foreground text-sm">12m ago</TableCell>
+            <TableCell className="text-muted-foreground text-sm">
+              12m ago
+            </TableCell>
           </TableRow>
 
           <TableRow>
@@ -336,18 +368,20 @@ export const WebhookEvents: Story = {
               </div>
             </TableCell>
             <TableCell>
-              <div className="font-mono text-sm">
-                POST /webhooks/inventory
-              </div>
+              <div className="font-mono text-sm">POST /webhooks/inventory</div>
             </TableCell>
             <TableCell>
               <WebhookStatus status="pending" size="sm" />
             </TableCell>
             <TableCell>
-              <Badge variant="secondary" className="text-xs">-</Badge>
+              <Badge variant="secondary" className="text-xs">
+                -
+              </Badge>
             </TableCell>
             <TableCell>-</TableCell>
-            <TableCell className="text-muted-foreground text-sm">15m ago</TableCell>
+            <TableCell className="text-muted-foreground text-sm">
+              15m ago
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -356,7 +390,8 @@ export const WebhookEvents: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Webhook events table with detailed status information and rich content.',
+        story:
+          'Webhook events table with detailed status information and rich content.',
       },
     },
   },
@@ -409,7 +444,9 @@ export const Minimal: Story = {
 export const SortableHeaders: Story = {
   render: () => {
     const [sortField, setSortField] = React.useState<string | null>('name')
-    const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>('asc')
+    const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>(
+      'asc'
+    )
 
     const handleSort = (field: string) => {
       if (sortField === field) {
@@ -420,28 +457,43 @@ export const SortableHeaders: Story = {
       }
     }
 
-    const SortableHeader = ({ field, children }: { field: string; children: React.ReactNode }) => (
-      <TableHead
-        className="cursor-pointer hover:bg-muted/50 select-none"
-        onClick={() => handleSort(field)}
-      >
-        <div className="flex items-center gap-2">
-          {children}
-          {sortField === field && (
-            <svg
-              className={`w-4 h-4 transition-transform ${
-                sortDirection === 'desc' ? 'rotate-180' : ''
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          )}
-        </div>
-      </TableHead>
-    )
+    function SortableHeader({
+      field,
+      children,
+    }: {
+      field: string
+      children: React.ReactNode
+    }) {
+      return (
+        <TableHead
+          className="cursor-pointer hover:bg-muted/50 select-none"
+          onClick={() => {
+            handleSort(field)
+          }}
+        >
+          <div className="flex items-center gap-2">
+            {children}
+            {sortField === field && (
+              <svg
+                className={`w-4 h-4 transition-transform ${
+                  sortDirection === 'desc' ? 'rotate-180' : ''
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 15l7-7 7 7"
+                />
+              </svg>
+            )}
+          </div>
+        </TableHead>
+      )
+    }
 
     return (
       <Card>
@@ -462,7 +514,9 @@ export const SortableHeaders: Story = {
               <TableCell>99.8%</TableCell>
               <TableCell>245ms</TableCell>
               <TableCell>
-                <Button variant="outline" size="sm">View</Button>
+                <Button variant="outline" size="sm">
+                  View
+                </Button>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -471,7 +525,9 @@ export const SortableHeaders: Story = {
               <TableCell>97.2%</TableCell>
               <TableCell>680ms</TableCell>
               <TableCell>
-                <Button variant="outline" size="sm">View</Button>
+                <Button variant="outline" size="sm">
+                  View
+                </Button>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -480,7 +536,9 @@ export const SortableHeaders: Story = {
               <TableCell>99.1%</TableCell>
               <TableCell>156ms</TableCell>
               <TableCell>
-                <Button variant="outline" size="sm">View</Button>
+                <Button variant="outline" size="sm">
+                  View
+                </Button>
               </TableCell>
             </TableRow>
           </TableBody>
@@ -491,7 +549,8 @@ export const SortableHeaders: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Table with sortable column headers and interactive sorting indicators.',
+        story:
+          'Table with sortable column headers and interactive sorting indicators.',
       },
     },
   },
@@ -502,7 +561,9 @@ export const SortableHeaders: Story = {
  */
 export const RowSelection: Story = {
   render: () => {
-    const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set())
+    const [selectedRows, setSelectedRows] = React.useState<Set<string>>(
+      new Set()
+    )
 
     const handleRowSelect = (id: string) => {
       const newSelected = new Set(selectedRows)
@@ -543,28 +604,56 @@ export const RowSelection: Story = {
           </TableHeader>
           <TableBody>
             {[
-              { id: '1', name: 'User Profile API', status: 'success', lastCheck: '2m ago' },
-              { id: '2', name: 'Payment Gateway', status: 'error', lastCheck: '5m ago' },
-              { id: '3', name: 'Analytics API', status: 'success', lastCheck: '1m ago' },
+              {
+                id: '1',
+                name: 'User Profile API',
+                status: 'success',
+                lastCheck: '2m ago',
+              },
+              {
+                id: '2',
+                name: 'Payment Gateway',
+                status: 'error',
+                lastCheck: '5m ago',
+              },
+              {
+                id: '3',
+                name: 'Analytics API',
+                status: 'success',
+                lastCheck: '1m ago',
+              },
             ].map((item) => (
-              <TableRow key={item.id} className={selectedRows.has(item.id) ? 'bg-muted/25' : ''}>
+              <TableRow
+                key={item.id}
+                className={selectedRows.has(item.id) ? 'bg-muted/25' : ''}
+              >
                 <TableCell>
                   <input
                     type="checkbox"
                     checked={selectedRows.has(item.id)}
-                    onChange={() => handleRowSelect(item.id)}
+                    onChange={() => {
+                      handleRowSelect(item.id)
+                    }}
                     className="rounded"
                   />
                 </TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>
                 <TableCell>
-                  <Badge variant={item.status === 'success' ? 'success' : 'destructive'}>
+                  <Badge
+                    variant={
+                      item.status === 'success' ? 'success' : 'destructive'
+                    }
+                  >
                     {item.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{item.lastCheck}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {item.lastCheck}
+                </TableCell>
                 <TableCell>
-                  <Button variant="outline" size="sm">Edit</Button>
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -573,12 +662,19 @@ export const RowSelection: Story = {
         {selectedRows.size > 0 && (
           <div className="p-4 bg-muted/25 border-t flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {selectedRows.size} item{selectedRows.size > 1 ? 's' : ''} selected
+              {selectedRows.size} item{selectedRows.size > 1 ? 's' : ''}{' '}
+              selected
             </span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">Enable</Button>
-              <Button variant="outline" size="sm">Disable</Button>
-              <Button variant="destructive" size="sm">Delete</Button>
+              <Button variant="outline" size="sm">
+                Enable
+              </Button>
+              <Button variant="outline" size="sm">
+                Disable
+              </Button>
+              <Button variant="destructive" size="sm">
+                Delete
+              </Button>
             </div>
           </div>
         )}
@@ -682,7 +778,9 @@ export const ResponsiveTable: Story = {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="success" className="font-mono text-xs">GET</Badge>
+                <Badge variant="success" className="font-mono text-xs">
+                  GET
+                </Badge>
               </TableCell>
               <TableCell>
                 <Badge variant="success">Active</Badge>
@@ -693,8 +791,12 @@ export const ResponsiveTable: Story = {
               <TableCell>142</TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Test</Button>
-                  <Button variant="outline" size="sm">Edit</Button>
+                  <Button variant="outline" size="sm">
+                    Test
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
@@ -708,7 +810,9 @@ export const ResponsiveTable: Story = {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant="info" className="font-mono text-xs">POST</Badge>
+                <Badge variant="info" className="font-mono text-xs">
+                  POST
+                </Badge>
               </TableCell>
               <TableCell>
                 <Badge variant="destructive">Error</Badge>
@@ -719,8 +823,12 @@ export const ResponsiveTable: Story = {
               <TableCell>0</TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">Test</Button>
-                  <Button variant="outline" size="sm">Edit</Button>
+                  <Button variant="outline" size="sm">
+                    Test
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    Edit
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>

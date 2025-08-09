@@ -3,7 +3,7 @@ import React from 'react'
 
 /**
  * Color palette and semantic color system for RocketHooks.
- * 
+ *
  * Our color system includes brand colors, semantic colors for states,
  * surface colors for backgrounds, and a complete text color hierarchy.
  * All colors support both light and dark themes.
@@ -16,15 +16,17 @@ const ColorSwatch: React.FC<{
   textColor?: string
 }> = ({ name, cssVar, description, textColor = 'var(--text-primary)' }) => (
   <div className="flex flex-col">
-    <div 
+    <div
       className="w-20 h-20 rounded-lg border shadow-sm mb-2"
-      style={{ 
+      style={{
         backgroundColor: `var(${cssVar})`,
-        borderColor: 'var(--border-primary)'
+        borderColor: 'var(--border-primary)',
       }}
     />
     <div className="text-sm">
-      <div className="font-medium" style={{ color: textColor }}>{name}</div>
+      <div className="font-medium" style={{ color: textColor }}>
+        {name}
+      </div>
       <div className="font-mono text-xs text-gray-500">{cssVar}</div>
       {description && (
         <div className="text-xs text-gray-400 mt-1">{description}</div>
@@ -43,7 +45,10 @@ const ColorSection: React.FC<{
   }>
 }> = ({ title, description, colors }) => (
   <div className="mb-8">
-    <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+    <h3
+      className="text-lg font-semibold mb-2"
+      style={{ color: 'var(--text-primary)' }}
+    >
       {title}
     </h3>
     <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
@@ -57,27 +62,29 @@ const ColorSection: React.FC<{
   </div>
 )
 
-const ColorsComponent = () => {
+function ColorsComponent() {
   return (
-    <div 
+    <div
       className="max-w-6xl mx-auto p-8 min-h-screen"
       style={{ backgroundColor: 'var(--surface-secondary)' }}
     >
       <div className="mb-8">
-        <h1 
+        <h1
           className="text-3xl font-bold mb-4"
           style={{
-            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
+            background:
+              'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
           }}
         >
           Color System
         </h1>
         <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-          RocketHooks uses a systematic approach to color that ensures consistency,
-          accessibility, and visual hierarchy across all interfaces.
+          RocketHooks uses a systematic approach to color that ensures
+          consistency, accessibility, and visual hierarchy across all
+          interfaces.
         </p>
       </div>
 
@@ -88,17 +95,17 @@ const ColorsComponent = () => {
           {
             name: 'Primary',
             cssVar: '--primary',
-            description: 'Main brand color'
+            description: 'Main brand color',
           },
           {
             name: 'Primary Dark',
             cssVar: '--primary-dark',
-            description: 'Hover states'
+            description: 'Hover states',
           },
           {
             name: 'Primary Light',
             cssVar: '--primary-light',
-            description: 'Gradients'
+            description: 'Gradients',
           },
         ]}
       />
@@ -110,17 +117,17 @@ const ColorsComponent = () => {
           {
             name: 'Secondary',
             cssVar: '--secondary',
-            description: 'Neutral actions'
+            description: 'Neutral actions',
           },
           {
             name: 'Secondary Dark',
             cssVar: '--secondary-dark',
-            description: 'Hover states'
+            description: 'Hover states',
           },
           {
             name: 'Secondary Light',
             cssVar: '--secondary-light',
-            description: 'Light variant'
+            description: 'Light variant',
           },
         ]}
       />
@@ -132,42 +139,42 @@ const ColorsComponent = () => {
           {
             name: 'Success',
             cssVar: '--success',
-            description: 'Positive actions'
+            description: 'Positive actions',
           },
           {
             name: 'Success Light',
             cssVar: '--success-light',
-            description: 'Backgrounds'
+            description: 'Backgrounds',
           },
           {
             name: 'Warning',
             cssVar: '--warning',
-            description: 'Caution states'
+            description: 'Caution states',
           },
           {
             name: 'Warning Light',
             cssVar: '--warning-light',
-            description: 'Backgrounds'
+            description: 'Backgrounds',
           },
           {
             name: 'Error',
             cssVar: '--error',
-            description: 'Error states'
+            description: 'Error states',
           },
           {
             name: 'Error Light',
             cssVar: '--error-light',
-            description: 'Backgrounds'
+            description: 'Backgrounds',
           },
           {
             name: 'Info',
             cssVar: '--info',
-            description: 'Information'
+            description: 'Information',
           },
           {
             name: 'Info Light',
             cssVar: '--info-light',
-            description: 'Backgrounds'
+            description: 'Backgrounds',
           },
         ]}
       />
@@ -179,22 +186,22 @@ const ColorsComponent = () => {
           {
             name: 'Primary',
             cssVar: '--surface-primary',
-            description: 'Main backgrounds'
+            description: 'Main backgrounds',
           },
           {
             name: 'Secondary',
             cssVar: '--surface-secondary',
-            description: 'Page backgrounds'
+            description: 'Page backgrounds',
           },
           {
             name: 'Tertiary',
             cssVar: '--surface-tertiary',
-            description: 'Subtle backgrounds'
+            description: 'Subtle backgrounds',
           },
           {
             name: 'Quaternary',
             cssVar: '--surface-quaternary',
-            description: 'Disabled states'
+            description: 'Disabled states',
           },
         ]}
       />
@@ -206,27 +213,27 @@ const ColorsComponent = () => {
           {
             name: 'Primary',
             cssVar: '--text-primary',
-            description: 'Headings, body'
+            description: 'Headings, body',
           },
           {
             name: 'Secondary',
             cssVar: '--text-secondary',
-            description: 'Subheadings'
+            description: 'Subheadings',
           },
           {
             name: 'Tertiary',
             cssVar: '--text-tertiary',
-            description: 'Captions'
+            description: 'Captions',
           },
           {
             name: 'Quaternary',
             cssVar: '--text-quaternary',
-            description: 'Placeholders'
+            description: 'Placeholders',
           },
           {
             name: 'Inverse',
             cssVar: '--text-inverse',
-            description: 'Text on dark'
+            description: 'Text on dark',
           },
         ]}
       />
@@ -238,45 +245,65 @@ const ColorsComponent = () => {
           {
             name: 'Primary',
             cssVar: '--border-primary',
-            description: 'Default borders'
+            description: 'Default borders',
           },
           {
             name: 'Secondary',
             cssVar: '--border-secondary',
-            description: 'Subtle borders'
+            description: 'Subtle borders',
           },
           {
             name: 'Focus',
             cssVar: '--border-focus',
-            description: 'Focus states'
+            description: 'Focus states',
           },
         ]}
       />
 
-      <div className="mt-12 p-6 rounded-xl border" style={{
-        backgroundColor: 'var(--surface-primary)',
-        borderColor: 'var(--border-primary)'
-      }}>
-        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>
+      <div
+        className="mt-12 p-6 rounded-xl border"
+        style={{
+          backgroundColor: 'var(--surface-primary)',
+          borderColor: 'var(--border-primary)',
+        }}
+      >
+        <h3
+          className="text-lg font-semibold mb-4"
+          style={{ color: 'var(--text-primary)' }}
+        >
           Usage Guidelines
         </h3>
         <div className="grid md:grid-cols-2 gap-6 text-sm">
           <div>
-            <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h4
+              className="font-medium mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Accessibility
             </h4>
-            <ul className="space-y-1" style={{ color: 'var(--text-secondary)' }}>
+            <ul
+              className="space-y-1"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               <li>• All colors meet WCAG 2.1 AA contrast requirements</li>
               <li>• Text colors provide 4.5:1 contrast ratio minimum</li>
-              <li>• Semantic colors are not the only way meaning is conveyed</li>
+              <li>
+                • Semantic colors are not the only way meaning is conveyed
+              </li>
               <li>• Dark mode variants maintain accessibility standards</li>
             </ul>
           </div>
           <div>
-            <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+            <h4
+              className="font-medium mb-2"
+              style={{ color: 'var(--text-primary)' }}
+            >
               Best Practices
             </h4>
-            <ul className="space-y-1" style={{ color: 'var(--text-secondary)' }}>
+            <ul
+              className="space-y-1"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               <li>• Use CSS variables for theme consistency</li>
               <li>• Limit custom colors outside the system</li>
               <li>• Test colors in both light and dark themes</li>

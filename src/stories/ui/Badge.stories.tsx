@@ -49,7 +49,15 @@ import { Badge } from '@/components/ui/badge'
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'secondary', 'destructive', 'outline', 'success', 'warning', 'info'],
+      options: [
+        'default',
+        'secondary',
+        'destructive',
+        'outline',
+        'success',
+        'warning',
+        'info',
+      ],
       description: 'Badge variant affecting color and style',
     },
     children: {
@@ -90,7 +98,8 @@ export const Variants: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Different badge variants for various semantic meanings and visual hierarchy.',
+        story:
+          'Different badge variants for various semantic meanings and visual hierarchy.',
       },
     },
   },
@@ -127,7 +136,8 @@ export const StatusBadges: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Status badges with indicator dots commonly used in RocketHooks for API connection states.',
+        story:
+          'Status badges with indicator dots commonly used in RocketHooks for API connection states.',
       },
     },
   },
@@ -140,26 +150,66 @@ export const WithIcons: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
       <Badge variant="success">
-        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        <svg
+          className="w-3 h-3 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M5 13l4 4L19 7"
+          />
         </svg>
         Verified
       </Badge>
       <Badge variant="warning">
-        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L5.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        <svg
+          className="w-3 h-3 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L5.35 16.5c-.77.833.192 2.5 1.732 2.5z"
+          />
         </svg>
         Warning
       </Badge>
       <Badge variant="destructive">
-        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          className="w-3 h-3 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
         Failed
       </Badge>
       <Badge variant="info">
-        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-3 h-3 mr-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
         Info
       </Badge>
@@ -168,7 +218,8 @@ export const WithIcons: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Badges with icons provide additional visual context and meaning.',
+        story:
+          'Badges with icons provide additional visual context and meaning.',
       },
     },
   },
@@ -204,29 +255,38 @@ export const Sizes: Story = {
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-600">Small:</span>
         <Badge className="text-xs px-1.5 py-0.5">Compact</Badge>
-        <Badge variant="success" className="text-xs px-1.5 py-0.5">Active</Badge>
-        <Badge variant="destructive" className="text-xs px-1.5 py-0.5">Error</Badge>
+        <Badge variant="success" className="text-xs px-1.5 py-0.5">
+          Active
+        </Badge>
+        <Badge variant="destructive" className="text-xs px-1.5 py-0.5">
+          Error
+        </Badge>
       </div>
-      
+
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-600">Default:</span>
         <Badge>Standard</Badge>
         <Badge variant="success">Active</Badge>
         <Badge variant="destructive">Error</Badge>
       </div>
-      
+
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-600">Large:</span>
         <Badge className="text-sm px-3 py-1">Large Badge</Badge>
-        <Badge variant="success" className="text-sm px-3 py-1">Active</Badge>
-        <Badge variant="destructive" className="text-sm px-3 py-1">Error</Badge>
+        <Badge variant="success" className="text-sm px-3 py-1">
+          Active
+        </Badge>
+        <Badge variant="destructive" className="text-sm px-3 py-1">
+          Error
+        </Badge>
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Badges can be customized to different sizes using className overrides.',
+        story:
+          'Badges can be customized to different sizes using className overrides.',
       },
     },
   },
@@ -242,21 +302,38 @@ export const RocketHooksPatterns: Story = {
       <div>
         <h4 className="text-sm font-medium text-gray-700 mb-2">HTTP Methods</h4>
         <div className="flex gap-2">
-          <Badge variant="success" className="font-mono text-xs">GET</Badge>
-          <Badge variant="info" className="font-mono text-xs">POST</Badge>
-          <Badge variant="warning" className="font-mono text-xs">PUT</Badge>
-          <Badge variant="outline" className="font-mono text-xs">PATCH</Badge>
-          <Badge variant="destructive" className="font-mono text-xs">DELETE</Badge>
+          <Badge variant="success" className="font-mono text-xs">
+            GET
+          </Badge>
+          <Badge variant="info" className="font-mono text-xs">
+            POST
+          </Badge>
+          <Badge variant="warning" className="font-mono text-xs">
+            PUT
+          </Badge>
+          <Badge variant="outline" className="font-mono text-xs">
+            PATCH
+          </Badge>
+          <Badge variant="destructive" className="font-mono text-xs">
+            DELETE
+          </Badge>
         </div>
       </div>
 
       {/* Plan Types */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-2">Subscription Plans</h4>
+        <h4 className="text-sm font-medium text-gray-700 mb-2">
+          Subscription Plans
+        </h4>
         <div className="flex gap-2">
           <Badge variant="secondary">Free</Badge>
           <Badge variant="info">Pro</Badge>
-          <Badge variant="default" className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">Enterprise</Badge>
+          <Badge
+            variant="default"
+            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+          >
+            Enterprise
+          </Badge>
         </div>
       </div>
 
@@ -286,7 +363,8 @@ export const RocketHooksPatterns: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Common badge patterns used throughout the RocketHooks application.',
+        story:
+          'Common badge patterns used throughout the RocketHooks application.',
       },
     },
   },
@@ -298,22 +376,32 @@ export const RocketHooksPatterns: Story = {
 export const Interactive: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3">
-      <Badge 
-        variant="outline" 
+      <Badge
+        variant="outline"
         className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
       >
         Clickable
       </Badge>
-      <Badge 
+      <Badge
         variant="secondary"
         className="cursor-pointer hover:bg-secondary/80 transition-colors"
       >
         Filter: Active
-        <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          className="w-3 h-3 ml-1"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </Badge>
-      <Badge 
+      <Badge
         variant="info"
         className="cursor-pointer hover:opacity-80 transition-opacity"
       >
@@ -324,7 +412,8 @@ export const Interactive: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Badges can be made interactive with hover states and click handlers.',
+        story:
+          'Badges can be made interactive with hover states and click handlers.',
       },
     },
   },
