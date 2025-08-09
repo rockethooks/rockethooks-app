@@ -45,6 +45,7 @@ jobs:
             Please review this pull request and provide feedback on:
             - Code quality and best practices
             - Potential bugs or issues
+            - Typescript type safety and Linting issues
             - Performance considerations
             - Security concerns
             - Test coverage
