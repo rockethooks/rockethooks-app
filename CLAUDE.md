@@ -19,6 +19,7 @@ The project had Tailwind CSS v4.1.11 installed DO NEVER USE v3 configuration pat
 
 ## Github Repository
 - [RocketHooks Frontend Webapp](https://github.com/rockethooks/rockethooks-app)
+- NEVER use `--no-verify` when pushing code, always fix linting errors before pushing code to the repository.
 
 
 ## Authentication Integration
