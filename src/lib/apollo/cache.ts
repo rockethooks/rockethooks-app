@@ -25,7 +25,7 @@ const typePolicies: TypePolicies = {
     keyFields: ['id'],
     fields: {
       members: {
-        merge: (_, incoming: unknown[] = []) => {
+        merge: (_, incoming: Record<string, unknown>[] = []) => {
           return incoming
         },
       },
@@ -35,7 +35,7 @@ const typePolicies: TypePolicies = {
     keyFields: ['id'],
     fields: {
       events: {
-        merge: (_, incoming: unknown[] = []) => {
+        merge: (_, incoming: Record<string, unknown>[] = []) => {
           return incoming
         },
       },

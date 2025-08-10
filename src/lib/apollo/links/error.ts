@@ -55,9 +55,6 @@ const getErrorMessage = (error: ErrorResponse): string => {
  * Handle authentication errors by redirecting to sign-in
  */
 const handleAuthError = () => {
-  // Clear any stored auth state
-  localStorage.removeItem('token')
-
   // Redirect to sign-in page
   const signInUrl = import.meta.env.VITE_CLERK_SIGN_IN_URL ?? '/sign-in'
 

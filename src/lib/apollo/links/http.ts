@@ -18,8 +18,8 @@ export const createAppSyncHttpLink = () => {
     },
     // Fetch options
     fetchOptions: {
-      // Enable credentials for cross-origin requests if needed
-      credentials: 'same-origin',
+      // Use 'omit' for cross-origin AWS AppSync requests
+      credentials: 'omit',
     },
     // Custom fetch implementation if needed
     fetch: (uri, options) => {
