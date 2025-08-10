@@ -209,6 +209,8 @@ const getDefaultOnboarding = (): OnboardingState => ({
   },
 })
 
+// Performance optimization: Reuse timestamp generation
+const getCurrentTimestamp = () => new Date().toISOString()
 export const useAuthStore = create<AuthStoreState>()(
   persist(
     (set, get) => ({
@@ -276,7 +278,7 @@ export const useAuthStore = create<AuthStoreState>()(
         set({
           profile: {
             ...profile,
-            lastProfileUpdate: new Date().toISOString(),
+            lastProfileUpdate: getCurrentTimestamp(),
           },
           isProfileLoaded: true,
         })
@@ -289,7 +291,7 @@ export const useAuthStore = create<AuthStoreState>()(
             ? {
                 ...currentProfile,
                 ...updates,
-                lastProfileUpdate: new Date().toISOString(),
+                lastProfileUpdate: getCurrentTimestamp(),
               }
             : null,
         })
@@ -307,7 +309,7 @@ export const useAuthStore = create<AuthStoreState>()(
         set({
           preferences: {
             ...preferences,
-            lastPreferencesUpdate: new Date().toISOString(),
+            lastPreferencesUpdate: getCurrentTimestamp(),
           },
           isPreferencesLoaded: true,
         })
@@ -320,7 +322,7 @@ export const useAuthStore = create<AuthStoreState>()(
             ? {
                 ...currentPreferences,
                 ...updates,
-                lastPreferencesUpdate: new Date().toISOString(),
+                lastPreferencesUpdate: getCurrentTimestamp(),
               }
             : null,
         })
@@ -333,7 +335,7 @@ export const useAuthStore = create<AuthStoreState>()(
             preferences: {
               ...currentPreferences,
               theme,
-              lastPreferencesUpdate: new Date().toISOString(),
+              lastPreferencesUpdate: getCurrentTimestamp(),
             },
           })
         }
@@ -349,7 +351,7 @@ export const useAuthStore = create<AuthStoreState>()(
                 ...currentPreferences.notifications,
                 ...notifications,
               },
-              lastPreferencesUpdate: new Date().toISOString(),
+              lastPreferencesUpdate: getCurrentTimestamp(),
             },
           })
         }
@@ -365,7 +367,7 @@ export const useAuthStore = create<AuthStoreState>()(
                 ...currentPreferences.accessibility,
                 ...accessibility,
               },
-              lastPreferencesUpdate: new Date().toISOString(),
+              lastPreferencesUpdate: getCurrentTimestamp(),
             },
           })
         }
@@ -383,7 +385,7 @@ export const useAuthStore = create<AuthStoreState>()(
         set({
           onboarding: {
             ...onboarding,
-            lastInteractionAt: new Date().toISOString(),
+            lastInteractionAt: getCurrentTimestamp(),
           },
           isOnboardingLoaded: true,
         })
@@ -396,7 +398,7 @@ export const useAuthStore = create<AuthStoreState>()(
             ? {
                 ...currentOnboarding,
                 ...updates,
-                lastInteractionAt: new Date().toISOString(),
+                lastInteractionAt: getCurrentTimestamp(),
               }
             : null,
         })
@@ -429,7 +431,7 @@ export const useAuthStore = create<AuthStoreState>()(
                 ...currentOnboarding.data,
                 [stepName]: true,
               },
-              lastInteractionAt: new Date().toISOString(),
+              lastInteractionAt: getCurrentTimestamp(),
             },
           })
         }
@@ -458,7 +460,7 @@ export const useAuthStore = create<AuthStoreState>()(
               completedSteps: newCompletedSteps,
               skippedSteps: newSkippedSteps,
               currentStep: newCurrentStep,
-              lastInteractionAt: new Date().toISOString(),
+              lastInteractionAt: getCurrentTimestamp(),
             },
           })
         }
@@ -471,8 +473,8 @@ export const useAuthStore = create<AuthStoreState>()(
             onboarding: {
               ...currentOnboarding,
               isCompleted: true,
-              completedAt: new Date().toISOString(),
-              lastInteractionAt: new Date().toISOString(),
+              completedAt: getCurrentTimestamp(),
+              lastInteractionAt: getCurrentTimestamp(),
             },
           })
         }
@@ -528,24 +530,52 @@ export const useAuthStore = create<AuthStoreState>()(
   )
 )
 
-// Selectors for easy state access
+// Memoized selector creators for performance optimization
+const createMemoizedSelector = <T, R>(
+  selector: (state: T) => R
+): ((state: T) => R) => {
+  let lastState: T | undefined
+  let lastResult: R
+
+  return (state: T) => {
+    if (state === lastState) {
+      return lastResult
+    }
+    lastState = state
+    lastResult = selector(state)
+    return lastResult
+  }
+}
+
+// Selectors for easy state access with memoization
 export const authSelectors = {
   // Authentication selectors
   isAuthenticated: (state: AuthStoreState) => state.isAuthenticated,
   user: (state: AuthStoreState) => state.user,
   userId: (state: AuthStoreState) => state.user?.id,
   userEmail: (state: AuthStoreState) => state.user?.email,
-  userName: (state: AuthStoreState) => {
+  userName: createMemoizedSelector((state: AuthStoreState) => {
     if (state.user?.firstName && state.user.lastName) {
       return `${state.user.firstName} ${state.user.lastName}`
     }
     return state.user?.firstName ?? state.user?.email ?? 'User'
-  },
+  }),
 
   // Profile selectors
   profile: (state: AuthStoreState) => state.profile,
-  displayName: (state: AuthStoreState) =>
-    state.profile?.displayName ?? authSelectors.userName(state),
+  displayName: createMemoizedSelector((state: AuthStoreState) => {
+    // Can't use authSelectors.userName here since it would create circular dependency
+    // Inline the logic instead
+    let userName = 'User'
+    if (state.user?.firstName && state.user.lastName) {
+      userName = `${state.user.firstName} ${state.user.lastName}`
+    } else if (state.user?.firstName) {
+      userName = state.user.firstName
+    } else if (state.user?.email) {
+      userName = state.user.email
+    }
+    return state.profile?.displayName ?? userName
+  }),
   profilePreferences: (state: AuthStoreState) => state.profile?.preferences,
 
   // Preferences selectors
@@ -566,29 +596,33 @@ export const authSelectors = {
     state.onboarding?.isCompleted ?? false,
   currentOnboardingStep: (state: AuthStoreState) =>
     state.onboarding?.currentStep ?? 0,
-  onboardingProgress: (state: AuthStoreState) => {
+  onboardingProgress: createMemoizedSelector((state: AuthStoreState) => {
     const onboarding = state.onboarding
     if (!onboarding) return 0
     return (onboarding.completedSteps.length / onboarding.totalSteps) * 100
-  },
-  shouldShowOnboarding: (state: AuthStoreState) =>
-    state.isAuthenticated &&
-    !authSelectors.isOnboardingCompleted(state) &&
-    state.isOnboardingLoaded,
+  }),
+  shouldShowOnboarding: createMemoizedSelector(
+    (state: AuthStoreState) =>
+      state.isAuthenticated &&
+      !(state.onboarding?.isCompleted ?? false) &&
+      state.isOnboardingLoaded
+  ),
 
   // Initialization selectors
   isInitialized: (state: AuthStoreState) => state.isInitialized,
-  isFullyLoaded: (state: AuthStoreState) =>
-    state.isInitialized &&
-    state.isProfileLoaded &&
-    state.isPreferencesLoaded &&
-    state.isOnboardingLoaded,
-  loadingStatus: (state: AuthStoreState) => ({
+  isFullyLoaded: createMemoizedSelector(
+    (state: AuthStoreState) =>
+      state.isInitialized &&
+      state.isProfileLoaded &&
+      state.isPreferencesLoaded &&
+      state.isOnboardingLoaded
+  ),
+  loadingStatus: createMemoizedSelector((state: AuthStoreState) => ({
     initialized: state.isInitialized,
     profile: state.isProfileLoaded,
     preferences: state.isPreferencesLoaded,
     onboarding: state.isOnboardingLoaded,
-  }),
+  })),
 }
 
 // Helper hooks for common use cases

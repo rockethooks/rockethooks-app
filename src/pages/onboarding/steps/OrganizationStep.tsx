@@ -131,8 +131,8 @@ export function OrganizationStep({
     }
   }
 
-  // Check if we have the minimum required data to proceed
-  const canProceed = formData.name && formData.name.length >= 2 && isValid
+  // Check if form is valid using schema validation
+  const canProceed = isValid
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">

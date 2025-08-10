@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { z } from 'zod'
+import { organizationSchema } from '@/lib/validations/onboarding'
 
 // ========================================================================================
 // Type Definitions
@@ -117,8 +119,98 @@ const DEBOUNCE_DELAY = 500
 const DRAFT_VERSION = '1.0'
 
 // ========================================================================================
+// Schema Definitions for Validation
+// ========================================================================================
+
+// Preferences schema for validation
+const preferencesSchema = z.object({
+  notifications: z
+    .object({
+      email: z.boolean().optional(),
+      sms: z.boolean().optional(),
+      push: z.boolean().optional(),
+    })
+    .optional(),
+  timezone: z.string().optional(),
+  language: z.string().optional(),
+  theme: z.enum(['light', 'dark', 'system']).optional(),
+  alertFrequency: z.enum(['instant', 'hourly', 'daily', 'weekly']).optional(),
+})
+
+// API Target schema for validation
+const apiTargetSchema = z.object({
+  name: z.string().optional(),
+  url: z.string().optional(),
+  method: z.enum(['GET', 'POST', 'PUT', 'DELETE', 'PATCH']).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
+  authentication: z
+    .object({
+      type: z.enum(['none', 'bearer', 'basic', 'apikey']).optional(),
+      credentials: z.record(z.string(), z.string()).optional(),
+    })
+    .optional(),
+  timeout: z.number().optional(),
+  retryConfig: z
+    .object({
+      maxRetries: z.number().optional(),
+      backoffStrategy: z.enum(['exponential', 'linear', 'fixed']).optional(),
+    })
+    .optional(),
+})
+
+// Webhook schema for validation
+const webhookSchema = z.object({
+  name: z.string().optional(),
+  url: z.string().optional(),
+  events: z.array(z.string()).optional(),
+  secret: z.string().optional(),
+  active: z.boolean().optional(),
+  retryConfig: z
+    .object({
+      maxRetries: z.number().optional(),
+      backoffStrategy: z.enum(['exponential', 'linear', 'fixed']).optional(),
+      retryDelays: z.array(z.number()).optional(),
+    })
+    .optional(),
+  filters: z
+    .object({
+      headers: z.record(z.string(), z.string()).optional(),
+      bodyPatterns: z.array(z.string()).optional(),
+    })
+    .optional(),
+})
+
+// Map of step names to their validation schemas
+const stepSchemas: Record<OnboardingStep, z.ZodType> = {
+  organization: organizationSchema,
+  preferences: preferencesSchema,
+  apiTarget: apiTargetSchema,
+  webhook: webhookSchema,
+}
+
+// ========================================================================================
 // Helper Functions
 // ========================================================================================
+
+/**
+ * Validate draft data against the schema for a specific step
+ * Returns validated data if valid, null if invalid
+ */
+function validateDraftData(
+  step: OnboardingStep,
+  data: unknown
+): DraftData | null {
+  const schema = stepSchemas[step]
+  // Schema is always defined for valid OnboardingStep values
+
+  try {
+    const validated = schema.parse(data)
+    return validated as DraftData
+  } catch (error) {
+    console.warn(`Draft data validation failed for step ${step}:`, error)
+    return null
+  }
+}
 
 /**
  * Get the localStorage key for a specific onboarding step
@@ -171,7 +263,7 @@ function isValidDraftWrapper(obj: unknown): obj is DraftWrapper {
     obj !== null &&
     'data' in obj &&
     'timestamp' in obj &&
-    typeof (obj as Record<string, unknown>)['timestamp'] === 'number'
+    typeof (obj as { timestamp: unknown }).timestamp === 'number'
   )
 }
 
@@ -241,6 +333,7 @@ export function saveDraft(step: OnboardingStep, data: DraftData): boolean {
 
 /**
  * Retrieve draft data for a specific onboarding step
+ * Includes schema validation to ensure data integrity
  */
 export function getDraft(step: OnboardingStep): DraftData | null {
   if (!isLocalStorageAvailable()) {
@@ -269,7 +362,18 @@ export function getDraft(step: OnboardingStep): DraftData | null {
       return null
     }
 
-    return wrapper.data
+    // Validate the draft data against the current schema
+    const validatedData = validateDraftData(step, wrapper.data)
+    if (!validatedData) {
+      // Data doesn't match current schema, remove it to prevent errors
+      console.warn(
+        `Removing invalid draft for step ${step} due to schema mismatch`
+      )
+      localStorage.removeItem(key)
+      return null
+    }
+
+    return validatedData
   } catch (error) {
     console.error(`Failed to get draft for step ${step}:`, error)
     return null
@@ -363,6 +467,10 @@ export function useAutoSaveDraft(
 ): AutoSaveResult {
   const { debounceDelay = DEBOUNCE_DELAY, enabled = true } = options
 
+  // Store data in a ref to avoid dependency issues
+  const dataRef = useRef(data)
+  dataRef.current = data
+
   const [isSaving, setIsSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -421,10 +529,10 @@ export function useAutoSaveDraft(
       clearTimeout(timeoutRef.current)
       timeoutRef.current = null
     }
-    void performSave(data)
-  }, [data, performSave])
+    void performSave(dataRef.current)
+  }, [performSave])
 
-  // Debounced save effect
+  // Debounced save effect with stable dependencies
   useEffect(() => {
     if (!enabled || !data || Object.keys(data).length === 0) {
       return
