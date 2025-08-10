@@ -1,7 +1,6 @@
 import { ArrowRight, CheckCircle, Sparkles, Trophy } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/app/store/auth.store'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import {
@@ -11,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/Card'
+import { useAuthStore } from '@/store/auth.store'
 import { clearDrafts } from '@/utils/onboardingDrafts'
 
 export interface FinalStepProps {
