@@ -1,6 +1,6 @@
 // src/services/auth/guards.ts
 
-import { useAuthStore } from '@/app/store/auth.store'
+import { useAuthStore } from '@/store/auth.store'
 import type { RouteGuard } from '@/types/auth'
 
 export const requireAuth: RouteGuard = (context) => {

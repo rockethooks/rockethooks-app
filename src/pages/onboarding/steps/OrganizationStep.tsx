@@ -3,7 +3,6 @@ import { Building2, FileText, Globe, Users } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/app/store/auth.store'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
 import {
@@ -37,6 +36,7 @@ import {
   organizationSchema,
   organizationSizes,
 } from '@/lib/validations/onboarding'
+import { useAuthStore } from '@/store/auth.store'
 import {
   getDraft,
   type OrganizationDraft,

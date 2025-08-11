@@ -1,6 +1,7 @@
 import { ClerkProvider } from '@clerk/clerk-react'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { ApolloWrapper } from '@/lib/apollo'
 import './index.css'
 import App from './App.tsx'
 
@@ -28,7 +29,9 @@ createRoot(rootElement).render(
       signInFallbackRedirectUrl="/dashboard"
       signUpFallbackRedirectUrl="/onboarding"
     >
-      <App />
+      <ApolloWrapper>
+        <App />
+      </ApolloWrapper>
     </ClerkProvider>
   </StrictMode>
 )

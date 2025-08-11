@@ -1,6 +1,6 @@
 import { useAuth, useUser } from '@clerk/clerk-react'
 import { useEffect } from 'react'
-import { initializeNewUser, useAuthStore } from '@/app/store/auth.store'
+import { initializeNewUser, useAuthStore } from '@/store/auth.store'
 
 export function AuthSync() {
   const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth()
