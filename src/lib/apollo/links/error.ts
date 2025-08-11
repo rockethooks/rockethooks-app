@@ -6,6 +6,7 @@
 import type { ErrorResponse } from '@apollo/client/link/error'
 import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
+import toast from 'react-hot-toast'
 
 interface RetryErrorWithNetwork {
   networkError?: unknown
@@ -100,21 +101,23 @@ export const createErrorLink = () => {
         switch (errorCode) {
           case 'UNAUTHENTICATED':
             console.error('Authentication error:', errorMessage)
+            toast.error(errorMessage)
             handleAuthError()
             break
 
           case 'FORBIDDEN':
             console.error('Authorization error:', errorMessage)
-            // Could show a toast notification here
+            toast.error(errorMessage)
             break
 
           case 'BAD_USER_INPUT':
             console.error('Input validation error:', errorMessage)
-            // Could show form validation errors here
+            toast.error(errorMessage)
             break
 
           default:
             console.error('GraphQL error:', errorMessage)
+            toast.error(errorMessage)
         }
       })
     }
@@ -123,6 +126,9 @@ export const createErrorLink = () => {
     if (networkError) {
       const errorMessage = getErrorMessage(error)
       console.error('Network error:', errorMessage)
+
+      // Show toast notification for network errors
+      toast.error(errorMessage)
 
       // Network errors will be retried by the RetryLink
     }
