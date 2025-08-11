@@ -35,14 +35,16 @@ export const createApolloClient = (
   return new ApolloClient({
     link,
     cache,
-    // Use network-only fetch policy for MVP simplicity
+    // Use optimized cache policies for better performance
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: 'network-only',
+        // Use cache-and-network for real-time data while still showing cached results
+        fetchPolicy: 'cache-and-network',
         errorPolicy: 'all', // Return both data and errors
       },
       query: {
-        fetchPolicy: 'network-only',
+        // Use cache-first for stable data, reducing unnecessary network requests
+        fetchPolicy: 'cache-first',
         errorPolicy: 'all',
       },
       mutate: {
