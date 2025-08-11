@@ -18,6 +18,18 @@ export interface OrganizationDraft {
 }
 
 /**
+ * Profile draft data collected during onboarding
+ */
+export interface ProfileDraft {
+  firstName?: string
+  lastName?: string
+  role?: 'developer' | 'manager' | 'admin' | 'other'
+  experience?: 'beginner' | 'intermediate' | 'advanced' | 'expert'
+  useCases?: string[]
+  avatar?: string
+}
+
+/**
  * User preferences draft data collected during onboarding
  */
 export interface PreferencesDraft {
@@ -76,6 +88,7 @@ export interface WebhookDraft {
  */
 export type DraftData =
   | OrganizationDraft
+  | ProfileDraft
   | PreferencesDraft
   | ApiTargetDraft
   | WebhookDraft
@@ -85,6 +98,7 @@ export type DraftData =
  */
 export type OnboardingStep =
   | 'organization'
+  | 'profile'
   | 'preferences'
   | 'apiTarget'
   | 'webhook'
@@ -121,6 +135,18 @@ const DRAFT_VERSION = '1.0'
 // ========================================================================================
 // Schema Definitions for Validation
 // ========================================================================================
+
+// Profile schema for validation
+const profileSchema = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  role: z.enum(['developer', 'manager', 'admin', 'other']).optional(),
+  experience: z
+    .enum(['beginner', 'intermediate', 'advanced', 'expert'])
+    .optional(),
+  useCases: z.array(z.string()).optional(),
+  avatar: z.string().optional(),
+})
 
 // Preferences schema for validation
 const preferencesSchema = z.object({
@@ -183,6 +209,7 @@ const webhookSchema = z.object({
 // Map of step names to their validation schemas
 const stepSchemas: Record<OnboardingStep, z.ZodType> = {
   organization: organizationSchema,
+  profile: profileSchema,
   preferences: preferencesSchema,
   apiTarget: apiTargetSchema,
   webhook: webhookSchema,
@@ -387,6 +414,7 @@ export function getAllDrafts(): Partial<Record<OnboardingStep, DraftData>> {
   const drafts: Partial<Record<OnboardingStep, DraftData>> = {}
   const steps: OnboardingStep[] = [
     'organization',
+    'profile',
     'preferences',
     'apiTarget',
     'webhook',
