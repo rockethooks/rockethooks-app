@@ -5,6 +5,25 @@
 
 import { InMemoryCache, type TypePolicies } from '@apollo/client'
 
+// Type definitions for GraphQL entities
+interface Member {
+  id: string
+  userId: string
+  organizationId: string
+  role: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface WebhookEvent {
+  id: string
+  webhookId: string
+  status: string
+  payload: Record<string, unknown>
+  response?: Record<string, unknown>
+  createdAt: string
+}
+
 /**
  * Type policies for caching GraphQL types
  */
@@ -25,7 +44,7 @@ const typePolicies: TypePolicies = {
     keyFields: ['id'],
     fields: {
       members: {
-        merge: (_, incoming: Record<string, unknown>[] = []) => {
+        merge: (_, incoming: Member[] = []) => {
           return incoming
         },
       },
@@ -35,7 +54,7 @@ const typePolicies: TypePolicies = {
     keyFields: ['id'],
     fields: {
       events: {
-        merge: (_, incoming: Record<string, unknown>[] = []) => {
+        merge: (_, incoming: WebhookEvent[] = []) => {
           return incoming
         },
       },
