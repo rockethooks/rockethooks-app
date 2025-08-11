@@ -1,6 +1,6 @@
 import type { ApolloError } from '@apollo/client'
 import { useAuth } from '@clerk/clerk-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GraphQLErrorClassifier } from '@/lib/errors/classifier'
 import { executeRecovery } from '@/lib/errors/recovery'
@@ -25,6 +25,9 @@ export function useGraphQLError(): UseGraphQLErrorReturn {
   const navigate = useNavigate()
   const { signOut } = useAuth()
 
+  // Use ref to store cleanup function
+  const cleanupRef = useRef<(() => void) | null>(null)
+
   const handleError = useCallback((apolloError: ApolloError): AppError => {
     const classifiedError = GraphQLErrorClassifier.classify(apolloError)
     setError(classifiedError)
@@ -43,13 +46,34 @@ export function useGraphQLError(): UseGraphQLErrorReturn {
     async (retryFn?: () => void) => {
       if (!error) return
 
+      // Clean up any previous recovery
+      if (cleanupRef.current) {
+        cleanupRef.current()
+        cleanupRef.current = null
+      }
+
       setIsRecovering(true)
       try {
-        await executeRecovery(error, {
+        const cleanup = await executeRecovery(error, {
           retry: retryFn ?? undefined,
-          router: { push: navigate },
-          authStore: { logout: signOut },
+          router: {
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            push: navigate,
+          },
+          authStore: {
+            logout: () => {
+              // Fire and forget the async signOut
+              void signOut().catch(() => {
+                // Silently handle any logout errors
+              })
+            },
+          },
         })
+
+        // Store cleanup function if provided
+        if (cleanup) {
+          cleanupRef.current = cleanup
+        }
 
         // Clear error after successful recovery
         if (retryFn) {
@@ -64,16 +88,36 @@ export function useGraphQLError(): UseGraphQLErrorReturn {
   )
 
   const dismiss = useCallback(() => {
+    // Clean up any ongoing recovery
+    if (cleanupRef.current) {
+      cleanupRef.current()
+      cleanupRef.current = null
+    }
+
     setError(null)
     setValidationErrors(null)
   }, [])
 
-  return {
-    error,
-    validationErrors,
-    isRecovering,
-    handleError,
-    recover,
-    dismiss,
-  }
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (cleanupRef.current) {
+        cleanupRef.current()
+        cleanupRef.current = null
+      }
+    }
+  }, [])
+
+  // Memoize the return value to prevent unnecessary re-renders
+  return useMemo(
+    () => ({
+      error,
+      validationErrors,
+      isRecovering,
+      handleError,
+      recover,
+      dismiss,
+    }),
+    [error, validationErrors, isRecovering, handleError, recover, dismiss]
+  )
 }

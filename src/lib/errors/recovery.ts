@@ -10,22 +10,47 @@ import {
   type WebhookError,
 } from './types'
 
-interface RecoveryContext {
-  retry?: (() => void) | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  router?: any // Your router instance
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  authStore?: any // Your auth store
+// Properly typed router interface
+interface Router {
+  push: (path: string) => void
 }
 
-export const recoveryStrategies = {
+// Properly typed auth store interface
+interface AuthStore {
+  logout: () => void
+}
+
+export interface RecoveryContext {
+  retry?: (() => void) | undefined
+  router?: Router
+  authStore?: AuthStore
+}
+
+// Type for cleanup functions
+type CleanupFunction = () => void
+
+// Recovery strategy type with optional cleanup return
+type RecoveryStrategy<T extends AppError> = (
+  error: T,
+  context: RecoveryContext
+) => CleanupFunction | undefined | Promise<CleanupFunction | undefined>
+
+// Properly typed recovery strategies with discriminated unions
+export const recoveryStrategies: {
+  [ErrorType.NETWORK]: RecoveryStrategy<NetworkError>
+  [ErrorType.AUTH]: RecoveryStrategy<AuthenticationError>
+  [ErrorType.RATE_LIMIT]: RecoveryStrategy<RateLimitError>
+  [ErrorType.VALIDATION]: RecoveryStrategy<ValidationError>
+  [ErrorType.WEBHOOK]: RecoveryStrategy<WebhookError>
+  [ErrorType.GRAPHQL]: RecoveryStrategy<GraphQLError>
+} = {
   [ErrorType.NETWORK]: async (
     _error: NetworkError,
     context: RecoveryContext
   ) => {
     const { retry } = context
 
-    if (!retry) return
+    if (!retry) return undefined
 
     // Show retrying toast
     const toastId = toast.loading('Retrying...', {
@@ -49,15 +74,17 @@ export const recoveryStrategies = {
         }
       )
     }
+
+    return undefined
   },
 
   [ErrorType.AUTH]: (_error: AuthenticationError, context: RecoveryContext) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { authStore, router } = context
 
     // Clear auth state
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    authStore?.logout()
+    if (authStore) {
+      authStore.logout()
+    }
 
     // Store current location for redirect after login
     if (typeof window !== 'undefined') {
@@ -65,36 +92,56 @@ export const recoveryStrategies = {
     }
 
     // Redirect to login
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    router?.push('/login')
+    if (router) {
+      router.push('/login')
+    }
+
+    return undefined
   },
 
   [ErrorType.RATE_LIMIT]: (error: RateLimitError, context: RecoveryContext) => {
     const { retry } = context
     let retryAfter = error.retryAfter ?? 60
 
-    if (!retry) return
+    if (!retry) return undefined
 
-    // Show countdown toast
-    const toastId = 'rate-limit-countdown'
+    // Generate unique toast ID to prevent collisions
+    const toastId = `rate-limit-${Date.now().toString()}`
 
-    const countdown = setInterval(() => {
-      if (retryAfter > 0) {
-        toast.loading(`Rate limited. Retrying in ${String(retryAfter)}s...`, {
-          id: toastId,
-        })
-        retryAfter--
-      } else {
-        clearInterval(countdown)
-        toast.dismiss(toastId)
-        retry()
-      }
-    }, 1000)
+    // Track interval for cleanup
+    let intervalId: NodeJS.Timeout | null = null
+
+    const startCountdown = () => {
+      intervalId = setInterval(() => {
+        if (retryAfter > 0) {
+          toast.loading(`Rate limited. Retrying in ${String(retryAfter)}s...`, {
+            id: toastId,
+          })
+          retryAfter--
+        } else {
+          if (intervalId) {
+            clearInterval(intervalId)
+          }
+          toast.dismiss(toastId)
+          retry()
+        }
+      }, 1000)
+    }
 
     // Initial toast
     toast.loading(`Rate limited. Retrying in ${String(retryAfter)}s...`, {
       id: toastId,
     })
+
+    startCountdown()
+
+    // Return cleanup function
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId)
+        toast.dismiss(toastId)
+      }
+    }
   },
 
   [ErrorType.VALIDATION]: (
@@ -103,41 +150,84 @@ export const recoveryStrategies = {
   ) => {
     // Don't show toast - let form handler deal with it
     // Validation errors are handled at the component level
-    return
+    return undefined
   },
 
   [ErrorType.WEBHOOK]: (error: WebhookError, _context: RecoveryContext) => {
-    // Show webhook-specific error message
+    // Show webhook-specific error message with unique ID
+    const toastId = `webhook-error-${Date.now().toString()}`
     toast.error(error.message, {
+      id: toastId,
       duration: 5000,
     })
+    return undefined
   },
 
   [ErrorType.GRAPHQL]: (error: GraphQLError, _context: RecoveryContext) => {
-    // Show generic GraphQL error
-    toast.error(error.message)
+    // Show generic GraphQL error with unique ID
+    const toastId = `graphql-error-${Date.now().toString()}`
+    toast.error(error.message, {
+      id: toastId,
+    })
+    return undefined
   },
+}
+
+// Type guard functions for proper type discrimination
+function isNetworkError(error: AppError): error is NetworkError {
+  return error.type === ErrorType.NETWORK
+}
+
+function isAuthenticationError(error: AppError): error is AuthenticationError {
+  return error.type === ErrorType.AUTH
+}
+
+function isRateLimitError(error: AppError): error is RateLimitError {
+  return error.type === ErrorType.RATE_LIMIT
+}
+
+function isValidationError(error: AppError): error is ValidationError {
+  return error.type === ErrorType.VALIDATION
+}
+
+function isWebhookError(error: AppError): error is WebhookError {
+  return error.type === ErrorType.WEBHOOK
+}
+
+function isGraphQLError(error: AppError): error is GraphQLError {
+  return error.type === ErrorType.GRAPHQL
 }
 
 export async function executeRecovery(
   error: AppError,
   context: RecoveryContext
-): Promise<void> {
-  const strategy = recoveryStrategies[error.type]
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (strategy) {
-    await strategy(
-      error as NetworkError &
-        AuthenticationError &
-        RateLimitError &
-        ValidationError &
-        WebhookError &
-        GraphQLError,
-      context
-    )
-  } else {
-    // Default fallback
-    toast.error(error.message)
+): Promise<CleanupFunction | undefined> {
+  // Use type guards for proper type discrimination
+  if (isNetworkError(error)) {
+    return recoveryStrategies[ErrorType.NETWORK](error, context)
   }
+
+  if (isAuthenticationError(error)) {
+    return recoveryStrategies[ErrorType.AUTH](error, context)
+  }
+
+  if (isRateLimitError(error)) {
+    return recoveryStrategies[ErrorType.RATE_LIMIT](error, context)
+  }
+
+  if (isValidationError(error)) {
+    return recoveryStrategies[ErrorType.VALIDATION](error, context)
+  }
+
+  if (isWebhookError(error)) {
+    return recoveryStrategies[ErrorType.WEBHOOK](error, context)
+  }
+
+  if (isGraphQLError(error)) {
+    return recoveryStrategies[ErrorType.GRAPHQL](error, context)
+  }
+
+  // Default fallback
+  toast.error(error.message)
+  return undefined
 }

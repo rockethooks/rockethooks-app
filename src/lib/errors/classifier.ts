@@ -10,6 +10,66 @@ import {
   WebhookError,
 } from './types'
 
+// Type-safe helper to extract retry-after header
+function getRetryAfterFromNetworkError(networkError: unknown): number {
+  // Default fallback value
+  const DEFAULT_RETRY_AFTER = 60
+
+  if (!networkError || typeof networkError !== 'object') {
+    return DEFAULT_RETRY_AFTER
+  }
+
+  // Safely check for headers property
+  if ('headers' in networkError) {
+    const headers = (networkError as { headers?: unknown }).headers
+
+    // Check if headers has a get method
+    if (headers && typeof headers === 'object' && 'get' in headers) {
+      const getMethod = (headers as { get?: unknown }).get
+
+      if (typeof getMethod === 'function') {
+        try {
+          const retryAfter = (getMethod as (key: string) => string | null)(
+            'Retry-After'
+          )
+          if (retryAfter) {
+            const parsed = parseInt(retryAfter, 10)
+            // Validate that it's a positive number
+            return parsed > 0 ? parsed : DEFAULT_RETRY_AFTER
+          }
+        } catch {
+          // If extraction fails, return default
+          return DEFAULT_RETRY_AFTER
+        }
+      }
+    }
+  }
+
+  return DEFAULT_RETRY_AFTER
+}
+
+// Type-safe helper to extract operation name
+function getOperationName(error: unknown): string | undefined {
+  if (!error || typeof error !== 'object') {
+    return undefined
+  }
+
+  if ('operation' in error) {
+    const operation = (error as { operation?: unknown }).operation
+    if (
+      operation &&
+      typeof operation === 'object' &&
+      'operationName' in operation
+    ) {
+      const operationName = (operation as { operationName?: unknown })
+        .operationName
+      return typeof operationName === 'string' ? operationName : undefined
+    }
+  }
+
+  return undefined
+}
+
 export const GraphQLErrorClassifier = {
   classify(error: ApolloError): AppError {
     // Check for network errors first
@@ -23,15 +83,8 @@ export const GraphQLErrorClassifier = {
           case 403:
             return new AuthenticationError('Access denied', 'FORBIDDEN')
           case 429: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            const retryAfter = (error.networkError as any).headers?.get?.(
-              'Retry-After'
-            )
-            return new RateLimitError(
-              'Too many requests',
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              retryAfter ? parseInt(retryAfter) : 60
-            )
+            const retryAfter = getRetryAfterFromNetworkError(error.networkError)
+            return new RateLimitError('Too many requests', retryAfter)
           }
           case 500:
           case 502:
@@ -69,9 +122,13 @@ export const GraphQLErrorClassifier = {
           return new ValidationError(firstError.message, fields)
         }
         case 'RATE_LIMITED': {
-          const retryAfter = firstError.extensions?.['retryAfter'] as number
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-          return new RateLimitError(firstError.message, retryAfter ?? 60)
+          const retryAfterRaw = firstError.extensions?.['retryAfter']
+          // Validate and ensure positive number
+          const retryAfter =
+            typeof retryAfterRaw === 'number' && retryAfterRaw > 0
+              ? retryAfterRaw
+              : 60
+          return new RateLimitError(firstError.message, retryAfter)
         }
       }
 
@@ -92,11 +149,7 @@ export const GraphQLErrorClassifier = {
       }
 
       // Default to GraphQLError
-      return new GraphQLError(
-        firstError.message,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
-        (error as any).operation?.operationName
-      )
+      return new GraphQLError(firstError.message, getOperationName(error))
     }
 
     // Fallback to generic error

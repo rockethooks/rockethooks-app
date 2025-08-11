@@ -1,3 +1,51 @@
+// List of sensitive field names to sanitize
+const SENSITIVE_FIELDS = [
+  'password',
+  'token',
+  'apiKey',
+  'secret',
+  'authorization',
+  'creditCard',
+  'ssn',
+  'socialSecurityNumber',
+  'sessionId',
+  'refreshToken',
+  'accessToken',
+  'privateKey',
+  'clientSecret',
+]
+
+// Sanitize error context to remove sensitive data
+function sanitizeContext(context: unknown): unknown {
+  if (!context || typeof context !== 'object') {
+    return context
+  }
+
+  if (Array.isArray(context)) {
+    return context.map((item) => sanitizeContext(item))
+  }
+
+  const sanitized: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(context)) {
+    // Check if field name contains sensitive keywords (case-insensitive)
+    const lowerKey = key.toLowerCase()
+    const isSensitive = SENSITIVE_FIELDS.some((field) =>
+      lowerKey.includes(field.toLowerCase())
+    )
+
+    if (isSensitive) {
+      sanitized[key] = '[REDACTED]'
+    } else if (typeof value === 'object' && value !== null) {
+      // Recursively sanitize nested objects
+      sanitized[key] = sanitizeContext(value)
+    } else {
+      sanitized[key] = value
+    }
+  }
+
+  return sanitized
+}
+
 // Base error class
 export class AppError extends Error {
   public readonly type: ErrorType
@@ -13,7 +61,10 @@ export class AppError extends Error {
     this.name = this.constructor.name
     this.type = type
     this.timestamp = new Date()
+    // Sanitize context to prevent sensitive data exposure
     this.context = context
+      ? (sanitizeContext(context) as Record<string, unknown>)
+      : undefined
   }
 }
 
