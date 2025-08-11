@@ -28,12 +28,14 @@ export const getAwsRegion = (): string => {
 
 /**
  * Get the GraphQL endpoint URL
+ * Checks for both VITE_APPSYNC_GRAPHQL_URL and VITE_GRAPHQL_URL for backward compatibility
  */
 export const getGraphqlUrl = (): string => {
-  const url = import.meta.env.VITE_APPSYNC_GRAPHQL_URL
+  const url =
+    import.meta.env.VITE_APPSYNC_GRAPHQL_URL || import.meta.env.VITE_GRAPHQL_URL
   if (!url) {
     console.warn(
-      'VITE_APPSYNC_GRAPHQL_URL not found, falling back to localhost'
+      'VITE_APPSYNC_GRAPHQL_URL or VITE_GRAPHQL_URL not found, falling back to localhost'
     )
     return 'http://localhost:4000/graphql'
   }
