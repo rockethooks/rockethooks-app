@@ -1,346 +1,91 @@
-/**
- * Onboarding State Machine Store
- *
- * Implementation of a robust finite state machine for managing the onboarding flow.
- * Uses Zustand with Immer for immutable updates and persists state to localStorage.
- *
- * Architecture: Hybrid approach
- * - State Machine: Navigation state, transitions, persistence
- * - Draft System: Form data persistence (existing system)
- */
-
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import type {
-  NavigationCapabilities,
-  OnboardingContext,
-  OnboardingError,
-  OnboardingFlowConfiguration,
-  OnboardingProgress,
-  OnboardingState,
-  OnboardingStore,
-  ProfileDraft,
-  SerializableOnboardingContext,
-  StateTransition,
-  StepConfiguration,
-} from '@/types/onboarding'
 import {
-  ONBOARDING_STEPS,
-  OnboardingErrorType,
+  type OnboardingContext,
   OnboardingEvent,
-  STATE_MACHINE_CONFIG,
-  STEP_ESTIMATES,
+  type OnboardingProgress,
+  type OnboardingState,
+  type StateTransition,
 } from '@/types/onboarding'
-import {
-  clearStepDraft,
-  getDraft,
-  type OnboardingStep,
-  type OrganizationDraft,
-} from '@/utils/onboardingDrafts'
+import { getDraft, validateDraft } from '@/utils/onboardingDrafts'
 
 // ========================================================================================
-// Flow Configuration and Transitions
+// Store Interface
+// ========================================================================================
+
+interface OnboardingStore {
+  // Current state
+  currentState: OnboardingState
+  context: OnboardingContext
+
+  // State machine instance
+  transitions: StateTransition[]
+
+  // Actions
+  sendEvent: (event: OnboardingEvent, payload?: any) => boolean
+  canTransition: (event: OnboardingEvent) => boolean
+  reset: () => void
+
+  // Navigation helpers
+  goBack: () => boolean
+  skip: () => boolean
+  canGoBack: () => boolean
+  canSkip: () => boolean
+
+  // Progress tracking
+  getProgress: () => OnboardingProgress
+
+  // Context management
+  updateContext: (updates: Partial<OnboardingContext>) => void
+  addError: (error: string) => void
+  clearErrors: () => void
+}
+
+// ========================================================================================
+// State Machine Configuration
 // ========================================================================================
 
 /**
- * Step configurations defining the onboarding flow
+ * Step configurations for validation and navigation
  */
-const stepConfigurations: Record<string, StepConfiguration> = {
-  organizationSetup: {
-    name: 'organizationSetup',
-    title: 'Set Up Your Organization',
-    description: 'Create your organization profile to get started',
-    component: 'OrganizationStep',
-    path: '/onboarding/organization',
-    estimatedTime: STEP_ESTIMATES[ONBOARDING_STEPS.ORGANIZATION],
-    required: true,
-    canSkip: false,
-    validation: {
-      requiresDraft: true,
-      minimumCompletion: 80,
-    },
-  },
-  profileCompletion: {
-    name: 'profileCompletion',
-    title: 'Complete Your Profile',
-    description: 'Tell us about yourself and your role',
-    component: 'ProfileStep',
-    path: '/onboarding/profile',
-    estimatedTime: STEP_ESTIMATES[ONBOARDING_STEPS.PROFILE],
-    required: true,
-    canSkip: false,
-    validation: {
-      requiresDraft: true,
-      minimumCompletion: 60,
-    },
-  },
-  preferences: {
-    name: 'preferences',
-    title: 'Set Your Preferences',
-    description: 'Configure your notification and app preferences',
-    component: 'PreferencesStep',
-    path: '/onboarding/preferences',
-    estimatedTime: STEP_ESTIMATES[ONBOARDING_STEPS.PREFERENCES],
-    required: false,
+const stepConfigs = {
+  ORGANIZATION_SETUP: {
+    id: 'organization',
     canSkip: true,
-    validation: {
-      requiresDraft: false,
-      minimumCompletion: 0,
-    },
+    canGoBack: false,
+    requiresValidation: true,
+    order: 1,
+    route: '/onboarding/organization',
   },
-  completion: {
-    name: 'completion',
-    title: 'Welcome to RocketHooks!',
-    description: 'Your onboarding is complete',
-    component: 'CompletionStep',
-    path: '/onboarding/complete',
-    estimatedTime: 0,
-    required: true,
+  PROFILE_COMPLETION: {
+    id: 'profile',
     canSkip: false,
+    canGoBack: true,
+    requiresValidation: false,
+    order: 2,
+    route: '/onboarding/profile',
+  },
+  PREFERENCES: {
+    id: 'preferences',
+    canSkip: true,
+    canGoBack: true,
+    requiresValidation: false,
+    order: 3,
+    route: '/onboarding/preferences',
+  },
+  COMPLETION: {
+    id: 'completion',
+    canSkip: false,
+    canGoBack: false,
+    requiresValidation: false,
+    order: 4,
+    route: '/onboarding/complete',
   },
 }
 
 /**
- * State transition definitions with guard conditions and actions
- */
-const createTransitions = (): StateTransition[] => [
-  // Initial flow
-  {
-    from: 'START',
-    event: OnboardingEvent.BEGIN,
-    to: 'CHECK_ORGANIZATION',
-    action: (context) => {
-      context.startedAt = new Date().toISOString()
-      context.lastActiveAt = new Date().toISOString()
-    },
-    description: 'Start onboarding process',
-  },
-
-  // Organization check flow
-  {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.HAS_ORGANIZATION,
-    to: 'PROFILE_COMPLETION',
-    guard: (context) => !!context.organizationId,
-    action: (context) => {
-      context.skippedSteps.add('organization')
-      context.currentStep = 2
-    },
-    description: 'User has existing organization',
-  },
-  {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.NO_ORGANIZATION,
-    to: 'ORGANIZATION_SETUP',
-    action: (context) => {
-      context.currentStep = 1
-    },
-    description: 'User needs to create organization',
-  },
-
-  // Organization setup flow
-  {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.ORGANIZATION_CREATED,
-    to: 'PROFILE_COMPLETION',
-    guard: () => {
-      const draft = getDraft('organization') as OrganizationDraft | null
-      return !!(draft?.name && draft.size)
-    },
-    action: (context, payload) => {
-      context.completedSteps.add('organization')
-      context.currentStep = 2
-      if (payload?.organizationId) {
-        context.organizationId = payload.organizationId
-      }
-      // Clear the draft after successful completion
-      clearStepDraft('organization')
-    },
-    description: 'Organization successfully created',
-  },
-
-  // Profile completion flow
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.PROFILE_COMPLETED,
-    to: 'PREFERENCES',
-    guard: () => {
-      const draft = getDraft('profile') as ProfileDraft | null
-      return !!(draft?.firstName && draft.role)
-    },
-    action: (context) => {
-      context.completedSteps.add('profile')
-      context.currentStep = 3
-      clearStepDraft('profile')
-    },
-    description: 'Profile successfully completed',
-  },
-
-  // Preferences flow
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.PREFERENCES_SAVED,
-    to: 'COMPLETION',
-    action: (context) => {
-      context.completedSteps.add('preferences')
-      context.currentStep = 4
-      clearStepDraft('preferences')
-    },
-    description: 'Preferences saved',
-  },
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.SKIP_PREFERENCES,
-    to: 'COMPLETION',
-    action: (context) => {
-      context.skippedSteps.add('preferences')
-      context.currentStep = 4
-    },
-    description: 'Preferences skipped',
-  },
-
-  // Completion flow
-  {
-    from: 'COMPLETION',
-    event: OnboardingEvent.COMPLETE,
-    to: 'DASHBOARD',
-    action: (context) => {
-      context.isComplete = true
-      context.completedAt = new Date().toISOString()
-      context.currentStep = 5
-    },
-    description: 'Onboarding completed',
-  },
-
-  // Navigation events
-  {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.BACK,
-    to: 'CHECK_ORGANIZATION',
-    action: (context) => {
-      context.currentStep = 0
-    },
-    description: 'Navigate back from organization setup',
-  },
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.BACK,
-    to: 'ORGANIZATION_SETUP',
-    guard: (context) => !context.skippedSteps.has('organization'),
-    action: (context) => {
-      context.currentStep = 1
-    },
-    description: 'Navigate back to organization setup',
-  },
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.BACK,
-    to: 'CHECK_ORGANIZATION',
-    guard: (context) => context.skippedSteps.has('organization'),
-    action: (context) => {
-      context.currentStep = 0
-    },
-    description: 'Navigate back to organization check if skipped',
-  },
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.BACK,
-    to: 'PROFILE_COMPLETION',
-    action: (context) => {
-      context.currentStep = 2
-    },
-    description: 'Navigate back to profile completion',
-  },
-  {
-    from: 'COMPLETION',
-    event: OnboardingEvent.BACK,
-    to: 'PREFERENCES',
-    action: (context) => {
-      context.currentStep = 3
-    },
-    description: 'Navigate back to preferences',
-  },
-
-  // Error handling
-  {
-    from: 'ERROR',
-    event: OnboardingEvent.RETRY,
-    to: 'ERROR', // Will be updated by the retry logic
-    description: 'Retry after error',
-  },
-  {
-    from: 'ERROR',
-    event: OnboardingEvent.ERROR_RECOVERED,
-    to: 'ERROR', // Will be updated by the recovery logic
-    description: 'Error recovered',
-  },
-
-  // Reset functionality
-  {
-    from: 'START',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from start',
-  },
-  {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from organization check',
-  },
-  {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from organization setup',
-  },
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from profile completion',
-  },
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from preferences',
-  },
-  {
-    from: 'COMPLETION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from completion',
-  },
-  {
-    from: 'ERROR',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-    description: 'Reset from error',
-  },
-]
-
-/**
- * Flow configuration combining steps and transitions
- */
-const flowConfiguration: OnboardingFlowConfiguration = {
-  steps: stepConfigurations,
-  transitions: createTransitions(),
-  defaultConfig: {
-    skipPreferences: false,
-    requireProfile: true,
-    enableAnalytics: true,
-  },
-  totalEstimatedTime: Object.values(STEP_ESTIMATES).reduce((a, b) => a + b, 0),
-}
-
-// ========================================================================================
-// Helper Functions
-// ========================================================================================
-
-/**
- * Create initial context with default values
+ * Create initial context
  */
 function createInitialContext(): OnboardingContext {
   return {
@@ -349,65 +94,56 @@ function createInitialContext(): OnboardingContext {
     completedSteps: new Set(),
     skippedSteps: new Set(),
     currentStep: 0,
-    totalSteps: 5,
+    totalSteps: 4,
     isComplete: false,
     startedAt: null,
     completedAt: null,
-    lastActiveAt: null,
     errors: [],
-    stateHistory: [],
-    config: flowConfiguration.defaultConfig,
   }
 }
 
 /**
- * Find transition for given state and event
+ * Find transition for current state + event
  */
 function findTransition(
-  fromState: string,
+  currentState: string,
   event: OnboardingEvent,
   transitions: StateTransition[]
 ): StateTransition | null {
   return (
-    transitions.find(
-      (transition) =>
-        transition.from === fromState && transition.event === event
-    ) || null
+    transitions.find((t) => t.from === currentState && t.event === event) ||
+    null
   )
 }
 
 /**
- * Create state object with given type and optional payload
+ * Create state object from type and payload
  */
-function createStateObject(stateType: string, payload?: any): OnboardingState {
-  switch (stateType) {
+function createStateObject(type: string, payload?: any): OnboardingState {
+  switch (type) {
     case 'START':
       return { type: 'START' }
     case 'CHECK_ORGANIZATION':
-      return {
-        type: 'CHECK_ORGANIZATION',
-        checking: payload?.checking ?? false,
-      }
+      return { type: 'CHECK_ORGANIZATION', checking: payload?.checking ?? true }
     case 'ORGANIZATION_SETUP':
       return { type: 'ORGANIZATION_SETUP', draft: payload?.draft }
     case 'PROFILE_COMPLETION':
       return {
         type: 'PROFILE_COMPLETION',
-        organizationId: payload?.organizationId ?? '',
+        organizationId: payload?.organizationId || '',
         draft: payload?.draft,
       }
     case 'PREFERENCES':
       return { type: 'PREFERENCES', draft: payload?.draft }
     case 'COMPLETION':
-      return { type: 'COMPLETION', completedAt: payload?.completedAt }
+      return { type: 'COMPLETION' }
     case 'DASHBOARD':
       return { type: 'DASHBOARD' }
     case 'ERROR':
       return {
         type: 'ERROR',
-        error: payload?.error ?? 'Unknown error',
-        previousState: payload?.previousState ?? { type: 'START' },
-        canRetry: payload?.canRetry ?? true,
+        error: payload?.error || 'Unknown error',
+        previousState: payload?.previousState || { type: 'START' },
       }
     default:
       return { type: 'START' }
@@ -415,25 +151,9 @@ function createStateObject(stateType: string, payload?: any): OnboardingState {
 }
 
 /**
- * Get the current step name for draft system integration
+ * Get next event based on current state
  */
-function getCurrentStepName(state: OnboardingState): OnboardingStep | null {
-  switch (state.type) {
-    case 'ORGANIZATION_SETUP':
-      return 'organization'
-    case 'PROFILE_COMPLETION':
-      return 'profile'
-    case 'PREFERENCES':
-      return 'preferences'
-    default:
-      return null
-  }
-}
-
-/**
- * Get next event for current state
- */
-function getNextEvent(state: OnboardingState): OnboardingEvent | null {
+function getNextEvent(state: OnboardingState): OnboardingEvent {
   switch (state.type) {
     case 'START':
       return OnboardingEvent.BEGIN
@@ -448,227 +168,319 @@ function getNextEvent(state: OnboardingState): OnboardingEvent | null {
     case 'COMPLETION':
       return OnboardingEvent.COMPLETE
     default:
-      return null
-  }
-}
-
-/**
- * Create an error object
- */
-function createError(
-  type: OnboardingErrorType,
-  message: string,
-  state: string,
-  canRetry: boolean = true
-): OnboardingError {
-  return {
-    type,
-    message,
-    timestamp: new Date().toISOString(),
-    state,
-    canRetry,
-    retryCount: 0,
-    maxRetries: 3,
-  }
-}
-
-/**
- * Convert context to serializable format for persistence
- */
-function contextToSerializable(
-  context: OnboardingContext
-): SerializableOnboardingContext {
-  return {
-    userId: context.userId,
-    organizationId: context.organizationId,
-    completedSteps: Array.from(context.completedSteps),
-    skippedSteps: Array.from(context.skippedSteps),
-    currentStep: context.currentStep,
-    totalSteps: context.totalSteps,
-    isComplete: context.isComplete,
-    startedAt: context.startedAt,
-    completedAt: context.completedAt,
-    lastActiveAt: context.lastActiveAt,
-    errors: context.errors,
-    stateHistory: context.stateHistory,
-    config: context.config,
-  }
-}
-
-/**
- * Restore context from serializable format
- */
-function contextFromSerializable(
-  serialized: SerializableOnboardingContext
-): OnboardingContext {
-  return {
-    ...serialized,
-    completedSteps: new Set(serialized.completedSteps),
-    skippedSteps: new Set(serialized.skippedSteps),
+      return OnboardingEvent.BEGIN
   }
 }
 
 // ========================================================================================
-// Zustand Store Implementation
+// Transition Definitions
+// ========================================================================================
+
+const transitions: StateTransition[] = [
+  // Start flow
+  {
+    from: 'START',
+    event: OnboardingEvent.BEGIN,
+    to: 'CHECK_ORGANIZATION',
+    action: (context) => {
+      context.startedAt = new Date().toISOString()
+    },
+  },
+
+  // Organization check results
+  {
+    from: 'CHECK_ORGANIZATION',
+    event: OnboardingEvent.HAS_ORGANIZATION,
+    to: 'PROFILE_COMPLETION',
+    guard: (context) => !!context.organizationId,
+    action: (context) => {
+      context.skippedSteps.add('organization')
+      context.currentStep = 2
+    },
+  },
+  {
+    from: 'CHECK_ORGANIZATION',
+    event: OnboardingEvent.NO_ORGANIZATION,
+    to: 'ORGANIZATION_SETUP',
+    action: (context) => {
+      context.currentStep = 1
+    },
+  },
+
+  // Organization setup completion
+  {
+    from: 'ORGANIZATION_SETUP',
+    event: OnboardingEvent.ORGANIZATION_CREATED,
+    to: 'PROFILE_COMPLETION',
+    guard: (_context) => {
+      const draft = getDraft('organization')
+      return validateDraft('organization', draft)
+    },
+    action: (context) => {
+      context.completedSteps.add('organization')
+      context.currentStep = 2
+    },
+  },
+
+  // Skip organization setup
+  {
+    from: 'ORGANIZATION_SETUP',
+    event: OnboardingEvent.SKIP_PREFERENCES,
+    to: 'PROFILE_COMPLETION',
+    action: (context) => {
+      context.skippedSteps.add('organization')
+      context.currentStep = 2
+    },
+  },
+
+  // Profile completion
+  {
+    from: 'PROFILE_COMPLETION',
+    event: OnboardingEvent.PROFILE_COMPLETED,
+    to: 'PREFERENCES',
+    action: (context) => {
+      context.completedSteps.add('profile')
+      context.currentStep = 3
+    },
+  },
+
+  // Preferences handling
+  {
+    from: 'PREFERENCES',
+    event: OnboardingEvent.PREFERENCES_SAVED,
+    to: 'COMPLETION',
+    action: (context) => {
+      context.completedSteps.add('preferences')
+      context.currentStep = 4
+    },
+  },
+  {
+    from: 'PREFERENCES',
+    event: OnboardingEvent.SKIP_PREFERENCES,
+    to: 'COMPLETION',
+    action: (context) => {
+      context.skippedSteps.add('preferences')
+      context.currentStep = 4
+    },
+  },
+
+  // Final completion
+  {
+    from: 'COMPLETION',
+    event: OnboardingEvent.COMPLETE,
+    to: 'DASHBOARD',
+    action: (context) => {
+      context.isComplete = true
+      context.completedAt = new Date().toISOString()
+    },
+  },
+
+  // Go back transitions
+  {
+    from: 'PROFILE_COMPLETION',
+    event: OnboardingEvent.GO_BACK,
+    to: 'ORGANIZATION_SETUP',
+    guard: (context) => !context.skippedSteps.has('organization'),
+    action: (context) => {
+      context.currentStep = Math.max(1, context.currentStep - 1)
+    },
+  },
+  {
+    from: 'PREFERENCES',
+    event: OnboardingEvent.GO_BACK,
+    to: 'PROFILE_COMPLETION',
+    action: (context) => {
+      context.currentStep = Math.max(2, context.currentStep - 1)
+    },
+  },
+
+  // Error handling
+  {
+    from: 'ORGANIZATION_SETUP',
+    event: OnboardingEvent.ERROR_OCCURRED,
+    to: 'ERROR',
+  },
+  {
+    from: 'PROFILE_COMPLETION',
+    event: OnboardingEvent.ERROR_OCCURRED,
+    to: 'ERROR',
+  },
+  {
+    from: 'PREFERENCES',
+    event: OnboardingEvent.ERROR_OCCURRED,
+    to: 'ERROR',
+  },
+
+  // Retry from error
+  {
+    from: 'ERROR',
+    event: OnboardingEvent.RETRY,
+    to: 'START', // Will be overridden by the previousState
+  },
+
+  // Reset from any state
+  {
+    from: 'START',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'CHECK_ORGANIZATION',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'ORGANIZATION_SETUP',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'PROFILE_COMPLETION',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'PREFERENCES',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'COMPLETION',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+  {
+    from: 'ERROR',
+    event: OnboardingEvent.RESET,
+    to: 'START',
+  },
+]
+
+// ========================================================================================
+// Store Implementation
 // ========================================================================================
 
 export const useOnboardingStore = create<OnboardingStore>()(
   persist(
     immer((set, get) => ({
-      // Initial state
       currentState: { type: 'START' },
       context: createInitialContext(),
-      transitions: flowConfiguration.transitions,
-      flowConfig: flowConfiguration,
+      transitions,
 
-      // Core state machine actions
-      sendEvent: async (
-        event: OnboardingEvent,
-        payload?: any
-      ): Promise<boolean> => {
-        return new Promise((resolve) => {
-          const state = get()
-          const { currentState, transitions, context } = state
+      sendEvent: (event, payload) => {
+        const { currentState, transitions, context } = get()
+        const transition = findTransition(currentState.type, event, transitions)
 
-          try {
-            const transition = findTransition(
-              currentState.type,
-              event,
-              transitions
-            )
+        if (!transition) {
+          if (process.env['NODE_ENV'] === 'development') {
+            console.warn(`No transition for ${currentState.type} + ${event}`)
+          }
+          return false
+        }
 
-            if (!transition) {
-              console.warn(
-                `No transition found for ${currentState.type} + ${event}`
-              )
-              resolve(false)
-              return
+        // Check guard with draft validation
+        if (transition.guard) {
+          if (!transition.guard(context, payload)) {
+            if (process.env['NODE_ENV'] === 'development') {
+              console.warn('Guard condition failed')
             }
+            return false
+          }
+        }
 
-            // Check guard condition
-            if (transition.guard && !transition.guard(context, payload)) {
-              console.warn(
-                `Guard condition failed for ${currentState.type} + ${event}`
-              )
-              resolve(false)
-              return
+        // Execute transition
+        set((state) => {
+          const previousState = { ...state.currentState }
+
+          // Execute action first to update context
+          if (transition.action) {
+            transition.action(state.context)
+          }
+
+          // Handle special retry case - restore previous state
+          if (
+            event === OnboardingEvent.RETRY &&
+            currentState.type === 'ERROR'
+          ) {
+            const errorState = currentState
+            state.currentState = errorState.previousState || {
+              type: 'START',
             }
+          } else {
+            // Update state
+            state.currentState = createStateObject(transition.to, payload)
+          }
 
-            // Execute transition
-            set((draft) => {
-              // Update last active timestamp
-              draft.context.lastActiveAt = new Date().toISOString()
+          // Handle reset - restore initial context
+          if (event === OnboardingEvent.RESET) {
+            state.context = createInitialContext()
+            state.currentState = { type: 'START' }
+          }
 
-              // Add current state to history
-              draft.context.stateHistory.push(currentState)
-
-              // Limit history length
-              if (
-                draft.context.stateHistory.length >
-                STATE_MACHINE_CONFIG.MAX_HISTORY_LENGTH
-              ) {
-                draft.context.stateHistory.shift()
-              }
-
-              // Execute transition action
-              if (transition.action) {
-                transition.action(draft.context, payload)
-              }
-
-              // Update state
-              draft.currentState = createStateObject(transition.to, payload)
-
-              console.log(
-                `[Onboarding] ${currentState.type} → ${transition.to}`,
-                {
-                  event,
-                  payload,
-                  description: transition.description,
-                }
-              )
+          // Add error to context if transitioning to error state
+          if (transition.to === 'ERROR' && payload?.error) {
+            state.context.errors.push({
+              timestamp: new Date().toISOString(),
+              error: payload.error,
+              state: previousState.type,
             })
+          }
 
-            resolve(true)
-          } catch (error) {
-            console.error('State machine error:', error)
-
-            // Handle state machine errors
-            set((draft) => {
-              const errorObj = createError(
-                OnboardingErrorType.STATE_MACHINE_ERROR,
-                error instanceof Error ? error.message : 'State machine error',
-                currentState.type
-              )
-
-              draft.context.errors.push({
-                timestamp: errorObj.timestamp,
-                error: errorObj.message,
-                state: errorObj.state,
-                recovered: false,
-              })
-
-              draft.currentState = {
-                type: 'ERROR',
-                error: errorObj.message,
-                previousState: currentState,
-                canRetry: true,
-              }
-            })
-
-            resolve(false)
+          // Log for debugging in development only
+          if (process.env['NODE_ENV'] === 'development') {
+            console.log(`[Onboarding] ${currentState.type} → ${transition.to}`)
           }
         })
+
+        return true
       },
 
-      canTransition: (event: OnboardingEvent, payload?: any): boolean => {
+      canTransition: (event) => {
         const { currentState, transitions, context } = get()
         const transition = findTransition(currentState.type, event, transitions)
 
         if (!transition) return false
         if (!transition.guard) return true
 
-        return transition.guard(context, payload)
+        return transition.guard(context)
       },
 
-      // Navigation actions
-      goNext: async (): Promise<boolean> => {
-        const { currentState } = get()
-        const nextEvent = getNextEvent(currentState)
-
-        if (!nextEvent) return false
-
-        return get().sendEvent(nextEvent)
-      },
-
-      goBack: async (): Promise<boolean> => {
-        return get().sendEvent(OnboardingEvent.BACK)
-      },
-
-      skip: async (): Promise<boolean> => {
-        const { currentState } = get()
-
-        if (currentState.type === 'PREFERENCES') {
-          return get().sendEvent(OnboardingEvent.SKIP_PREFERENCES)
-        }
-
-        return false
-      },
-
-      retry: async (): Promise<boolean> => {
-        return get().sendEvent(OnboardingEvent.RETRY)
-      },
-
-      reset: (): void => {
-        set((draft) => {
-          draft.currentState = { type: 'START' }
-          draft.context = createInitialContext()
+      reset: () => {
+        set((state) => {
+          state.currentState = { type: 'START' }
+          state.context = createInitialContext()
         })
       },
 
-      // Progress and status
-      getProgress: (): OnboardingProgress => {
-        const { context, currentState } = get()
+      goBack: () => {
+        return get().sendEvent(OnboardingEvent.GO_BACK)
+      },
 
+      skip: () => {
+        const { currentState } = get()
+        if (currentState.type === 'PREFERENCES') {
+          return get().sendEvent(OnboardingEvent.SKIP_PREFERENCES)
+        }
+        // Add other skip logic as needed
+        return false
+      },
+
+      canGoBack: () => {
+        const { currentState } = get()
+        const config =
+          stepConfigs[currentState.type as keyof typeof stepConfigs]
+        return config?.canGoBack ?? false
+      },
+
+      canSkip: () => {
+        const { currentState } = get()
+        const config =
+          stepConfigs[currentState.type as keyof typeof stepConfigs]
+        return config?.canSkip ?? false
+      },
+
+      getProgress: () => {
+        const { context, currentState } = get()
         return {
           currentStep: context.currentStep,
           totalSteps: context.totalSteps,
@@ -677,191 +489,114 @@ export const useOnboardingStore = create<OnboardingStore>()(
           ),
           completedSteps: Array.from(context.completedSteps),
           skippedSteps: Array.from(context.skippedSteps),
-          canGoBack: context.currentStep > 0 && currentState.type !== 'START',
-          canSkip: currentState.type === 'PREFERENCES',
-          isFirstStep: context.currentStep <= 1,
-          isLastStep: context.currentStep >= context.totalSteps - 1,
-          estimatedTimeRemaining: Math.max(
-            0,
-            flowConfiguration.totalEstimatedTime - context.currentStep * 2
-          ),
+          canGoBack: get().canGoBack(),
+          canSkip: get().canSkip(),
+          canProceed: get().canTransition(getNextEvent(currentState)),
         }
       },
 
-      getNavigationCapabilities: (): NavigationCapabilities => {
-        const { currentState, context } = get()
-
-        return {
-          canGoBack: context.currentStep > 0 && currentState.type !== 'START',
-          canSkip: currentState.type === 'PREFERENCES',
-          canRetry: currentState.type === 'ERROR',
-          canReset: true,
-          nextEvent: getNextEvent(currentState),
-          backEvent: OnboardingEvent.BACK,
-          skipEvent:
-            currentState.type === 'PREFERENCES'
-              ? OnboardingEvent.SKIP_PREFERENCES
-              : null,
-        }
+      updateContext: (updates) => {
+        set((state) => {
+          Object.assign(state.context, updates)
+        })
       },
 
-      getCurrentStepConfig: (): StepConfiguration | null => {
-        const { currentState } = get()
-
-        switch (currentState.type) {
-          case 'ORGANIZATION_SETUP':
-            return flowConfiguration.steps['organizationSetup'] ?? null
-          case 'PROFILE_COMPLETION':
-            return flowConfiguration.steps['profileCompletion'] ?? null
-          case 'PREFERENCES':
-            return flowConfiguration.steps['preferences'] ?? null
-          case 'COMPLETION':
-            return flowConfiguration.steps['completion'] ?? null
-          default:
-            return null
-        }
-      },
-
-      // Error handling
-      handleError: (error: OnboardingError): void => {
-        set((draft) => {
-          draft.context.errors.push({
-            timestamp: error.timestamp,
-            error: error.message,
-            state: error.state,
-            recovered: false,
+      addError: (error) => {
+        set((state) => {
+          state.context.errors.push({
+            timestamp: new Date().toISOString(),
+            error,
+            state: state.currentState.type,
           })
-
-          // Limit error history
-          if (
-            draft.context.errors.length > STATE_MACHINE_CONFIG.MAX_ERROR_HISTORY
-          ) {
-            draft.context.errors.shift()
-          }
-
-          draft.currentState = {
-            type: 'ERROR',
-            error: error.message,
-            previousState: draft.currentState,
-            canRetry: error.canRetry,
-          }
         })
       },
 
-      clearErrors: (): void => {
-        set((draft) => {
-          draft.context.errors = []
+      clearErrors: () => {
+        set((state) => {
+          state.context.errors = []
         })
-      },
-
-      getLastError: (): OnboardingError | null => {
-        const { context } = get()
-        const lastError = context.errors[context.errors.length - 1]
-
-        if (!lastError) return null
-
-        return createError(
-          OnboardingErrorType.UNKNOWN_ERROR,
-          lastError.error,
-          lastError.state
-        )
-      },
-
-      // Integration with draft system
-      validateCurrentStep: (): boolean => {
-        const { currentState } = get()
-        const stepName = getCurrentStepName(currentState)
-
-        if (!stepName) return true
-
-        return get().hasValidDraft(stepName)
-      },
-
-      getCurrentDraft: (): any => {
-        const { currentState } = get()
-        const stepName = getCurrentStepName(currentState)
-
-        if (!stepName) return null
-
-        return getDraft(stepName)
-      },
-
-      hasValidDraft: (step?: OnboardingStep): boolean => {
-        const { currentState } = get()
-        const targetStep = step || getCurrentStepName(currentState)
-
-        if (!targetStep) return false
-
-        const draft = getDraft(targetStep)
-
-        // Basic validation - can be enhanced
-        if (!draft) return false
-
-        switch (targetStep) {
-          case 'organization':
-            return (
-              !!(draft as OrganizationDraft).name &&
-              !!(draft as OrganizationDraft).size
-            )
-          case 'profile':
-            return (
-              !!(draft as ProfileDraft).firstName &&
-              !!(draft as ProfileDraft).role
-            )
-          case 'preferences':
-            return true // Preferences are optional
-          default:
-            return false
-        }
-      },
-
-      // Analytics and monitoring
-      trackEvent: (event: string, properties?: Record<string, any>): void => {
-        // Placeholder for analytics integration
-        console.log(`[Analytics] ${event}`, properties)
-      },
-
-      getSessionDuration: (): number => {
-        const { context } = get()
-
-        if (!context.startedAt) return 0
-
-        const now = new Date()
-        const started = new Date(context.startedAt)
-
-        return Math.round((now.getTime() - started.getTime()) / 1000 / 60) // minutes
-      },
-
-      getCompletionRate: (): number => {
-        const { context } = get()
-
-        if (context.totalSteps === 0) return 0
-
-        const completedCount = context.completedSteps.size
-        return Math.round((completedCount / context.totalSteps) * 100)
       },
     })),
     {
-      name: STATE_MACHINE_CONFIG.STORAGE_KEY,
+      name: 'onboarding-state',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         currentState: state.currentState,
-        context: contextToSerializable(state.context),
+        context: {
+          ...state.context,
+          completedSteps: Array.from(state.context.completedSteps),
+          skippedSteps: Array.from(state.context.skippedSteps),
+        },
       }),
       onRehydrateStorage: () => (state) => {
+        // Convert arrays back to Sets after rehydration
         if (state?.context) {
-          // Restore context from serializable format
-          const serializedContext =
-            state.context as unknown as SerializableOnboardingContext
-          state.context = contextFromSerializable(serializedContext)
+          const completedArray = Array.isArray(state.context.completedSteps)
+            ? state.context.completedSteps
+            : Array.from(state.context.completedSteps)
+          const skippedArray = Array.isArray(state.context.skippedSteps)
+            ? state.context.skippedSteps
+            : Array.from(state.context.skippedSteps)
+
+          state.context.completedSteps = new Set(completedArray)
+          state.context.skippedSteps = new Set(skippedArray)
         }
       },
       version: 1,
       migrate: (persistedState: any, version: number) => {
-        // Handle migrations if state structure changes in future versions
-        console.log(`Migrating onboarding state from version ${version}`)
+        // Handle migrations if state structure changes
+        if (version === 0) {
+          // Migration from version 0 to 1 - convert arrays to Sets
+          if (persistedState.context) {
+            persistedState.context.completedSteps = new Set(
+              persistedState.context.completedSteps || []
+            )
+            persistedState.context.skippedSteps = new Set(
+              persistedState.context.skippedSteps || []
+            )
+          }
+        }
         return persistedState
       },
     }
   )
 )
+
+// ========================================================================================
+// Helper Functions and Exports
+// ========================================================================================
+
+/**
+ * Initialize onboarding for a user
+ */
+export function initializeOnboarding(userId: string, organizationId?: string) {
+  const store = useOnboardingStore.getState()
+
+  store.updateContext({
+    userId,
+    organizationId: organizationId || null,
+  })
+
+  // Start the flow
+  store.sendEvent(OnboardingEvent.BEGIN)
+
+  // Skip organization setup if user already has an organization
+  if (organizationId) {
+    store.sendEvent(OnboardingEvent.HAS_ORGANIZATION)
+  } else {
+    store.sendEvent(OnboardingEvent.NO_ORGANIZATION)
+  }
+}
+
+/**
+ * Get route for current state
+ */
+export function getCurrentRoute(state: OnboardingState): string {
+  const config = stepConfigs[state.type as keyof typeof stepConfigs]
+  return config?.route || '/onboarding/organization'
+}
+
+/**
+ * Export step configurations for external use
+ */
+export { stepConfigs as onboardingStepConfigs }

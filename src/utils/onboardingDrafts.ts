@@ -603,3 +603,17 @@ export function useAutoSaveDraft(
     clearError,
   }
 }
+
+// ========================================================================================
+// Additional Exports for State Machine Integration
+// ========================================================================================
+
+/**
+ * Validate draft data for use with state machine
+ * @param step - The onboarding step name
+ * @param data - The data to validate
+ * @returns True if data is valid, false otherwise
+ */
+export function validateDraft(step: OnboardingStep, data: unknown): boolean {
+  return validateDraftData(step, data) !== null
+}
