@@ -372,14 +372,18 @@ export const useOnboardingStore = create<OnboardingStore>()(
         const transition = findTransition(currentState.type, event, transitions)
 
         if (!transition) {
-          console.warn(`No transition for ${currentState.type} + ${event}`)
+          if (process.env['NODE_ENV'] === 'development') {
+            console.warn(`No transition for ${currentState.type} + ${event}`)
+          }
           return false
         }
 
         // Check guard with draft validation
         if (transition.guard) {
           if (!transition.guard(context, payload)) {
-            console.warn('Guard condition failed')
+            if (process.env['NODE_ENV'] === 'development') {
+              console.warn('Guard condition failed')
+            }
             return false
           }
         }
@@ -398,7 +402,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
             event === OnboardingEvent.RETRY &&
             currentState.type === 'ERROR'
           ) {
-            state.currentState = (currentState as any).previousState || {
+            const errorState = currentState
+            state.currentState = errorState.previousState || {
               type: 'START',
             }
           } else {
@@ -421,8 +426,10 @@ export const useOnboardingStore = create<OnboardingStore>()(
             })
           }
 
-          // Log for debugging
-          console.log(`[Onboarding] ${currentState.type} → ${transition.to}`)
+          // Log for debugging in development only
+          if (process.env['NODE_ENV'] === 'development') {
+            console.log(`[Onboarding] ${currentState.type} → ${transition.to}`)
+          }
         })
 
         return true
@@ -524,12 +531,15 @@ export const useOnboardingStore = create<OnboardingStore>()(
       onRehydrateStorage: () => (state) => {
         // Convert arrays back to Sets after rehydration
         if (state?.context) {
-          state.context.completedSteps = new Set(
-            state.context.completedSteps as any
-          )
-          state.context.skippedSteps = new Set(
-            state.context.skippedSteps as any
-          )
+          const completedArray = Array.isArray(state.context.completedSteps)
+            ? state.context.completedSteps
+            : Array.from(state.context.completedSteps)
+          const skippedArray = Array.isArray(state.context.skippedSteps)
+            ? state.context.skippedSteps
+            : Array.from(state.context.skippedSteps)
+
+          state.context.completedSteps = new Set(completedArray)
+          state.context.skippedSteps = new Set(skippedArray)
         }
       },
       version: 1,
