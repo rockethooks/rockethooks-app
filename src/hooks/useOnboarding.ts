@@ -95,7 +95,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
 
   // Auto-save hook for current step
   const autoSave = useAutoSaveDraft(
-    currentStepName || 'organization', // fallback to valid step name
+    currentStepName ?? 'organization', // fallback to valid step name
     draft ?? undefined,
     { enabled: !!currentStepName }
   )
@@ -113,9 +113,17 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
         )
       }
 
-      initializeOnboarding(user.id, orgId || undefined)
+      initializeOnboarding(user.id, orgId ?? undefined)
     }
-  }, [autoInitialize, isLoaded, user, currentState.type, context.userId, debug])
+  }, [
+    autoInitialize,
+    isLoaded,
+    user,
+    orgId,
+    currentState.type,
+    context.userId,
+    debug,
+  ])
 
   // Auto-navigation based on state changes
   useEffect(() => {
@@ -138,7 +146,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
           targetRoute
         )
       }
-      navigate(targetRoute)
+      void navigate(targetRoute)
     }
   }, [currentState, navigate, autoNavigate, debug])
 
@@ -156,7 +164,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
 
   // Complete current step
   const completeStep = useCallback(
-    async (data?: DraftData) => {
+    (data?: DraftData) => {
       const eventMap = {
         ORGANIZATION_SETUP: OnboardingEvent.ORGANIZATION_CREATED,
         PROFILE_COMPLETION: OnboardingEvent.PROFILE_COMPLETED,
@@ -194,7 +202,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
           if (currentState.type === 'ORGANIZATION_SETUP' && data) {
             // Update profile with organization information
             updateProfile({
-              company: (data as any).name,
+              company: (data as { name: string }).name,
             })
           }
 

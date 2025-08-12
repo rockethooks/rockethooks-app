@@ -11,7 +11,7 @@ import {
   EndpointsPage,
   HomePage,
   LoginWithErrorBoundary,
-  PlaceholderOnboardingPage,
+  OnboardingPage,
   SettingsPage,
   TeamPage,
   WebhooksPage,
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
         path: 'onboarding/:step',
         element: (
           <ProtectedRoute guards={[requireAuth]}>
-            <PlaceholderOnboardingPage />
+            <OnboardingPage />
           </ProtectedRoute>
         ),
       },

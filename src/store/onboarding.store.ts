@@ -75,7 +75,7 @@ const stepConfigs = {
     route: '/onboarding/preferences',
   },
   COMPLETION: {
-    id: 'completion',
+    id: 'complete',
     canSkip: false,
     canGoBack: false,
     requiresValidation: false,
@@ -543,20 +543,26 @@ export const useOnboardingStore = create<OnboardingStore>()(
         }
       },
       version: 1,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
         // Handle migrations if state structure changes
         if (version === 0) {
           // Migration from version 0 to 1 - convert arrays to Sets
-          if (persistedState.context) {
-            persistedState.context.completedSteps = new Set(
-              persistedState.context.completedSteps || []
+          const state = persistedState as {
+            context?: {
+              completedSteps?: string[]
+              skippedSteps?: string[]
+            }
+          }
+          if (state.context) {
+            ;(state.context as any).completedSteps = new Set(
+              state.context.completedSteps ?? []
             )
-            persistedState.context.skippedSteps = new Set(
-              persistedState.context.skippedSteps || []
+            ;(state.context as any).skippedSteps = new Set(
+              state.context.skippedSteps ?? []
             )
           }
         }
-        return persistedState
+        return persistedState as OnboardingStore
       },
     }
   )
