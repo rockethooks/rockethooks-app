@@ -127,9 +127,8 @@ interface AuthStoreState {
   isOnboardingLoaded: boolean;
 
   // Authentication actions
-  setAuthenticated: (user: User, sessionId: string, token: string) => void;
+  setAuthenticated: (user: User, sessionId: string) => void;
   setUnauthenticated: () => void;
-  updateToken: (token: string) => void;
   clearAuth: () => void;
 
   // Profile actions
@@ -234,13 +233,13 @@ export const useAuthStore = create<AuthStoreState>()(
         isOnboardingLoaded: false,
 
         // Authentication actions
-        setAuthenticated: (user, sessionId, token) => {
+        setAuthenticated: (user, sessionId) => {
           set(
             {
               isAuthenticated: true,
               user,
               sessionId,
-              token,
+              token: null, // Token is managed by Clerk internally
             },
             false,
             'auth/setAuthenticated'
@@ -257,17 +256,6 @@ export const useAuthStore = create<AuthStoreState>()(
             },
             false,
             'auth/setUnauthenticated'
-          );
-        },
-
-        updateToken: (token) => {
-          set(
-            (state) => ({
-              ...state,
-              token,
-            }),
-            false,
-            'auth/updateToken'
           );
         },
 
