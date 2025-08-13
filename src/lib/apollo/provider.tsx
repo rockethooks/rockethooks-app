@@ -21,18 +21,15 @@ export function ApolloWrapper({ children }: ApolloWrapperProps) {
 
   // Create Apollo Client with Clerk token getter
   const apolloClient = useMemo(() => {
-    const tokenGetter = async () => {
+    return getApolloClient(async () => {
       try {
         // Get JWT token using Clerk's getToken method with the AppSync template
-        const token = await getToken({ template: '1day-template' });
-        return token;
+        return await getToken({ template: '1day-template' });
       } catch (error) {
         console.error('Failed to get Clerk token:', error);
         return null;
       }
-    };
-
-    return getApolloClient(tokenGetter);
+    });
   }, [getToken]);
 
   return <ApolloProvider client={apolloClient}>{children}</ApolloProvider>;

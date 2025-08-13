@@ -46,22 +46,6 @@ export const requireOnboarding: RouteGuard = (context) => {
   return { allowed: true };
 };
 
-export const publicOnly: RouteGuard = (context) => {
-  if (context.isAuthenticated) {
-    // Check auth store for onboarding completion
-    const authState = useAuthStore.getState();
-    const isOnboardingComplete = authState.onboarding?.isCompleted ?? false;
-
-    const redirectTo = isOnboardingComplete ? '/dashboard' : '/onboarding/1';
-    return {
-      allowed: false,
-      redirectTo,
-      reason: 'Already authenticated',
-    };
-  }
-  return { allowed: true };
-};
-
 // Utility for combining guards
 export function combineGuards(...guards: RouteGuard[]): RouteGuard {
   return async (context) => {

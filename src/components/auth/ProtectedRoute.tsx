@@ -72,7 +72,7 @@ export function ProtectedRoute({
 
       try {
         for (const guard of guardsRef.current) {
-          const result = await Promise.resolve(guard(context));
+          const result = await guard(context);
           if (!result.allowed) {
             setGuardsResult(result);
             setGuardsLoading(false);
