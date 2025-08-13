@@ -63,14 +63,12 @@ const commonUseCases = [
 export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
   // Use the new onboarding hook instead of directly accessing stores
   const {
-    draft,
-    saveDraft,
-    autoSave,
+    draftData,
+    saveDraftData,
     completeStep,
     skipStep,
     goBack,
     canProceed,
-    isFirstStep,
     hasErrors,
     latestError,
     clearErrors,
@@ -104,7 +102,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as ProfileDraft | null;
+    const existingDraft = draftData as ProfileDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
@@ -120,7 +118,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
       }
       if (existingDraft.avatar) setValue('avatar', existingDraft.avatar);
     }
-  }, [setValue, draft]);
+  }, [setValue, draftData]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -133,9 +131,9 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
         ...formData,
         useCases: selectedUseCases,
       } as ProfileDraft;
-      saveDraft(draftData);
+      saveDraftData(draftData);
     }
-  }, [formData, selectedUseCases, saveDraft]);
+  }, [formData, selectedUseCases, saveDraftData]);
 
   // Handle adding a use case
   const handleAddUseCase = (useCase: string) => {
@@ -506,45 +504,12 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                 {(hasErrors || latestError) && (
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
-                      <span>{latestError?.error ?? 'An error occurred'}</span>
+                      <span>{latestError ?? 'An error occurred'}</span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
                         onClick={clearErrors}
-                        aria-label="Dismiss error"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  </Alert>
-                )}
-
-                {autoSave.isSaving && (
-                  <div className="text-sm text-muted-foreground flex items-center gap-2">
-                    <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />
-                    Saving progress...
-                  </div>
-                )}
-
-                {autoSave.lastSaved &&
-                  !autoSave.isSaving &&
-                  !autoSave.error && (
-                    <div className="text-sm text-muted-foreground">
-                      Progress saved at{' '}
-                      {autoSave.lastSaved.toLocaleTimeString()}
-                    </div>
-                  )}
-
-                {autoSave.error && (
-                  <Alert variant="destructive">
-                    <div className="flex items-center justify-between">
-                      <span>Failed to save progress: {autoSave.error}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={autoSave.clearError}
                         aria-label="Dismiss error"
                       >
                         ×
@@ -570,7 +535,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  {!isFirstStep && (
+                  {!progress.isFirstStep && (
                     <Button type="button" variant="ghost" onClick={handleBack}>
                       Back
                     </Button>
@@ -596,8 +561,8 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
 
       {/* Progress Indicator */}
       <div className="text-center text-sm text-muted-foreground">
-        Step {progress.currentStep} of {progress.totalSteps} (
-        {progress.percentage}% complete)
+        Step {progress.current} of {progress.total} ({progress.percentage}%
+        complete)
       </div>
     </div>
   );

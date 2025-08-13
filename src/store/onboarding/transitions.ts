@@ -1,185 +1,280 @@
-import { OnboardingEvent, type StateTransition } from '@/types/onboarding';
-import { getDraft, validateDraft } from '@/utils/onboardingDrafts';
+/**
+ * State transition configurations for the onboarding state machine
+ */
+
+import * as actions from './actions';
+import * as guards from './guards';
+import type { TransitionConfig } from './types';
+import { OnboardingEvents, OnboardingStates } from './types';
 
 /**
- * All state transitions for the onboarding flow
+ * Define all state transitions for the onboarding flow
  */
-export const transitions: StateTransition[] = [
-  // Start flow
+export const transitions: TransitionConfig[] = [
+  // START state transitions
   {
-    from: 'START',
-    event: OnboardingEvent.BEGIN,
-    to: 'CHECK_ORGANIZATION',
-    action: (context) => {
-      context.startedAt = new Date().toISOString();
+    from: OnboardingStates.START,
+    event: OnboardingEvents.BEGIN,
+    to: OnboardingStates.CHECK_ORGANIZATION,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'userId' in payload) {
+        actions.setUserId(context, payload as { userId: string });
+      }
+      actions.setStep(1)(context);
     },
   },
 
-  // Organization check results
+  // CHECK_ORGANIZATION state transitions
   {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.HAS_ORGANIZATION,
-    to: 'PROFILE_COMPLETION',
-    guard: (context) => !!context.organizationId,
-    action: (context) => {
-      context.skippedSteps.add('organization');
-      context.currentStep = 2;
+    from: OnboardingStates.CHECK_ORGANIZATION,
+    event: OnboardingEvents.HAS_ORGANIZATION,
+    to: OnboardingStates.PROFILE_COMPLETION,
+    guard: guards.hasOrganization,
+    action: (context, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        'organizationId' in payload
+      ) {
+        actions.setOrganizationId(
+          context,
+          payload as { organizationId: string }
+        );
+      }
+      actions.markStepSkipped('organization')(context);
+      actions.setStep(2)(context);
     },
   },
   {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.NO_ORGANIZATION,
-    to: 'ORGANIZATION_SETUP',
+    from: OnboardingStates.CHECK_ORGANIZATION,
+    event: OnboardingEvents.NO_ORGANIZATION,
+    to: OnboardingStates.ORGANIZATION_SETUP,
+    guard: guards.noOrganization,
     action: (context) => {
-      context.currentStep = 1;
+      actions.setStep(1)(context);
     },
   },
 
-  // Organization setup completion
+  // ORGANIZATION_SETUP state transitions
   {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.ORGANIZATION_CREATED,
-    to: 'PROFILE_COMPLETION',
-    guard: (_context) => {
-      const draft = getDraft('organization');
-      return validateDraft('organization', draft);
+    from: OnboardingStates.ORGANIZATION_SETUP,
+    event: OnboardingEvents.ORGANIZATION_CREATED,
+    to: OnboardingStates.PROFILE_COMPLETION,
+    action: (context, payload) => {
+      if (
+        payload &&
+        typeof payload === 'object' &&
+        'organizationId' in payload
+      ) {
+        actions.handleOrganizationCreated(
+          context,
+          payload as { organizationId: string }
+        );
+      }
     },
+  },
+  {
+    from: OnboardingStates.ORGANIZATION_SETUP,
+    event: OnboardingEvents.SKIP_ORGANIZATION,
+    to: OnboardingStates.PROFILE_COMPLETION,
+    action: actions.handleSkipOrganization,
+  },
+  {
+    from: OnboardingStates.ORGANIZATION_SETUP,
+    event: OnboardingEvents.SKIP,
+    to: OnboardingStates.PROFILE_COMPLETION,
+    action: actions.handleSkipOrganization,
+  },
+
+  // PROFILE_COMPLETION state transitions
+  {
+    from: OnboardingStates.PROFILE_COMPLETION,
+    event: OnboardingEvents.PROFILE_COMPLETED,
+    to: OnboardingStates.PREFERENCES_SETUP,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'profileData' in payload) {
+        actions.handleProfileCompleted(
+          context,
+          payload as { profileData: Record<string, unknown> }
+        );
+      }
+    },
+  },
+  {
+    from: OnboardingStates.PROFILE_COMPLETION,
+    event: OnboardingEvents.BACK,
+    to: OnboardingStates.ORGANIZATION_SETUP,
+    guard: (context) => !guards.organizationSkipped(context),
+    action: actions.decrementStep,
+  },
+
+  // PREFERENCES_SETUP state transitions
+  {
+    from: OnboardingStates.PREFERENCES_SETUP,
+    event: OnboardingEvents.PREFERENCES_SAVED,
+    to: OnboardingStates.COMPLETE,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'preferences' in payload) {
+        actions.handlePreferencesSaved(
+          context,
+          payload as { preferences: Record<string, unknown> }
+        );
+      }
+      actions.markComplete(context);
+    },
+  },
+  {
+    from: OnboardingStates.PREFERENCES_SETUP,
+    event: OnboardingEvents.SKIP_PREFERENCES,
+    to: OnboardingStates.COMPLETE,
     action: (context) => {
-      context.completedSteps.add('organization');
-      context.currentStep = 2;
+      actions.handleSkipPreferences(context);
+      actions.markComplete(context);
+    },
+  },
+  {
+    from: OnboardingStates.PREFERENCES_SETUP,
+    event: OnboardingEvents.SKIP,
+    to: OnboardingStates.COMPLETE,
+    action: (context) => {
+      actions.handleSkipPreferences(context);
+      actions.markComplete(context);
+    },
+  },
+  {
+    from: OnboardingStates.PREFERENCES_SETUP,
+    event: OnboardingEvents.BACK,
+    to: OnboardingStates.PROFILE_COMPLETION,
+    action: actions.decrementStep,
+  },
+
+  // ACCOUNT_SETUP state transitions (if needed)
+  {
+    from: OnboardingStates.ACCOUNT_SETUP,
+    event: OnboardingEvents.ACCOUNT_COMPLETED,
+    to: OnboardingStates.COMPLETE,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'accountData' in payload) {
+        actions.saveDraft(
+          'preferences',
+          (payload as { accountData: Record<string, unknown> }).accountData
+        )(context);
+      }
+      actions.markStepCompleted('account')(context);
+      actions.markComplete(context);
+    },
+  },
+  {
+    from: OnboardingStates.ACCOUNT_SETUP,
+    event: OnboardingEvents.BACK,
+    to: OnboardingStates.PREFERENCES_SETUP,
+    action: actions.decrementStep,
+  },
+
+  // ERROR state transitions
+  {
+    from: OnboardingStates.ERROR,
+    event: OnboardingEvents.RETRY,
+    to: OnboardingStates.START,
+    action: (context) => {
+      actions.clearErrorsAction(context);
+      actions.resetOnboarding(context);
     },
   },
 
-  // Skip organization setup
+  // Global error handling (from any state)
   {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.SKIP_PREFERENCES,
-    to: 'PROFILE_COMPLETION',
-    action: (context) => {
-      context.skippedSteps.add('organization');
-      context.currentStep = 2;
-    },
-  },
-
-  // Profile completion
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.PROFILE_COMPLETED,
-    to: 'PREFERENCES',
-    action: (context) => {
-      context.completedSteps.add('profile');
-      context.currentStep = 3;
-    },
-  },
-
-  // Preferences handling
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.PREFERENCES_SAVED,
-    to: 'COMPLETION',
-    action: (context) => {
-      context.completedSteps.add('preferences');
-      context.currentStep = 4;
+    from: OnboardingStates.CHECK_ORGANIZATION,
+    event: OnboardingEvents.ERROR,
+    to: OnboardingStates.ERROR,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        actions.addErrorAction(
+          context,
+          payload as { error: string; code?: string; field?: string }
+        );
+      }
     },
   },
   {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.SKIP_PREFERENCES,
-    to: 'COMPLETION',
-    action: (context) => {
-      context.skippedSteps.add('preferences');
-      context.currentStep = 4;
-    },
-  },
-
-  // Final completion
-  {
-    from: 'COMPLETION',
-    event: OnboardingEvent.COMPLETE,
-    to: 'DASHBOARD',
-    action: (context) => {
-      context.isComplete = true;
-      context.completedAt = new Date().toISOString();
-    },
-  },
-
-  // Go back transitions
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.GO_BACK,
-    to: 'ORGANIZATION_SETUP',
-    guard: (context) => !context.skippedSteps.has('organization'),
-    action: (context) => {
-      context.currentStep = Math.max(1, context.currentStep - 1);
+    from: OnboardingStates.ORGANIZATION_SETUP,
+    event: OnboardingEvents.ERROR,
+    to: OnboardingStates.ERROR,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        actions.addErrorAction(
+          context,
+          payload as { error: string; code?: string; field?: string }
+        );
+      }
     },
   },
   {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.GO_BACK,
-    to: 'PROFILE_COMPLETION',
-    action: (context) => {
-      context.currentStep = Math.max(2, context.currentStep - 1);
+    from: OnboardingStates.PROFILE_COMPLETION,
+    event: OnboardingEvents.ERROR,
+    to: OnboardingStates.ERROR,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        actions.addErrorAction(
+          context,
+          payload as { error: string; code?: string; field?: string }
+        );
+      }
     },
   },
-
-  // Error handling
   {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.ERROR_OCCURRED,
-    to: 'ERROR',
-  },
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.ERROR_OCCURRED,
-    to: 'ERROR',
-  },
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.ERROR_OCCURRED,
-    to: 'ERROR',
-  },
-
-  // Retry from error
-  {
-    from: 'ERROR',
-    event: OnboardingEvent.RETRY,
-    to: 'START', // Will be overridden by the previousState
-  },
-
-  // Reset from any state
-  {
-    from: 'START',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'CHECK_ORGANIZATION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'ORGANIZATION_SETUP',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'PROFILE_COMPLETION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'PREFERENCES',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'COMPLETION',
-    event: OnboardingEvent.RESET,
-    to: 'START',
-  },
-  {
-    from: 'ERROR',
-    event: OnboardingEvent.RESET,
-    to: 'START',
+    from: OnboardingStates.PREFERENCES_SETUP,
+    event: OnboardingEvents.ERROR,
+    to: OnboardingStates.ERROR,
+    action: (context, payload) => {
+      if (payload && typeof payload === 'object' && 'error' in payload) {
+        actions.addErrorAction(
+          context,
+          payload as { error: string; code?: string; field?: string }
+        );
+      }
+    },
   },
 ];
+
+/**
+ * Helper function to find a transition
+ */
+export function findTransition(
+  currentState: OnboardingStates,
+  event: OnboardingEvents
+): TransitionConfig | undefined {
+  return transitions.find((t) => t.from === currentState && t.event === event);
+}
+
+/**
+ * Helper function to get available transitions from a state
+ */
+export function getAvailableTransitions(
+  currentState: OnboardingStates
+): TransitionConfig[] {
+  return transitions.filter((t) => t.from === currentState);
+}
+
+/**
+ * Helper function to validate if a transition is possible
+ */
+export function canTransition(
+  currentState: OnboardingStates,
+  event: OnboardingEvents,
+  context: unknown
+): boolean {
+  const transition = findTransition(currentState, event);
+  if (!transition) return false;
+
+  // Check guard if present
+  if (transition.guard && !guards.isValidContext(context)) {
+    return false;
+  }
+
+  if (transition.guard && guards.isValidContext(context)) {
+    return transition.guard(context);
+  }
+
+  return true;
+}

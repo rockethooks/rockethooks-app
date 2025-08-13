@@ -1,804 +1,201 @@
+/**
+ * Onboarding state machine store
+ * This file orchestrates the onboarding flow using modular components
+ */
+
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { getDraft, validateDraft } from '@/utils/onboardingDrafts';
-// import type {
-//   OrganizationData,
-//   ProfileData,
-//   PreferencesData,
-// } from '@/types/onboarding';
 import { createDevtoolsConfig } from '../devtools.config';
+import {
+  ALLOWED_CONTEXT_FIELDS,
+  getInitialContext,
+  getStepConfigByState,
+  STORAGE_KEY,
+  STORAGE_VERSION,
+} from './config';
+
+// Import modular components
+import * as guards from './guards';
+import { canTransition, findTransition, transitions } from './transitions';
+import type { OnboardingContext, OnboardingStore } from './types';
+// Import types
+import { OnboardingEvents, OnboardingStates } from './types';
 
 /**
- * Type guard to validate context structure
- */
-function isValidContext(context: unknown): context is OnboardingContext {
-  if (!context || typeof context !== 'object') {
-    return false;
-  }
-
-  const ctx = context as Partial<OnboardingContext>;
-
-  return (
-    typeof ctx.userId === 'string' &&
-    (ctx.organizationId === null || typeof ctx.organizationId === 'string') &&
-    typeof ctx.currentStep === 'number' &&
-    typeof ctx.totalSteps === 'number' &&
-    ctx.completedSteps instanceof Set &&
-    ctx.skippedSteps instanceof Set &&
-    typeof ctx.isComplete === 'boolean' &&
-    Array.isArray(ctx.errors)
-  );
-}
-
-/**
- * Type guard to validate context updates
- */
-function isValidContextUpdate(
-  updates: unknown
-): updates is Partial<OnboardingContext> {
-  if (!updates || typeof updates !== 'object') {
-    return false;
-  }
-
-  const upd = updates as Record<string, unknown>;
-
-  // Check each provided field is valid
-  for (const [key, value] of Object.entries(upd)) {
-    switch (key) {
-      case 'userId':
-        if (typeof value !== 'string') return false;
-        break;
-      case 'organizationId':
-        if (value !== null && typeof value !== 'string') return false;
-        break;
-      case 'currentStep':
-      case 'totalSteps':
-        if (typeof value !== 'number') return false;
-        break;
-      case 'completedSteps':
-      case 'skippedSteps':
-        if (!(value instanceof Set)) return false;
-        break;
-      case 'isComplete':
-        if (typeof value !== 'boolean') return false;
-        break;
-      case 'startedAt':
-      case 'completedAt':
-        if (value !== null && typeof value !== 'string') return false;
-        break;
-      case 'errors':
-        if (!Array.isArray(value)) return false;
-        break;
-      default:
-        // Unknown field - allow it but log warning
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`[Onboarding] Unknown context field: ${key}`);
-        }
-        break;
-    }
-  }
-
-  return true;
-}
-
-/**
- * Type guard for event payloads
- */
-function isValidEventPayload(
-  payload: unknown
-): payload is Record<string, unknown> | null | undefined {
-  return (
-    payload === null ||
-    payload === undefined ||
-    (typeof payload === 'object' && !Array.isArray(payload))
-  );
-}
-
-// ========================================================================================
-// Onboarding State Machine Enums and Types
-// ========================================================================================
-
-/**
- * All possible states in the onboarding flow
- */
-export enum OnboardingStates {
-  START = 'START',
-  CHECK_ORGANIZATION = 'CHECK_ORGANIZATION',
-  ORGANIZATION_SETUP = 'ORGANIZATION_SETUP',
-  PROFILE_COMPLETION = 'PROFILE_COMPLETION',
-  PREFERENCES = 'PREFERENCES',
-  COMPLETION = 'COMPLETION',
-  DASHBOARD = 'DASHBOARD',
-  ERROR = 'ERROR',
-}
-
-/**
- * All possible events that can trigger state transitions
- */
-export enum OnboardingEvents {
-  BEGIN = 'BEGIN',
-  HAS_ORGANIZATION = 'HAS_ORGANIZATION',
-  NO_ORGANIZATION = 'NO_ORGANIZATION',
-  ORGANIZATION_CREATED = 'ORGANIZATION_CREATED',
-  SKIP_ORGANIZATION = 'SKIP_ORGANIZATION',
-  PROFILE_COMPLETED = 'PROFILE_COMPLETED',
-  PREFERENCES_SAVED = 'PREFERENCES_SAVED',
-  SKIP_PREFERENCES = 'SKIP_PREFERENCES',
-  COMPLETE = 'COMPLETE',
-  RESET = 'RESET',
-  ERROR_OCCURRED = 'ERROR_OCCURRED',
-  RETRY = 'RETRY',
-  GO_BACK = 'GO_BACK',
-}
-
-/**
- * Context for onboarding state machine
- */
-export interface OnboardingContext {
-  userId: string;
-  organizationId: string | null;
-  currentStep: number;
-  totalSteps: number;
-  completedSteps: Set<string>;
-  skippedSteps: Set<string>;
-  isComplete: boolean;
-  startedAt: string | null;
-  completedAt: string | null;
-  errors: Array<{ timestamp: string; error: string; state: string }>;
-}
-
-/**
- * Progress tracking interface
- */
-export interface OnboardingProgress {
-  currentStep: number;
-  totalSteps: number;
-  percentage: number;
-  completedSteps: string[];
-  skippedSteps: string[];
-  canGoBack: boolean;
-  canSkip: boolean;
-  canProceed: boolean;
-}
-
-/**
- * State transition definition
- */
-interface StateTransition {
-  from: OnboardingStates;
-  event: OnboardingEvents;
-  to: OnboardingStates;
-  guard?: (
-    context: OnboardingContext,
-    payload?: Record<string, unknown>
-  ) => boolean;
-  action?: (context: OnboardingContext) => void;
-}
-
-// ========================================================================================
-// Context Creation and Utilities
-// ========================================================================================
-
-/**
- * Creates the initial context for the onboarding state machine
- */
-function createInitialContext(): OnboardingContext {
-  // Calculate total steps dynamically from step configuration
-  const totalSteps = Object.keys(stepConfigs).length;
-
-  return {
-    userId: '',
-    organizationId: null,
-    currentStep: 0,
-    totalSteps,
-    completedSteps: new Set<string>(),
-    skippedSteps: new Set<string>(),
-    isComplete: false,
-    startedAt: null,
-    completedAt: null,
-    errors: [],
-  };
-}
-
-// ========================================================================================
-// Step Configuration
-// ========================================================================================
-
-/**
- * Step configurations for navigation and validation
- */
-const stepConfigs = {
-  [OnboardingStates.ORGANIZATION_SETUP]: {
-    id: 'organization',
-    name: 'Organization Setup',
-    canSkip: true,
-    canGoBack: false,
-    requiresValidation: true,
-    order: 1,
-    route: '/onboarding/organization',
-  },
-  [OnboardingStates.PROFILE_COMPLETION]: {
-    id: 'profile',
-    name: 'Profile Completion',
-    canSkip: false,
-    canGoBack: true,
-    requiresValidation: false,
-    order: 2,
-    route: '/onboarding/profile',
-  },
-  [OnboardingStates.PREFERENCES]: {
-    id: 'preferences',
-    name: 'Preferences',
-    canSkip: true,
-    canGoBack: true,
-    requiresValidation: false,
-    order: 3,
-    route: '/onboarding/preferences',
-  },
-  [OnboardingStates.COMPLETION]: {
-    id: 'completion',
-    name: 'Completion',
-    canSkip: false,
-    canGoBack: false,
-    requiresValidation: false,
-    order: 4,
-    route: '/onboarding/complete',
-  },
-} as const;
-
-// ========================================================================================
-// State Machine Transitions
-// ========================================================================================
-
-/**
- * All state transitions for the onboarding flow using the new state machine pattern
- */
-const transitions: StateTransition[] = [
-  // Start flow
-  {
-    from: OnboardingStates.START,
-    event: OnboardingEvents.BEGIN,
-    to: OnboardingStates.CHECK_ORGANIZATION,
-    action: (context) => {
-      context.startedAt = new Date().toISOString();
-    },
-  },
-
-  // Organization check results
-  {
-    from: OnboardingStates.CHECK_ORGANIZATION,
-    event: OnboardingEvents.HAS_ORGANIZATION,
-    to: OnboardingStates.PROFILE_COMPLETION,
-    guard: (context) => {
-      if (!isValidContext(context)) {
-        console.warn('[Onboarding] Invalid context in guard:', context);
-        return false;
-      }
-      return !!context.organizationId;
-    },
-    action: (context) => {
-      context.skippedSteps.add('organization');
-      context.currentStep = 2;
-    },
-  },
-  {
-    from: OnboardingStates.CHECK_ORGANIZATION,
-    event: OnboardingEvents.NO_ORGANIZATION,
-    to: OnboardingStates.ORGANIZATION_SETUP,
-    action: (context) => {
-      context.currentStep = 1;
-    },
-  },
-
-  // Organization setup completion
-  {
-    from: OnboardingStates.ORGANIZATION_SETUP,
-    event: OnboardingEvents.ORGANIZATION_CREATED,
-    to: OnboardingStates.PROFILE_COMPLETION,
-    guard: (context) => {
-      if (!isValidContext(context)) {
-        console.warn(
-          '[Onboarding] Invalid context in organization guard:',
-          context
-        );
-        return false;
-      }
-      const draft = getDraft('organization');
-      return validateDraft('organization', draft);
-    },
-    action: (context) => {
-      context.completedSteps.add('organization');
-      context.currentStep = 2;
-    },
-  },
-
-  // Skip organization setup
-  {
-    from: OnboardingStates.ORGANIZATION_SETUP,
-    event: OnboardingEvents.SKIP_ORGANIZATION,
-    to: OnboardingStates.PROFILE_COMPLETION,
-    action: (context) => {
-      context.skippedSteps.add('organization');
-      context.currentStep = 2;
-    },
-  },
-
-  // Profile completion
-  {
-    from: OnboardingStates.PROFILE_COMPLETION,
-    event: OnboardingEvents.PROFILE_COMPLETED,
-    to: OnboardingStates.PREFERENCES,
-    action: (context) => {
-      context.completedSteps.add('profile');
-      context.currentStep = 3;
-    },
-  },
-
-  // Preferences handling
-  {
-    from: OnboardingStates.PREFERENCES,
-    event: OnboardingEvents.PREFERENCES_SAVED,
-    to: OnboardingStates.COMPLETION,
-    action: (context) => {
-      context.completedSteps.add('preferences');
-      context.currentStep = 4;
-    },
-  },
-  {
-    from: OnboardingStates.PREFERENCES,
-    event: OnboardingEvents.SKIP_PREFERENCES,
-    to: OnboardingStates.COMPLETION,
-    action: (context) => {
-      context.skippedSteps.add('preferences');
-      context.currentStep = 4;
-    },
-  },
-
-  // Final completion
-  {
-    from: OnboardingStates.COMPLETION,
-    event: OnboardingEvents.COMPLETE,
-    to: OnboardingStates.DASHBOARD,
-    action: (context) => {
-      context.isComplete = true;
-      context.completedAt = new Date().toISOString();
-    },
-  },
-
-  // Go back transitions
-  {
-    from: OnboardingStates.PROFILE_COMPLETION,
-    event: OnboardingEvents.GO_BACK,
-    to: OnboardingStates.ORGANIZATION_SETUP,
-    guard: (context) => {
-      if (!isValidContext(context)) {
-        console.warn('[Onboarding] Invalid context in go back guard:', context);
-        return false;
-      }
-      return !context.skippedSteps.has('organization');
-    },
-    action: (context) => {
-      context.currentStep = Math.max(1, context.currentStep - 1);
-    },
-  },
-  {
-    from: OnboardingStates.PREFERENCES,
-    event: OnboardingEvents.GO_BACK,
-    to: OnboardingStates.PROFILE_COMPLETION,
-    action: (context) => {
-      context.currentStep = Math.max(2, context.currentStep - 1);
-    },
-  },
-
-  // Error handling
-  {
-    from: OnboardingStates.ORGANIZATION_SETUP,
-    event: OnboardingEvents.ERROR_OCCURRED,
-    to: OnboardingStates.ERROR,
-  },
-  {
-    from: OnboardingStates.PROFILE_COMPLETION,
-    event: OnboardingEvents.ERROR_OCCURRED,
-    to: OnboardingStates.ERROR,
-  },
-  {
-    from: OnboardingStates.PREFERENCES,
-    event: OnboardingEvents.ERROR_OCCURRED,
-    to: OnboardingStates.ERROR,
-  },
-
-  // Retry from error
-  {
-    from: OnboardingStates.ERROR,
-    event: OnboardingEvents.RETRY,
-    to: OnboardingStates.START, // Will be overridden by the previousState
-  },
-
-  // Reset from any state
-  {
-    from: OnboardingStates.START,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.CHECK_ORGANIZATION,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.ORGANIZATION_SETUP,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.PROFILE_COMPLETION,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.PREFERENCES,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.COMPLETION,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-  {
-    from: OnboardingStates.ERROR,
-    event: OnboardingEvents.RESET,
-    to: OnboardingStates.START,
-  },
-];
-
-// ========================================================================================
-// Utility Functions
-// ========================================================================================
-
-/**
- * Find transition for current state + event
- */
-function findTransition(
-  currentState: OnboardingStates,
-  event: OnboardingEvents,
-  allTransitions: StateTransition[]
-): StateTransition | null {
-  return (
-    allTransitions.find((t) => t.from === currentState && t.event === event) ??
-    null
-  );
-}
-
-/**
- * Get next event based on current state
- */
-function getNextEvent(state: OnboardingStates): OnboardingEvents {
-  switch (state) {
-    case OnboardingStates.START:
-      return OnboardingEvents.BEGIN;
-    case OnboardingStates.CHECK_ORGANIZATION:
-      return OnboardingEvents.NO_ORGANIZATION; // Default assumption
-    case OnboardingStates.ORGANIZATION_SETUP:
-      return OnboardingEvents.ORGANIZATION_CREATED;
-    case OnboardingStates.PROFILE_COMPLETION:
-      return OnboardingEvents.PROFILE_COMPLETED;
-    case OnboardingStates.PREFERENCES:
-      return OnboardingEvents.PREFERENCES_SAVED;
-    case OnboardingStates.COMPLETION:
-      return OnboardingEvents.COMPLETE;
-    default:
-      return OnboardingEvents.BEGIN;
-  }
-}
-
-// ========================================================================================
-// Store Interface and Implementation
-// ========================================================================================
-
-interface OnboardingStore {
-  // Current state
-  currentState: OnboardingStates;
-  context: OnboardingContext;
-
-  // State machine instance
-  transitions: StateTransition[];
-
-  // Actions
-  sendEvent: (
-    event: OnboardingEvents,
-    payload?: Record<string, unknown>
-  ) => boolean;
-  canTransition: (event: OnboardingEvents) => boolean;
-  reset: () => void;
-
-  // Navigation helpers
-  goBack: () => boolean;
-  skip: () => boolean;
-  canGoBack: () => boolean;
-  canSkip: () => boolean;
-
-  // Progress tracking
-  getProgress: () => OnboardingProgress;
-
-  // Context management
-  updateContext: (updates: Partial<OnboardingContext>) => void;
-  addError: (error: string) => void;
-  clearErrors: () => void;
-
-  // Initialization helper
-  initialize: (userId: string, organizationId?: string) => void;
-
-  // Route helper
-  getCurrentRoute: () => string;
-}
-
-/**
- * Enhanced onboarding store using state machine pattern
+ * Create the onboarding store with state machine logic
  */
 export const useOnboardingStore = create<OnboardingStore>()(
   devtools(
     persist(
       immer((set, get) => ({
+        // Initial state
         currentState: OnboardingStates.START,
-        context: createInitialContext(),
+        context: getInitialContext(),
         transitions,
 
+        // Core state machine actions
         sendEvent: (event, payload) => {
-          const { currentState, transitions: allTransitions, context } = get();
+          const { currentState, context } = get();
+          const transition = findTransition(currentState, event);
 
-          // Runtime validation of event payload
-          if (!isValidEventPayload(payload)) {
+          if (!transition) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(
+                `[Onboarding] No transition found for event ${event} in state ${currentState}`
+              );
+            }
+            return false;
+          }
+
+          // Validate payload if needed
+          if (payload && !guards.isValidEventPayload(event, payload)) {
             if (process.env.NODE_ENV === 'development') {
               console.error('[Onboarding] Invalid event payload:', payload);
             }
             return false;
           }
 
-          // Runtime validation of context before processing
-          if (!isValidContext(context)) {
+          // Check guard condition
+          if (transition.guard && !transition.guard(context)) {
             if (process.env.NODE_ENV === 'development') {
-              console.error(
-                '[Onboarding] Invalid context structure in sendEvent:',
-                context
+              console.log(
+                `[Onboarding] Guard prevented transition for ${event}`
               );
             }
             return false;
           }
 
-          const transition = findTransition(
-            currentState,
-            event,
-            allTransitions
-          );
-
-          if (!transition) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn(`No transition for ${currentState} + ${event}`);
-            }
-            return false;
-          }
-
-          // Check guard with draft validation
-          if (transition.guard) {
-            try {
-              if (
-                !transition.guard(context, payload as Record<string, unknown>)
-              ) {
-                if (process.env.NODE_ENV === 'development') {
-                  console.warn(
-                    `[Onboarding] Guard condition failed for ${currentState} -> ${transition.to} on ${event}`,
-                    { context, payload }
-                  );
-                }
-                return false;
-              }
-            } catch (error) {
-              if (process.env.NODE_ENV === 'development') {
-                console.error(
-                  `[Onboarding] Guard function error for ${currentState} -> ${transition.to} on ${event}:`,
-                  error
-                );
-              }
-              return false;
-            }
-          }
-
-          // Execute transition
+          // Execute the transition
           set(
             (state) => {
-              const previousState = state.currentState;
-
-              // Execute action first to update context
+              // Execute transition action if defined
               if (transition.action) {
-                transition.action(state.context);
+                transition.action(state.context, payload);
               }
 
-              // Handle special retry case - restore previous state
-              if (
-                event === OnboardingEvents.RETRY &&
-                currentState === OnboardingStates.ERROR
-              ) {
-                // For now, just go back to START - can be enhanced later
-                state.currentState = OnboardingStates.START;
-              } else {
-                // Update state
-                state.currentState = transition.to;
-              }
-
-              // Handle reset - restore initial context
-              if (event === OnboardingEvents.RESET) {
-                state.context = createInitialContext();
-                state.currentState = OnboardingStates.START;
-              }
-
-              // Add error to context if transitioning to error state
-              if (
-                transition.to === OnboardingStates.ERROR &&
-                payload &&
-                typeof payload === 'object' &&
-                'error' in payload
-              ) {
-                state.context.errors.push({
-                  timestamp: new Date().toISOString(),
-                  error: payload.error as string,
-                  state: previousState,
-                });
-              }
-
-              // Log for debugging in development only
-              if (process.env.NODE_ENV === 'development') {
-                console.log(`[Onboarding] ${currentState} → ${transition.to}`);
-              }
+              // Update state
+              state.currentState = transition.to;
             },
             false,
-            `onboarding/sendEvent/${event}`
+            `onboarding/${event}`
           );
 
           return true;
         },
 
-        canTransition: (event) => {
-          const { currentState, transitions: allTransitions, context } = get();
-          const transition = findTransition(
-            currentState,
-            event,
-            allTransitions
-          );
-
-          if (!transition) return false;
-          if (!transition.guard) return true;
-
-          return transition.guard(context);
-        },
-
-        reset: () => {
-          set(
-            (state) => {
-              state.currentState = OnboardingStates.START;
-              state.context = createInitialContext();
-            },
-            false,
-            'onboarding/reset'
-          );
-        },
-
-        goBack: () => {
-          return get().sendEvent(OnboardingEvents.GO_BACK);
-        },
-
-        skip: () => {
-          const { currentState } = get();
-          if (currentState === OnboardingStates.PREFERENCES) {
-            return get().sendEvent(OnboardingEvents.SKIP_PREFERENCES);
-          }
-          if (currentState === OnboardingStates.ORGANIZATION_SETUP) {
-            return get().sendEvent(OnboardingEvents.SKIP_ORGANIZATION);
-          }
-          return false;
-        },
-
-        canGoBack: () => {
-          const { currentState } = get();
-          if (currentState in stepConfigs) {
-            const config =
-              stepConfigs[currentState as keyof typeof stepConfigs];
-            return config.canGoBack;
-          }
-          return false;
-        },
-
-        canSkip: () => {
-          const { currentState } = get();
-          if (currentState in stepConfigs) {
-            const config =
-              stepConfigs[currentState as keyof typeof stepConfigs];
-            return config.canSkip;
-          }
-          return false;
-        },
-
-        getProgress: () => {
-          const { context, currentState } = get();
-          return {
-            currentStep: context.currentStep,
-            totalSteps: context.totalSteps,
-            percentage: Math.round(
-              (context.currentStep / context.totalSteps) * 100
-            ),
-            completedSteps: Array.from(context.completedSteps),
-            skippedSteps: Array.from(context.skippedSteps),
-            canGoBack: get().canGoBack(),
-            canSkip: get().canSkip(),
-            canProceed: get().canTransition(getNextEvent(currentState)),
-          };
-        },
-
         updateContext: (updates) => {
-          // Runtime validation of updates
-          if (!isValidContextUpdate(updates)) {
+          // Validate updates
+          if (!guards.isValidContextUpdate(updates)) {
             if (process.env.NODE_ENV === 'development') {
               console.error('[Onboarding] Invalid context updates:', updates);
             }
             return;
           }
 
-          // Define allowed context fields to prevent arbitrary updates
-          const allowedFields = new Set([
-            'userId',
-            'organizationId',
-            'currentStep',
-            'totalSteps',
-            'completedSteps',
-            'skippedSteps',
-            'isComplete',
-            'startedAt',
-            'completedAt',
-            'errors',
-          ]);
-
-          // Filter out disallowed fields using safer typing
-          const filteredUpdates: Record<string, unknown> = {};
+          // Filter allowed fields
+          const filteredUpdates: Partial<OnboardingContext> = {};
           for (const [key, value] of Object.entries(updates)) {
-            if (allowedFields.has(key)) {
-              filteredUpdates[key] = value;
-            } else {
-              console.warn(
-                `Attempted to update disallowed context field: ${key}`
-              );
+            if (
+              ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
+            ) {
+              (filteredUpdates as Record<string, unknown>)[key] = value;
+            } else if (process.env.NODE_ENV === 'development') {
+              console.warn(`[Onboarding] Disallowed field update: ${key}`);
             }
           }
 
           set(
             (state) => {
-              return {
-                ...state,
-                context: {
-                  ...state.context,
-                  ...(filteredUpdates as Partial<OnboardingContext>),
-                },
-              };
+              Object.assign(state.context, filteredUpdates);
+              state.context.lastUpdatedAt = new Date().toISOString();
             },
             false,
             'onboarding/updateContext'
           );
         },
 
-        addError: (error) => {
+        reset: () => {
           set(
             (state) => {
-              state.context.errors.push({
-                timestamp: new Date().toISOString(),
-                error,
-                state: state.currentState,
-              });
+              state.currentState = OnboardingStates.START;
+              Object.assign(state.context, getInitialContext());
             },
             false,
-            'onboarding/addError'
+            'onboarding/reset'
           );
         },
 
+        // Navigation helpers
+        goBack: () => {
+          const { currentState } = get();
+
+          // Define back navigation map
+          const backMap: Partial<Record<OnboardingStates, OnboardingEvents>> = {
+            [OnboardingStates.PROFILE_COMPLETION]: OnboardingEvents.BACK,
+            [OnboardingStates.PREFERENCES_SETUP]: OnboardingEvents.BACK,
+            [OnboardingStates.ACCOUNT_SETUP]: OnboardingEvents.BACK,
+          };
+
+          const backEvent = backMap[currentState];
+          if (backEvent) {
+            return get().sendEvent(backEvent);
+          }
+          return false;
+        },
+
+        skip: () => {
+          const { currentState } = get();
+
+          // Define which states can be skipped
+          const skipMap: Partial<Record<OnboardingStates, OnboardingEvents>> = {
+            [OnboardingStates.ORGANIZATION_SETUP]:
+              OnboardingEvents.SKIP_ORGANIZATION,
+            [OnboardingStates.PREFERENCES_SETUP]:
+              OnboardingEvents.SKIP_PREFERENCES,
+          };
+
+          const skipEvent = skipMap[currentState];
+          if (skipEvent) {
+            return get().sendEvent(skipEvent);
+          }
+          return false;
+        },
+
+        canGoBack: () => {
+          const { context } = get();
+          return context.currentStep > 1;
+        },
+
+        canSkip: () => {
+          const { currentState } = get();
+          const config = getStepConfigByState(currentState);
+          return config?.canSkip ?? false;
+        },
+
+        // Progress helpers
+        getProgress: () => {
+          const { context } = get();
+          return {
+            current: context.currentStep,
+            total: context.totalSteps,
+            percentage: Math.round(
+              (context.currentStep / context.totalSteps) * 100
+            ),
+            completedSteps: Array.from(context.completedSteps),
+            skippedSteps: Array.from(context.skippedSteps),
+          };
+        },
+
+        // State checks
+        isInState: (state) => get().currentState === state,
+
+        canTransition: (event) => {
+          const { currentState, context } = get();
+          return canTransition(currentState, event, context);
+        },
+
+        // Error handling
         clearErrors: () => {
           set(
             (state) => {
@@ -809,38 +206,30 @@ export const useOnboardingStore = create<OnboardingStore>()(
           );
         },
 
-        initialize: (userId: string, organizationId?: string) => {
-          const store = get();
-
-          store.updateContext({
-            userId,
-            organizationId: organizationId ?? null,
-          });
-
-          // Start the flow
-          store.sendEvent(OnboardingEvents.BEGIN);
-
-          // Skip organization setup if user already has an organization
-          if (organizationId) {
-            store.sendEvent(OnboardingEvents.HAS_ORGANIZATION);
-          } else {
-            store.sendEvent(OnboardingEvents.NO_ORGANIZATION);
-          }
-        },
-
-        getCurrentRoute: () => {
-          const { currentState } = get();
-          if (currentState in stepConfigs) {
-            const config =
-              stepConfigs[currentState as keyof typeof stepConfigs];
-            return config.route;
-          }
-          return '/onboarding/organization';
+        addError: (error) => {
+          set(
+            (state) => {
+              const errorObj =
+                typeof error === 'string'
+                  ? {
+                      code: 'UNKNOWN',
+                      message: error,
+                      timestamp: new Date().toISOString(),
+                    }
+                  : { ...error, timestamp: new Date().toISOString() };
+              state.context.errors.push(errorObj);
+            },
+            false,
+            'onboarding/addError'
+          );
         },
       })),
       {
-        name: 'onboarding-state',
+        name: STORAGE_KEY,
+        version: STORAGE_VERSION,
         storage: createJSONStorage(() => localStorage),
+
+        // Serialize Sets to Arrays for storage
         partialize: (state) => ({
           currentState: state.currentState,
           context: {
@@ -849,10 +238,10 @@ export const useOnboardingStore = create<OnboardingStore>()(
             skippedSteps: Array.from(state.context.skippedSteps),
           },
         }),
+
+        // Deserialize Arrays back to Sets
         onRehydrateStorage: () => (state) => {
-          // Convert arrays back to Sets after rehydration
           if (state?.context) {
-            // Simplified: always expect arrays from storage
             const completedSteps = Array.isArray(state.context.completedSteps)
               ? state.context.completedSteps
               : [];
@@ -864,41 +253,50 @@ export const useOnboardingStore = create<OnboardingStore>()(
             state.context.skippedSteps = new Set(skippedSteps as string[]);
           }
         },
-        version: 1,
-        migrate: (persistedState: unknown, version: number) => {
-          // Handle migrations if state structure changes
-          if (version === 0) {
-            // Migration from version 0 to 1 - simplified
-            // Just ensure we have valid structure, onRehydrateStorage handles Set conversion
-          }
-          return persistedState as OnboardingStore;
-        },
       }
     ),
     createDevtoolsConfig('Onboarding')
   )
 );
 
-// ========================================================================================
-// Helper Functions for Compatibility
-// ========================================================================================
-
 /**
- * Initialize onboarding for a user (compatibility with existing code)
+ * Helper function to initialize onboarding (backward compatibility)
  */
 export function initializeOnboarding(userId: string, organizationId?: string) {
-  useOnboardingStore.getState().initialize(userId, organizationId);
+  const store = useOnboardingStore.getState();
+
+  store.updateContext({
+    userId,
+    organizationId,
+  });
+
+  store.sendEvent(OnboardingEvents.BEGIN, { userId });
+
+  if (organizationId) {
+    store.sendEvent(OnboardingEvents.HAS_ORGANIZATION, { organizationId });
+  } else {
+    store.sendEvent(OnboardingEvents.NO_ORGANIZATION);
+  }
 }
 
 /**
- * Get route for current state (compatibility with existing code)
+ * Get current route helper (backward compatibility)
  */
 export function getCurrentRoute(): string {
-  return useOnboardingStore.getState().getCurrentRoute();
+  const { currentState } = useOnboardingStore.getState();
+  const routeMap: Partial<Record<OnboardingStates, string>> = {
+    [OnboardingStates.ORGANIZATION_SETUP]: '/onboarding/organization',
+    [OnboardingStates.PROFILE_COMPLETION]: '/onboarding/profile',
+    [OnboardingStates.PREFERENCES_SETUP]: '/onboarding/preferences',
+    [OnboardingStates.ACCOUNT_SETUP]: '/onboarding/account',
+    [OnboardingStates.COMPLETE]: '/onboarding/complete',
+    [OnboardingStates.ERROR]: '/onboarding/error',
+  };
+  return routeMap[currentState] ?? '/onboarding';
 }
 
-// ========================================================================================
-// Exports
-// ========================================================================================
-
-// Note: Types and enums are already exported above in their definitions
+export type { OnboardingContext, OnboardingStore } from './types';
+/**
+ * Export everything for backward compatibility
+ */
+export { OnboardingEvents, OnboardingStates } from './types';

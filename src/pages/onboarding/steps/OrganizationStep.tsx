@@ -35,12 +35,8 @@ import {
   organizationSchema,
   organizationSizes,
 } from '@/lib/validations/onboarding';
-import {
-  useOnboardingActions,
-  useOnboardingCapabilities,
-  useOnboardingContext,
-  useOnboardingProgress,
-} from '@/store/onboarding/hooks';
+import { OnboardingEvents } from '@/store/onboarding';
+import { useOnboarding } from '@/store/onboarding/hooks';
 import type { OrganizationData } from '@/types/onboarding';
 import type { OrganizationDraft } from '@/utils/onboardingDrafts';
 import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
@@ -54,11 +50,7 @@ export function OrganizationStep({
   onComplete,
   onNext,
 }: OrganizationStepProps) {
-  // Use the new state machine hooks
-  const actions = useOnboardingActions();
-  const progress = useOnboardingProgress();
-  const context = useOnboardingContext();
-  const capabilities = useOnboardingCapabilities();
+  const { actions, context, capabilities, progress } = useOnboarding();
 
   // Initialize form with existing draft data
   const form = useForm<OrganizationFormData>({
@@ -112,8 +104,11 @@ export function OrganizationStep({
       // Clear any previous errors
       actions.clearErrors();
 
+      // TODO: make GraphQL mutation to create
       // Set organization data and complete the step
-      const success = actions.setOrganization(context.userId); // Set basic organization
+      const success = actions.sendEvent(OnboardingEvents.ORGANIZATION_CREATED, {
+        organizationId: '',
+      }); // Set basic organization
       actions.updateContext(data as Partial<typeof context>); // Update with form data
 
       if (success) {
@@ -311,7 +306,7 @@ export function OrganizationStep({
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
                       <span>
-                        {context.errors[context.errors.length - 1]?.error ??
+                        {context.errors[context.errors.length - 1]?.message ??
                           'An error occurred'}
                       </span>
                       <Button

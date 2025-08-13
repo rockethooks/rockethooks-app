@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { useOnboarding, useOnboardingState } from '@/store/onboarding/hooks';
+import { useOnboarding } from '@/store/onboarding/hooks';
 import { OnboardingErrorBoundary } from './components/OnboardingErrorBoundary';
 import { OnboardingFooter } from './components/OnboardingFooter';
 import { OnboardingHeader } from './components/OnboardingHeader';
@@ -28,8 +28,7 @@ export function OnboardingPage() {
   const navigate = useNavigate();
 
   // Use the new state machine hooks
-  const { currentRoute, context } = useOnboarding();
-  const stateChecks = useOnboardingState();
+  const { currentRoute, context, stateChecks } = useOnboarding();
 
   // Default to 'organization' if no step is provided or step is invalid
   const currentStep =

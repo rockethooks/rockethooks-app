@@ -57,7 +57,7 @@ export function OnboardingFlow() {
                 <div>
                   <p className="font-semibold">Latest Error:</p>
                   <p>
-                    {context.errors[context.errors.length - 1]?.error ??
+                    {context.errors[context.errors.length - 1]?.message ??
                       'Unknown error'}
                   </p>
                 </div>
@@ -365,8 +365,8 @@ export function OnboardingFlow() {
                     <strong>Errors:</strong>
                     <ul className="list-disc list-inside ml-4">
                       {context.errors.map((error) => (
-                        <li key={`${error.timestamp}-${error.state}`}>
-                          {error.timestamp}: {error.error} (State: {error.state}
+                        <li key={`${error.timestamp}-${error.code}`}>
+                          {error.timestamp}: {error.message} (Code: {error.code}
                           )
                         </li>
                       ))}

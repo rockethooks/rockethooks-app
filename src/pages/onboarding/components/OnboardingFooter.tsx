@@ -1,19 +1,14 @@
 import { ArrowRight, SkipForward } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import {
-  useOnboarding,
-  useOnboardingProgress,
-  useOnboardingState,
-} from '@/store/onboarding/hooks';
+import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 
 interface OnboardingFooterProps {
   currentStep: string;
 }
 
 export function OnboardingFooter({ currentStep }: OnboardingFooterProps) {
-  const { actions, capabilities } = useOnboarding();
+  const { actions, capabilities, stateChecks } = useOnboarding();
   const progress = useOnboardingProgress();
-  const stateChecks = useOnboardingState();
 
   // Don't show footer on completion step or dashboard
   if (

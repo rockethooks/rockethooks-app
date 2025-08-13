@@ -101,7 +101,8 @@ export type OnboardingStep =
   | 'profile'
   | 'preferences'
   | 'apiTarget'
-  | 'webhook';
+  | 'webhook'
+  | 'account';
 
 /**
  * Internal storage structure for draft data
@@ -213,6 +214,7 @@ const stepSchemas: Record<OnboardingStep, z.ZodType> = {
   preferences: preferencesSchema,
   apiTarget: apiTargetSchema,
   webhook: webhookSchema,
+  account: z.object({}), // Account step has no specific schema
 };
 
 // ========================================================================================
@@ -485,7 +487,28 @@ export function clearStepDraft(step: OnboardingStep): boolean {
  * @param options - Configuration options
  * @returns Auto-save result with status and controls
  */
-export function useAutoSaveDraft(
+export function useAutoSaveDraft(step: OnboardingStep | null): {
+  draftData: DraftData | null;
+  setDraftData: (data: DraftData | null) => void;
+} {
+  const [draftData, setDraftData] = useState<DraftData | null>(() => {
+    if (!step) return null;
+    return getDraft(step);
+  });
+
+  useEffect(() => {
+    if (!step) {
+      setDraftData(null);
+      return;
+    }
+    const draft = getDraft(step);
+    setDraftData(draft);
+  }, [step]);
+
+  return { draftData, setDraftData };
+}
+
+export function useAutoSaveDraftAdvanced(
   step: OnboardingStep,
   data: DraftData | undefined,
   options: {

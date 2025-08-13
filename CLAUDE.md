@@ -46,20 +46,14 @@ The project had Tailwind CSS v4.1.11 installed DO NEVER USE v3 configuration pat
 
 ## UI Components
 
-All ShadCN components available via `@/components/ui/`:
+- All ShadCN components available via `@/components/ui/`:
+- Use Shardcn MCP when working with ShadCN components.
 
 ```typescript
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 ```
-
-## Styling Guidelines
-
-- Use Tailwind utility classes
-- Mobile-first responsive design
-- Primary color: Indigo Blue (#6366f1)
-- Font: Inter family
 
 ## Testing Infrastructure
 
@@ -92,21 +86,18 @@ Detailed documentation available in `docs/` directory:
 - `legacy-docs/` - Folder containing legacy documentation, which is no longer maintained but may contain useful information
 
 ## Important Notes
-
+- **Coding Style**: Always read @eslint.config.js, @tsconfig.json, and @biome.json before starting any coding task.
 - **Error Handling**: Always implement error boundaries and graceful failures
 - **GraphQL**: Use Apollo Client error policy `'all'` for comprehensive error handling
 - **Playwright**: Use Playwright MCP for UI testing, validation and debugging
-- Before using Playwright MCP, make sure that server is running on port 8080, otherwise, you can use `yarn dev` to start the server on a custom port.
-- If you start a server on a custom port, make sure to do it in parallel
-- If you started the server on a custom port, make sure it's stopped when your task is done
 - **Documentation**: Keep all documentation up-to-date with code changes
 - When you add a document in `docs/`, ensure it is linked in section `## Reference Documentation` above.
 
 ## Playwright MCP Specific Notes
 - When running Playwright MCP, make sure that server is not already started before starting a new one.
 - **Parallel Server Management**: When running Playwright MCP, ensure to:
-  - Run the server in parallel mode
-  - Turn off the server once the task is completed
+- Run the server in parallel mode
+- Turn off the server once the task is completed
 
 
 

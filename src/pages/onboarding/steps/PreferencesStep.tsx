@@ -39,12 +39,7 @@ import {
   type PreferencesFormData,
   preferencesSchema,
 } from '@/lib/validations/onboarding';
-import {
-  useOnboardingActions,
-  useOnboardingCapabilities,
-  useOnboardingContext,
-  useOnboardingProgress,
-} from '@/store/onboarding/hooks';
+import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 import type { PreferencesDraft } from '@/utils/onboardingDrafts';
 import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
 
@@ -104,11 +99,8 @@ const alertFrequencies = [
 ] as const;
 
 export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
-  // Use the new state machine hooks
-  const actions = useOnboardingActions();
+  const { actions, capabilities, context } = useOnboarding();
   const progress = useOnboardingProgress();
-  const context = useOnboardingContext();
-  const capabilities = useOnboardingCapabilities();
 
   // Initialize form with existing draft data
   const form = useForm<PreferencesFormData>({
@@ -515,7 +507,7 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
                       <span>
-                        {context.errors[context.errors.length - 1]?.error ??
+                        {context.errors[context.errors.length - 1]?.message ??
                           'An error occurred'}
                       </span>
                       <Button
@@ -574,8 +566,8 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
 
       {/* Progress Indicator */}
       <div className="text-center text-sm text-muted-foreground">
-        Step {progress.currentStep} of {progress.totalSteps} (
-        {progress.percentage}% complete)
+        Step {progress.current} of {progress.total} ({progress.percentage}%
+        complete)
       </div>
     </div>
   );

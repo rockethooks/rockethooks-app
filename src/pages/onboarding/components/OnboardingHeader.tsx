@@ -3,11 +3,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
 import { cn } from '@/lib/utils';
-import {
-  useOnboarding,
-  useOnboardingProgress,
-  useOnboardingState,
-} from '@/store/onboarding/hooks';
+import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 
 const stepLabels = {
   organization: 'Organization Setup',
@@ -17,9 +13,8 @@ const stepLabels = {
 } as const;
 
 export function OnboardingHeader() {
-  const { actions, capabilities } = useOnboarding();
+  const { actions, capabilities, stateChecks } = useOnboarding();
   const progress = useOnboardingProgress();
-  const stateChecks = useOnboardingState();
 
   const currentStepKey = (() => {
     if (stateChecks.isOrgSetup) return 'organization';

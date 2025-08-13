@@ -313,7 +313,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
               <div className="flex items-center justify-between">
                 <span>
                   {error ??
-                    latestError?.error ??
+                    latestError ??
                     'An error occurred during completion'}
                 </span>
                 <Button
@@ -359,7 +359,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
       {/* Progress Indicator */}
       <div className="text-center">
         <div className="text-sm text-muted-foreground mb-2">
-          Step {progress.currentStep} of {progress.totalSteps} - Setup Complete!
+          Step {progress.current} of {progress.total} - Setup Complete!
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
