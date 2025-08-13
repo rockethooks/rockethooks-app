@@ -7,121 +7,312 @@
 
 This template contains essential shared patterns, standards, and guidelines that apply across ALL RocketHooks services and projects.
 Reading this file first ensures consistency and prevents duplication of common patterns.
+
 ---
 
-## Project Overview
+## Project: RocketHooks WebApp
 
-RocketHooks frontend - React-based SaaS platform for API monitoring and webhook management.
+### Overview
+RocketHooks frontend - React-based SaaS platform for API monitoring and webhook management with real-time features, OAuth authentication, and organization-based access control.
 
-**Architecture**: GraphQL APIs with Clerk authentication and Apollo Client for real-time features.
-** CSS ** Tailwind v4 for styling, ShadCN components for UI consistency, use Context7 MCP and Shadcn MCP before making any change.
-The project had Tailwind CSS v4.1.11 installed DO NEVER USE v3 configuration patterns, this will cause a complete CSS failure.
+## Technology Stack
+- **Language**: TypeScript 5.7.2 with strict mode enabled
+- **Framework**: React 19.0.0 with React Router 7.8.0
+- **State Management**: Zustand 5.0.7 with Immer for immutable updates
+- **UI Framework**: Tailwind CSS v4.1.11 + ShadCN components
+- **GraphQL Client**: Apollo Client 3.13.9
+- **Authentication**: Clerk 5.40.0 (OAuth with Google/GitHub)
+- **Build Tool**: Vite 6.0.1 with React plugin
+- **Package Manager**: Yarn (preferred over npm)
+- **Code Quality**: ESLint 9.15.0, Biome 2.1.3, TypeScript strict mode
+- **Git Hooks**: Lefthook for pre-commit and pre-push validation
+- **Testing**: Playwright for E2E (configured but no unit tests present)
+- **Component Development**: Storybook 8.6.14
 
-## Github Repository
-- [RocketHooks Frontend Webapp](https://github.com/rockethooks/rockethooks-app)
-- NEVER use `--no-verify` when pushing code, always fix linting errors before pushing code to the repository.
-
-
-## Authentication Integration
-
-### Clerk Setup
-**IMPORTANT**: Always use web fetch tool to read Clerk documentation when implementing authentication features: [Clerk React documentation](https://clerk.com/docs/quickstarts/react)
-
-- OAuth with Google and GitHub
-- User context and protected routes
-- Organization-based access control
-
-## Backend Integration
-
-- **GraphQL Endpoint**: `process.env.VITE_GRAPHQL_URL`
-- **Backend Location**: `/Users/adnene/Projects/RocketHooks/03_Back/rockethooks-api-service`
-- **Data Models**: `/Users/adnene/Projects/RocketHooks/03_Back/data-model`
-
-## Common Issues & Solutions
-
-- **Port conflicts**: Use `npm run debug` for port 8080
-- **Auth issues**: Check VITE_CLERK_PUBLISHABLE_KEY in .env
-- **GraphQL errors**: Verify token in network requests
-- **Build errors**: Run `npx tsc --noEmit` for TypeScript issues
-
-## UI Components
-
-- All ShadCN components available via `@/components/ui/`:
-- Use Shardcn MCP when working with ShadCN components.
-
-```typescript
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
+## Project Structure
 ```
+rockethooks-app/
+├── .claude/              # Claude-specific configurations
+├── .github/              # GitHub workflows and templates
+├── .serena/              # Serena MCP configurations
+├── .storybook/           # Storybook configuration
+├── dist/                 # Production build output
+├── docs/                 # Project documentation
+│   ├── authentication-flow-guide.md
+│   └── legacy-docs/      # Historical documentation
+├── logs/                 # Application logs
+├── mockups/              # UI mockups and designs
+├── node_modules/         # Dependencies
+├── public/               # Static assets
+└── src/                  # Source code
+    ├── components/       # React components
+    │   ├── auth/        # Authentication components
+    │   ├── onboarding/  # Onboarding flow components
+    │   ├── rockethooks/ # Domain-specific components
+    │   └── ui/          # ShadCN UI components
+    ├── config/          # Application configuration
+    ├── hooks/           # Custom React hooks
+    ├── layouts/         # Page layouts
+    ├── lib/             # Utility libraries
+    ├── pages/           # Route pages/views
+    ├── providers/       # React context providers
+    ├── router/          # React Router configuration
+    ├── services/        # API and external services
+    ├── shared/          # Shared utilities
+    ├── store/           # Zustand state stores
+    │   ├── app.store.ts
+    │   ├── auth.store.ts
+    │   └── onboarding/  # Onboarding state machine
+    ├── stories/         # Storybook stories
+    ├── styles/          # Global styles
+    ├── types/           # TypeScript type definitions
+    └── utils/           # Utility functions
+```
+
+## Key Conventions
+
+### Code Style
+- **File Naming**:
+  - React Components: PascalCase (e.g., `UserNav.tsx`, `DashboardLayout.tsx`)
+  - Hooks: camelCase with 'use' prefix (e.g., `useAuth.ts`, `useOnboarding.ts`)
+  - Context Files: PascalCase (e.g., `AuthContext.tsx`)
+  - Utilities: camelCase (e.g., `formatDate.ts`, `generateId.ts`)
+  - Styles: kebab-case (e.g., `themes.css`, `index.css`)
+  - Tests: Component name + `.test.tsx` or `.spec.tsx`
+  - Stories: Component name + `.stories.tsx`
+  - Index files: lowercase `index.ts` or `index.tsx`
+
+- **Import Patterns**:
+  - Use `@/` alias for src imports: `import { Button } from '@/components/ui/button'`
+  - Group imports: external libs → internal modules → relative paths
+  - Prefer named exports over default exports
+
+- **TypeScript Conventions**:
+  - Strict mode enabled with all strict checks
+  - Interfaces for object shapes, types for unions/primitives
+  - Explicit return types for functions
+  - No implicit any, unused variables, or unreachable code
+
+### State Management
+- **Zustand Stores**: Located in `src/store/`
+- **Immer Integration**: Used for immutable state updates
+- **Store Pattern**: Separate stores for different domains (auth, app, onboarding)
+- **DevTools**: Redux DevTools integration for debugging
+
+### Component Architecture
+- **ShadCN Components**: Pre-built UI components in `src/components/ui/`
+- **Domain Components**: Business logic components in `src/components/rockethooks/`
+- **Form Handling**: React Hook Form with Zod validation
+- **Error Boundaries**: Implement graceful error handling
+
+## Development Commands
+```bash
+# Install dependencies
+yarn install
+
+# Run development server (port 3000)
+yarn dev
+
+# Run development server on port 8080 (for testing)
+yarn debug
+
+# Build for production
+yarn build
+
+# Type checking
+yarn type-check
+
+# Linting and formatting
+yarn lint          # Run ESLint
+yarn lint:fix      # Fix ESLint issues
+yarn format        # Format with Biome
+yarn check         # Run Biome checks
+yarn check:fix     # Fix Biome issues
+
+# Quality check (runs type-check, biome, and eslint)
+yarn quality
+
+# Preview production build
+yarn preview
+
+# Storybook
+yarn storybook       # Run Storybook dev server
+yarn build-storybook # Build Storybook
+```
+
+## Environment Setup
+
+### Required Environment Variables
+Create `.env` from `.env.example`:
+
+### Configuration Files
+- `tsconfig.json`: TypeScript configuration with strict mode
+- `vite.config.ts`: Vite build configuration
+- `biome.json`: Biome formatter and linter settings
+- `eslint.config.js`: ESLint rules and plugins
+- `lefthook.yml`: Git hooks configuration
+- `postcss.config.js`: PostCSS configuration for Tailwind
+- `components.json`: ShadCN components configuration
+
+## Git Workflow
+
+### Branch Strategy
+- Feature branches: `feature/state-machine-components`
+- Main branch for production
+- Use conventional commits
+
+### Commit Conventions
+Enforced by Lefthook commit-msg hook:
+- Format: `type(scope): description`
+- Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`, `revert`
+- Example: `feat(auth): add OAuth login with GitHub`
+- Include issue number: `fix(onboarding): resolve draft persistence #63`
+
+### Git Hooks (Lefthook)
+**Pre-commit**:
+- TypeScript type checking
+- Biome formatting and linting
+- ESLint with auto-fix
+- Stages fixed files automatically
+
+**Pre-push**:
+- Full type check
+- Production build test
+- Complete linting
+- Security audit (moderate level)
 
 ## Testing Infrastructure
 
 ### End-to-End Testing with Playwright
+- **Setup**: `yarn test:e2e:install` (install browsers)
+- **Run Server**: `yarn debug` (port 8080 for testing)
+- **Test Coverage**:
+  - Authentication flows (OAuth, demo access)
+  - Onboarding process (multi-step forms)
+  - Error handling (GraphQL, network failures)
+  - Critical bug fixes (#35, #36, #37)
 
-The project uses Playwright for comprehensive E2E testing covering authentication flows, onboarding processes, and error handling scenarios.
+### Testing Guidelines
+- Use Playwright MCP for UI testing and validation
+- Run server in parallel mode during tests
+- Ensure server is stopped after test completion
+- No unit tests currently implemented
 
-#### Test Coverage
+## Important Patterns
 
-- **Authentication Flow**: OAuth login, demo access, session persistence
-- **Onboarding Process**: Multi-step form flows, draft saving/restoration
-- **Error Handling**: GraphQL errors, network failures, validation errors
-- **Edge Cases**: Browser compatibility, concurrent sessions, performance
-- **Critical Bugs**: Coverage for bugs #35, #36, #37
+### Authentication Flow
+- Clerk handles OAuth with Google/GitHub
+- Protected routes via `ProtectedRoute` component
+- Public routes via `PublicRoute` component
+- User context available through Clerk hooks
+- Organization-based access control
 
-#### Test Environment Setup
+### State Management
+- **Zustand stores** for global state
+- **React Context** for component trees
+- **Immer** for immutable updates
+- **Redux DevTools** for debugging
 
-1. **Start server**: `yarn debug` (runs on port 8080 for testing)
-2. **Environment**: Copy `.env.example` to `.env` with required keys
-3. **Browser Installation**: `yarn test:e2e:install`
+### Error Handling
+- Apollo Client error policy: `'all'`
+- Error boundaries for component failures
+- GraphQL error handling in mutations
+- Network failure recovery
+- Toast notifications for user feedback
+
+### API Integration
+- **GraphQL Endpoint**: `process.env.VITE_APPSYNC_GRAPHQL_URL`
+- **Apollo Client** for GraphQL operations
+- **WebSocket URL**: For real-time subscriptions
+- **Backend Location**: `/Users/adnene/Projects/RocketHooks/services/api-service`
+
+## Security Considerations
+- Never commit `.env` files
+- Use environment variables for secrets
+- Clerk handles authentication security
+- Input validation with Zod schemas
+- HTTPS only in production
+- No `--no-verify` flag when pushing code
+
+## CSS and Styling
+
+### Tailwind CSS v4
+**CRITICAL**: Project uses Tailwind CSS v4.1.11
+- **DO NOT** use v3 configuration patterns
+- All styling must be v4 compatible
+- Use Tailwind Vite plugin for processing
+
+### ShadCN Components
+- Pre-configured UI components in `@/components/ui/`
+- Use ShadCN MCP for component management
+- Consistent theming with CSS variables
+- Dark mode support via next-themes
+
+## MCP Tools Integration
+- **Serena MCP**: For codebase analysis and memory
+- **ShadCN MCP**: For UI component management
+- **Context7 MCP**: For library documentation
+- **Playwright MCP**: For E2E testing
+- **DynamoDB MCP**: For database operations
+
+## Common Issues & Solutions
+- **Port conflicts**: Use `yarn debug` for port 8080
+- **Auth issues**: Check `VITE_CLERK_PUBLISHABLE_KEY` in `.env`
+- **GraphQL errors**: Verify token in network requests
+- **Build errors**: Run `npx tsc --noEmit` for TypeScript issues
+- **CSS failures**: Ensure Tailwind v4 compatibility
+
+## Deployment
+- Build: `yarn build` creates production bundle in `dist/`
+- Target: ES2022 for modern browsers
+- Source maps enabled for debugging
+- Static hosting compatible
+
+## Performance Optimizations
+- Code splitting with React.lazy
+- Route-based code splitting
+- Optimized bundle size with Vite
+- Tree shaking for unused code
+
+## Additional Notes
+
+### React Development
+- Prevent infinite re-renders in hooks/useEffect
+- Always fix TypeScript errors (even non-blocking)
+- Use React 19 features appropriately
+
+### GraphQL Development
+- Check backend implementation in `/Users/adnene/Projects/RocketHooks/services/api-service`
+- Use Apollo Client error handling
+- Implement optimistic updates where appropriate
+
+### Documentation
+- Keep docs up-to-date with code changes
+- Link new docs in the Reference Documentation section
+- Use Context7 MCP for library usage guidance
+
+### Code Quality Requirements
+- Must pass `yarn quality` before committing
+- No TypeScript errors allowed
+- Follow ESLint and Biome rules
+- Maintain consistent code style
+
+## GitHub Repository
+- Repository: [rockethooks/rockethooks-app](https://github.com/rockethooks/rockethooks-app)
+- Always fix linting errors before pushing
+- Use conventional commits
+- Include issue numbers in commits
 
 ## Reference Documentation
-
 Detailed documentation available in `docs/` directory:
 
 ### Authentication & Security
 - `authentication-flow-guide.md` - Complete guide to authentication flows, route guards, and user journey
 
 ### General Documentation
-- `legacy-docs/` - Folder containing legacy documentation, which is no longer maintained but may contain useful information
+- `legacy-docs/` - Historical documentation (no longer maintained)
 
-## Important Notes
-- **Coding Style**: Always read @eslint.config.js, @tsconfig.json, and @biome.json before starting any coding task.
-- **Error Handling**: Always implement error boundaries and graceful failures
-- **GraphQL**: Use Apollo Client error policy `'all'` for comprehensive error handling
-- **Playwright**: Use Playwright MCP for UI testing, validation and debugging
-- **Documentation**: Keep all documentation up-to-date with code changes
-- When you add a document in `docs/`, ensure it is linked in section `## Reference Documentation` above.
+---
 
-## Playwright MCP Specific Notes
-- When running Playwright MCP, make sure that server is not already started before starting a new one.
-- **Parallel Server Management**: When running Playwright MCP, ensure to:
-- Run the server in parallel mode
-- Turn off the server once the task is completed
-
-
-
-## Library Usage Guidelines
-
-- When using any library in the project, make sure to use Context7 MCP to check if any information is available about the library and see how to use the library
-
-## GraphQL Development Notes
-
-- **Backend GraphQL Implementation Check**: To check if a GraphQL mutation or query is implemented on the backend refer to project `/Users/adnene/Projects/RocketHooks/services/api-service`
-
-## React Development Notes
-
-- When creating or editing hooks, useEffect, or any other React features make sure the dependency can not cause infinite re-renders
-- Always fix typescript errors even if they are not blocking
-
-## File Naming Conventions
-
-- **React Components**: Use PascalCase for all component files (e.g., `AuthCallback.tsx`, `DashboardLayout.tsx`, `UserNav.tsx`)
-- **Hooks**: Use camelCase for custom hooks (e.g., `useAuth.ts`, `useOnboarding.ts`)
-- **Context Files**: Use PascalCase for context files (e.g., `AuthContext.tsx`, `OnboardingContext.tsx`)
-- **Non-component TypeScript/JavaScript**: Use camelCase for utility functions and non-component files (e.g., `formatDate.ts`, `generateId.ts`)
-- **Style Files**: Use kebab-case for CSS files (e.g., `themes.css`, `index.css`)
-- **Test Files**: Match the component name with `.test.tsx` or `.spec.tsx` suffix
-- **Story Files**: Use PascalCase matching the component name with `.stories.tsx` suffix (e.g., `Button.stories.tsx`)
-- **Index Files**: Always use lowercase `index.ts` or `index.tsx`
-- Whenever you change a css make sure it's compatible with Tailwind v4 and ShadCN components
+**Last Updated**: August 2025
+**Maintained By**: RocketHooks Development Team
