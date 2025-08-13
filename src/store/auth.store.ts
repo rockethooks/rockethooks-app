@@ -113,7 +113,8 @@ interface AuthStoreState {
   isAuthenticated: boolean;
   user: User | null;
   sessionId: string | null;
-  token: string | null;
+  // Token management is handled entirely by Clerk's getToken() method
+  // which provides automatic refresh and caching. See Apollo auth link.
 
   // Extended state
   profile: Profile | null;
@@ -219,7 +220,6 @@ export const useAuthStore = create<AuthStoreState>()(
         isAuthenticated: false,
         user: null,
         sessionId: null,
-        token: null,
 
         // Initial extended state
         profile: null,
@@ -239,7 +239,8 @@ export const useAuthStore = create<AuthStoreState>()(
               isAuthenticated: true,
               user,
               sessionId,
-              token: null, // Token is managed by Clerk internally
+              // Token management is handled entirely by Clerk's getToken() method
+              // which provides automatic refresh and caching. See Apollo auth link.
             },
             false,
             'auth/setAuthenticated'
@@ -252,7 +253,6 @@ export const useAuthStore = create<AuthStoreState>()(
               isAuthenticated: false,
               user: null,
               sessionId: null,
-              token: null,
             },
             false,
             'auth/setUnauthenticated'
@@ -265,7 +265,6 @@ export const useAuthStore = create<AuthStoreState>()(
               isAuthenticated: false,
               user: null,
               sessionId: null,
-              token: null,
               profile: null,
               preferences: null,
               onboarding: null,
