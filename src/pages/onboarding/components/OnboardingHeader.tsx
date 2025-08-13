@@ -2,21 +2,12 @@ import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import { cn } from '@/lib/utils';
-import type { OnboardingProgress } from '@/types/onboarding';
-
-interface OnboardingHeaderProps {
-  progress: OnboardingProgress;
-  navigation: {
-    isFirstStep: boolean;
-    isLastStep: boolean;
-    currentRoute: string;
-    canGoBack: boolean;
-    canSkip: boolean;
-    canProceed: boolean;
-  };
-}
+import {
+  useOnboarding,
+  useOnboardingProgress,
+  useOnboardingState,
+} from '@/store/onboarding/hooks';
 
 const stepLabels = {
   organization: 'Organization Setup',
@@ -25,25 +16,17 @@ const stepLabels = {
   complete: 'Complete Setup',
 } as const;
 
-export function OnboardingHeader({
-  progress,
-  navigation,
-}: OnboardingHeaderProps) {
-  const { goBack, currentState } = useOnboarding();
+export function OnboardingHeader() {
+  const { actions, capabilities } = useOnboarding();
+  const progress = useOnboardingProgress();
+  const stateChecks = useOnboardingState();
 
   const currentStepKey = (() => {
-    switch (currentState.type) {
-      case 'ORGANIZATION_SETUP':
-        return 'organization';
-      case 'PROFILE_COMPLETION':
-        return 'profile';
-      case 'PREFERENCES':
-        return 'preferences';
-      case 'COMPLETION':
-        return 'complete';
-      default:
-        return 'organization';
-    }
+    if (stateChecks.isOrgSetup) return 'organization';
+    if (stateChecks.isProfile) return 'profile';
+    if (stateChecks.isPreferences) return 'preferences';
+    if (stateChecks.isCompletion) return 'complete';
+    return 'organization'; // default
   })();
 
   const currentStepLabel = stepLabels[currentStepKey];
@@ -54,11 +37,11 @@ export function OnboardingHeader({
         <div className="flex items-center justify-between">
           {/* Back Button and Title */}
           <div className="flex items-center gap-4">
-            {navigation.canGoBack && (
+            {capabilities.canGoBack && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={goBack}
+                onClick={actions.goBack}
                 className="gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />

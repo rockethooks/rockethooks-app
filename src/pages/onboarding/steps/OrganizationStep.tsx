@@ -29,15 +29,21 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   getOrganizationSizeLabel,
   type OrganizationFormData,
   organizationSchema,
   organizationSizes,
 } from '@/lib/validations/onboarding';
+import {
+  useOnboardingActions,
+  useOnboardingCapabilities,
+  useOnboardingContext,
+  useOnboardingProgress,
+} from '@/store/onboarding/hooks';
 import type { OrganizationData } from '@/types/onboarding';
 import type { OrganizationDraft } from '@/utils/onboardingDrafts';
+import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
 
 export interface OrganizationStepProps {
   onComplete?: () => void;
@@ -48,21 +54,11 @@ export function OrganizationStep({
   onComplete,
   onNext,
 }: OrganizationStepProps) {
-  // Use the new onboarding hook instead of directly accessing stores
-  const {
-    draft,
-    saveDraft,
-    autoSave,
-    completeStep,
-    skipStep,
-    goBack,
-    canProceed,
-    isFirstStep,
-    hasErrors,
-    latestError,
-    clearErrors,
-    progress,
-  } = useOnboarding();
+  // Use the new state machine hooks
+  const actions = useOnboardingActions();
+  const progress = useOnboardingProgress();
+  const context = useOnboardingContext();
+  const capabilities = useOnboardingCapabilities();
 
   // Initialize form with existing draft data
   const form = useForm<OrganizationFormData>({
@@ -86,7 +82,7 @@ export function OrganizationStep({
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as OrganizationDraft | null;
+    const existingDraft = getDraft('organization') as OrganizationDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
@@ -97,7 +93,7 @@ export function OrganizationStep({
       if (existingDraft.description)
         setValue('description', existingDraft.description);
     }
-  }, [setValue, draft]);
+  }, [setValue]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -106,52 +102,54 @@ export function OrganizationStep({
         (key) => formData[key as keyof typeof formData]
       )
     ) {
-      saveDraft(formData as OrganizationData);
+      saveDraft('organization', formData as OrganizationData);
     }
-  }, [formData, saveDraft]);
+  }, [formData]);
 
   // Handle form submission
   const handleSubmit = (data: OrganizationFormData) => {
     try {
       // Clear any previous errors
-      clearErrors();
+      actions.clearErrors();
 
-      // Complete the step using the state machine
-      const success = completeStep(data as OrganizationData);
+      // Set organization data and complete the step
+      const success = actions.setOrganization(context.userId); // Set basic organization
+      actions.updateContext(data as Partial<typeof context>); // Update with form data
 
       if (success) {
+        // Complete the organization step
+        actions.completeOrganization();
+
         // Call completion callbacks for backward compatibility
         onComplete?.();
-        if (onNext) {
-          onNext();
-        }
+        onNext?.();
       } else {
-        // Error handling is managed by the state machine
         console.error('Failed to complete organization step');
       }
     } catch (error) {
       console.error('Failed to complete organization step:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      actions.addError(errorMessage);
     }
   };
 
   // Handle skip action
   const handleSkip = () => {
-    skipStep();
+    actions.skip();
 
     // Call completion callbacks for backward compatibility
     onComplete?.();
-    if (onNext) {
-      onNext();
-    }
+    onNext?.();
   };
 
   // Handle back navigation
   const handleBack = () => {
-    goBack();
+    actions.goBack();
   };
 
   // Check if form is valid and we can proceed
-  const canSubmit = isValid && canProceed;
+  const canSubmit = isValid && capabilities.canProceed;
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -307,50 +305,20 @@ export function OrganizationStep({
                 )}
               />
 
-              {/* Save Status and Error Handling */}
+              {/* Error Handling */}
               <div className="space-y-2">
-                {(hasErrors || latestError) && (
+                {context.errors.length > 0 && (
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
-                      <span>{latestError?.error ?? 'An error occurred'}</span>
+                      <span>
+                        {context.errors[context.errors.length - 1]?.error ??
+                          'An error occurred'}
+                      </span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={clearErrors}
-                        aria-label="Dismiss error"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  </Alert>
-                )}
-
-                {autoSave.isSaving && (
-                  <div className="text-sm text-muted-foreground flex items-center gap-2">
-                    <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />
-                    Saving progress...
-                  </div>
-                )}
-
-                {autoSave.lastSaved &&
-                  !autoSave.isSaving &&
-                  !autoSave.error && (
-                    <div className="text-sm text-muted-foreground">
-                      Progress saved at{' '}
-                      {autoSave.lastSaved.toLocaleTimeString()}
-                    </div>
-                  )}
-
-                {autoSave.error && (
-                  <Alert variant="destructive">
-                    <div className="flex items-center justify-between">
-                      <span>Failed to save progress: {autoSave.error}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={autoSave.clearError}
+                        onClick={actions.clearErrors}
                         aria-label="Dismiss error"
                       >
                         ×
@@ -374,15 +342,21 @@ export function OrganizationStep({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  {!isFirstStep && (
+                  {capabilities.canGoBack && (
                     <Button type="button" variant="ghost" onClick={handleBack}>
                       Back
                     </Button>
                   )}
 
-                  <Button type="button" variant="outline" onClick={handleSkip}>
-                    Skip for now
-                  </Button>
+                  {capabilities.canSkip && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSkip}
+                    >
+                      Skip for now
+                    </Button>
+                  )}
 
                   <Button
                     type="submit"
@@ -399,12 +373,10 @@ export function OrganizationStep({
       </Card>
 
       {/* Progress Indicator */}
-      {progress.percentage && (
-        <div className="text-center text-sm text-muted-foreground">
-          Step {progress.currentStep} of {progress.totalSteps} (
-          {progress.percentage}% complete)
-        </div>
-      )}
+      <div className="text-center text-sm text-muted-foreground">
+        Step {progress.currentStep} of {progress.totalSteps} (
+        {progress.percentage}% complete)
+      </div>
     </div>
   );
 }
