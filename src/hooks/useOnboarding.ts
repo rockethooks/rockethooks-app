@@ -5,14 +5,13 @@ import { useAuthStore } from '@/store/auth.store';
 import {
   getCurrentRoute,
   initializeOnboarding,
+  OnboardingEvents,
+  OnboardingStates,
   useOnboardingStore,
-} from '@/store/onboarding.store';
-import type { OrganizationData } from '@/types/onboarding';
-import { OnboardingEvent } from '@/types/onboarding';
+} from '@/store/onboarding';
 import {
   clearStepDraft,
   type DraftData,
-  getDraft,
   type OnboardingStep,
   saveDraft,
   useAutoSaveDraft,
@@ -48,372 +47,233 @@ interface UseOnboardingOptions {
  * - State machine navigation and flow control
  * - Draft data persistence and auto-save
  * - Integration with existing auth store
- * - Automatic navigation based on state changes
  */
 export function useOnboarding(options: UseOnboardingOptions = {}) {
   const { autoInitialize = true, autoNavigate = true, debug = false } = options;
 
-  const navigate = useNavigate();
-  const { isLoaded, orgId } = useAuth();
+  // External hooks
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
   const { user } = useUser();
+  const navigate = useNavigate();
 
-  // State machine store
-  const {
-    currentState,
-    context,
-    sendEvent,
-    canTransition,
-    reset,
-    goBack,
-    skip,
-    canGoBack,
-    canSkip,
-    getProgress,
-    addError,
-    clearErrors,
-  } = useOnboardingStore();
+  // Store hooks
+  const authStore = useAuthStore();
+  const store = useOnboardingStore();
 
-  // Auth store for legacy compatibility
-  const { completeOnboardingStep, updateProfile } = useAuthStore();
-
-  // Get current step name for draft system
-  const currentStepName = useMemo((): OnboardingStep | null => {
-    switch (currentState.type) {
-      case 'ORGANIZATION_SETUP':
-        return 'organization';
-      case 'PREFERENCES':
-        return 'preferences';
-      // Add other steps as they're implemented
-      default:
-        return null;
-    }
-  }, [currentState.type]);
-
-  // Get draft data for current step
-  const draft = useMemo(() => {
-    return currentStepName ? getDraft(currentStepName) : null;
-  }, [currentStepName]);
-
-  // Auto-save hook for current step
-  const autoSave = useAutoSaveDraft(
-    currentStepName ?? 'organization', // fallback to valid step name
-    draft ?? undefined,
-    { enabled: !!currentStepName }
-  );
-
-  // Combined initialization and navigation effect for better performance
+  // Initialize state machine when auth is ready
   useEffect(() => {
-    // Initialize state machine on mount
-    if (autoInitialize && isLoaded && user) {
-      // Only initialize if we haven't started or if user changed
-      if (currentState.type === 'START' || context.userId !== user.id) {
-        if (debug) {
-          console.log(
-            '[useOnboarding] Initializing state machine for user:',
-            user.id
-          );
-        }
+    if (!autoInitialize || !authLoaded) return;
 
-        initializeOnboarding(user.id, orgId ?? undefined);
-      }
-    }
+    if (isSignedIn && user) {
+      const organizationId = user.publicMetadata.organizationId as
+        | string
+        | undefined;
+      initializeOnboarding(user.id, organizationId);
 
-    // Auto-navigation based on state changes
-    if (autoNavigate) {
-      const targetRoute = getCurrentRoute(currentState);
-      const currentPath = window.location.pathname;
-
-      // Only navigate if we're not already on the target route
-      if (
-        targetRoute !== currentPath &&
-        currentState.type !== 'START' &&
-        currentState.type !== 'CHECK_ORGANIZATION'
-      ) {
-        if (debug) {
-          console.log(
-            '[useOnboarding] Auto-navigating from',
-            currentPath,
-            'to',
-            targetRoute
-          );
-        }
-        void navigate(targetRoute);
-      }
-    }
-
-    // Sync with auth store for legacy compatibility
-    if (context.completedSteps.size > 0) {
-      const completedArray = Array.from(context.completedSteps);
-
-      // Sync completed steps with auth store
-      completedArray.forEach((stepName) => {
-        completeOnboardingStep(stepName);
-      });
-    }
-  }, [
-    autoInitialize,
-    autoNavigate,
-    isLoaded,
-    user,
-    orgId,
-    currentState,
-    context.userId,
-    context.completedSteps,
-    navigate,
-    completeOnboardingStep,
-    debug,
-  ]);
-
-  // Complete current step
-  const completeStep = useCallback(
-    (data?: DraftData) => {
-      const eventMap = {
-        ORGANIZATION_SETUP: OnboardingEvent.ORGANIZATION_CREATED,
-        PROFILE_COMPLETION: OnboardingEvent.PROFILE_COMPLETED,
-        PREFERENCES: OnboardingEvent.PREFERENCES_SAVED,
-        COMPLETION: OnboardingEvent.COMPLETE,
-      };
-
-      const event = eventMap[currentState.type as keyof typeof eventMap];
-
-      try {
-        // Save final draft data if provided
-        if (data && currentStepName) {
-          saveDraft(currentStepName, data);
-        }
-
-        // Send state machine event
-        const success = sendEvent(event, data as Record<string, unknown>);
-
-        if (success) {
-          // Clear draft on successful transition
-          if (currentStepName) {
-            clearStepDraft(currentStepName);
-          }
-
-          // Handle specific step completion logic
-          if (currentState.type === 'ORGANIZATION_SETUP' && data) {
-            // Update profile with organization information
-            const orgData = data as OrganizationData;
-            updateProfile({
-              company: orgData.name,
-            });
-          }
-
-          if (debug) {
-            console.log(
-              '[useOnboarding] Step completed successfully:',
-              currentState.type
-            );
-          }
-        }
-
-        return success;
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : 'Unknown error occurred';
-        addError(errorMessage);
-        sendEvent(OnboardingEvent.ERROR_OCCURRED, {
-          error: errorMessage,
-          previousState: currentState,
+      if (debug) {
+        console.log('[useOnboarding] Initialized with:', {
+          userId: user.id,
+          organizationId,
+          currentState: store.currentState,
         });
-
-        if (debug) {
-          console.error('[useOnboarding] Step completion failed:', error);
-        }
-
-        return false;
       }
-    },
-    [currentState, currentStepName, sendEvent, addError, updateProfile, debug]
-  );
+    }
+  }, [authLoaded, isSignedIn, user, autoInitialize, debug, store.currentState]);
 
-  // Skip current step
-  const skipStep = useCallback(() => {
-    if (!canSkip()) {
+  // Auto-navigation based on state changes
+  useEffect(() => {
+    if (!autoNavigate) return;
+
+    const route = getCurrentRoute();
+    const currentPath = window.location.pathname;
+
+    if (route !== currentPath) {
       if (debug) {
-        console.warn(
-          '[useOnboarding] Cannot skip current step:',
-          currentState.type
-        );
+        console.log('[useOnboarding] Navigating:', {
+          from: currentPath,
+          to: route,
+          state: store.currentState,
+        });
       }
-      return false;
+      void navigate(route);
     }
+  }, [store.currentState, autoNavigate, navigate, debug]);
 
-    const success = skip();
+  // Helper to get current step name for draft system
+  const currentStep = useMemo((): OnboardingStep => {
+    const stepMap: Record<OnboardingStates, OnboardingStep> = {
+      [OnboardingStates.ORGANIZATION_SETUP]: 'organization',
+      [OnboardingStates.PROFILE_COMPLETION]: 'profile',
+      [OnboardingStates.PREFERENCES_SETUP]: 'preferences',
+      [OnboardingStates.ACCOUNT_SETUP]: 'account',
+      [OnboardingStates.START]: 'organization',
+      [OnboardingStates.CHECK_ORGANIZATION]: 'organization',
+      [OnboardingStates.COMPLETE]: 'organization',
+      [OnboardingStates.ERROR]: 'organization',
+    };
+    return stepMap[store.currentState];
+  }, [store.currentState]);
 
-    if (success && currentStepName) {
-      // Clear draft when skipping
-      clearStepDraft(currentStepName);
+  // Draft management
+  const { draftData, setDraftData } = useAutoSaveDraft(currentStep);
 
-      if (debug) {
-        console.log('[useOnboarding] Step skipped:', currentState.type);
-      }
-    }
-
-    return success;
-  }, [canSkip, skip, currentStepName, currentState.type, debug]);
-
-  // Go to previous step
-  const goToPreviousStep = useCallback(() => {
-    if (!canGoBack()) {
-      if (debug) {
-        console.warn(
-          '[useOnboarding] Cannot go back from current step:',
-          currentState.type
-        );
-      }
-      return false;
-    }
-
-    const success = goBack();
-
-    if (debug && success) {
-      console.log('[useOnboarding] Went back from:', currentState.type);
-    }
-
-    return success;
-  }, [canGoBack, goBack, currentState.type, debug]);
-
-  // Save draft data
   const saveDraftData = useCallback(
     (data: DraftData) => {
-      if (!currentStepName) {
-        if (debug) {
-          console.warn(
-            '[useOnboarding] No current step name, cannot save draft'
-          );
-        }
-        return false;
-      }
-
-      const success = saveDraft(currentStepName, data);
+      setDraftData(data);
+      saveDraft(currentStep, data);
 
       if (debug) {
-        console.log(
-          '[useOnboarding] Draft saved for step:',
-          currentStepName,
-          success
-        );
+        console.log('[useOnboarding] Draft saved:', {
+          step: currentStep,
+          data,
+        });
       }
-
-      return success;
     },
-    [currentStepName, debug]
+    [currentStep, setDraftData, debug]
   );
 
-  // Check if we can proceed to next step
-  const canProceed = useMemo(() => {
-    const nextEvent = (() => {
-      switch (currentState.type) {
-        case 'ORGANIZATION_SETUP':
-          return OnboardingEvent.ORGANIZATION_CREATED;
-        case 'PROFILE_COMPLETION':
-          return OnboardingEvent.PROFILE_COMPLETED;
-        case 'PREFERENCES':
-          return OnboardingEvent.PREFERENCES_SAVED;
-        case 'COMPLETION':
-          return OnboardingEvent.COMPLETE;
-        default:
-          return null;
-      }
-    })();
-
-    return nextEvent ? canTransition(nextEvent) : false;
-  }, [currentState.type, canTransition]);
-
-  // Progress information
-  const progress = useMemo(() => getProgress(), [getProgress]);
-
-  // Navigation helpers
-  const navigation = useMemo(
-    () => ({
-      isFirstStep:
-        currentState.type === 'ORGANIZATION_SETUP' &&
-        !context.skippedSteps.has('organization'),
-      isLastStep: currentState.type === 'COMPLETION',
-      currentRoute: getCurrentRoute(currentState),
-      canGoBack: canGoBack(),
-      canSkip: canSkip(),
-      canProceed,
-    }),
-    [currentState, context.skippedSteps, canGoBack, canSkip, canProceed]
-  );
-
-  // Error handling
-  const hasErrors = context.errors.length > 0;
-  const latestError = hasErrors
-    ? context.errors[context.errors.length - 1]
-    : null;
-
-  // Recovery from errors
-  const retry = useCallback(() => {
-    clearErrors();
-    return sendEvent(OnboardingEvent.RETRY);
-  }, [clearErrors, sendEvent]);
-
-  // Reset onboarding
-  const resetOnboarding = useCallback(() => {
-    reset();
-
-    // Clear all drafts
-    const steps: OnboardingStep[] = [
-      'organization',
-      'preferences',
-      'apiTarget',
-      'webhook',
-    ];
-    steps.forEach((step) => clearStepDraft(step));
+  const clearDraft = useCallback(() => {
+    clearStepDraft(currentStep);
+    setDraftData(null);
 
     if (debug) {
-      console.log('[useOnboarding] Onboarding reset');
+      console.log('[useOnboarding] Draft cleared:', currentStep);
     }
-  }, [reset, debug]);
+  }, [currentStep, setDraftData, debug]);
+
+  // Navigation actions
+  const completeStep = useCallback(
+    (data?: DraftData) => {
+      let event: OnboardingEvents | null = null;
+
+      switch (store.currentState) {
+        case OnboardingStates.ORGANIZATION_SETUP:
+          event = OnboardingEvents.ORGANIZATION_CREATED;
+          break;
+        case OnboardingStates.PROFILE_COMPLETION:
+          event = OnboardingEvents.PROFILE_COMPLETED;
+          break;
+        case OnboardingStates.PREFERENCES_SETUP:
+          event = OnboardingEvents.PREFERENCES_SAVED;
+          break;
+        case OnboardingStates.ACCOUNT_SETUP:
+          event = OnboardingEvents.ACCOUNT_COMPLETED;
+          break;
+      }
+
+      if (event) {
+        const success = store.sendEvent(event, data);
+        if (success) {
+          clearDraft();
+        }
+        return success;
+      }
+      return false;
+    },
+    [store, clearDraft]
+  );
+
+  const skipStep = useCallback(() => {
+    const success = store.skip();
+    if (success) {
+      clearDraft();
+    }
+    return success;
+  }, [store, clearDraft]);
+
+  const goBack = useCallback(() => {
+    return store.goBack();
+  }, [store]);
+
+  const handleError = useCallback(
+    (error: string) => {
+      store.addError(error);
+      store.sendEvent(OnboardingEvents.ERROR, { error });
+    },
+    [store]
+  );
+
+  // Progress tracking
+  const progress = useMemo(() => {
+    const progressData = store.getProgress();
+    return {
+      ...progressData,
+      isFirstStep: progressData.current === 1,
+      isLastStep: progressData.current === progressData.total,
+      stepsRemaining: progressData.total - progressData.current,
+    };
+  }, [store]);
+
+  // State checks
+  const stateChecks = useMemo(
+    () => ({
+      isStart: store.currentState === OnboardingStates.START,
+      isCheckingOrganization:
+        store.currentState === OnboardingStates.CHECK_ORGANIZATION,
+      isOrgSetup: store.currentState === OnboardingStates.ORGANIZATION_SETUP,
+      isProfile: store.currentState === OnboardingStates.PROFILE_COMPLETION,
+      isPreferences: store.currentState === OnboardingStates.PREFERENCES_SETUP,
+      isAccount: store.currentState === OnboardingStates.ACCOUNT_SETUP,
+      isComplete: store.currentState === OnboardingStates.COMPLETE,
+      isError: store.currentState === OnboardingStates.ERROR,
+      needsOnboarding: !store.context.isComplete && isSignedIn,
+    }),
+    [store.currentState, store.context.isComplete, isSignedIn]
+  );
+
+  // Capabilities
+  const capabilities = useMemo(
+    () => ({
+      canGoBack: store.canGoBack(),
+      canSkip: store.canSkip(),
+      canProceed: !!currentStep,
+    }),
+    [store, currentStep]
+  );
 
   return {
-    // State
-    currentState,
-    context,
+    // Current state
+    currentState: store.currentState,
+    context: store.context,
+
+    // State checks
+    ...stateChecks,
+
+    // Progress
     progress,
-    navigation,
+
+    // Capabilities
+    ...capabilities,
 
     // Draft management
-    draft,
-    saveDraft: saveDraftData,
-    autoSave,
+    draftData,
+    saveDraftData,
+    clearDraft,
 
     // Actions
     completeStep,
     skipStep,
-    goBack: goToPreviousStep,
-    retry,
-    reset: resetOnboarding,
+    goBack,
+    handleError,
+    reset: store.reset,
+    clearErrors: store.clearErrors,
 
-    // Status checks
-    canProceed,
-    isLoading: !isLoaded || currentState.type === 'CHECK_ORGANIZATION',
+    // Error helpers (for backward compatibility)
+    hasErrors: store.context.errors.length > 0,
+    latestError: store.context.errors[store.context.errors.length - 1]?.message,
 
-    // Error handling
-    hasErrors,
-    errors: context.errors,
-    latestError,
-    clearErrors,
+    // Utilities
+    currentStep,
+    getCurrentRoute,
 
-    // Legacy compatibility - map to existing patterns
-    onComplete: completeStep,
-    onNext: completeStep,
-    isFirstStep: navigation.isFirstStep,
-    isLastStep: navigation.isLastStep,
-
-    // Debug info (only included if debug enabled)
-    ...(debug && {
-      debug: {
-        currentState,
-        context,
-        transitions: useOnboardingStore
-          .getState()
-          .transitions.filter((t) => t.from === currentState.type),
-      },
-    }),
+    // Debug info
+    debug: debug
+      ? {
+          store: store,
+          authStore: authStore,
+          currentStep,
+          draftData,
+        }
+      : undefined,
   };
 }

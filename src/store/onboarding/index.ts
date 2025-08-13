@@ -1,48 +1,36 @@
-import type { OnboardingState } from '@/types/onboarding';
-import { OnboardingEvent } from '@/types/onboarding';
-import { getStepConfig } from './config';
-import { useOnboardingStore } from './store';
+/**
+ * Onboarding state machine module exports
+ *
+ * This module provides a complete state machine implementation for onboarding flow
+ * using Zustand with modular architecture for better maintainability
+ */
 
+// Actions (for testing or custom usage)
+export * as actions from './actions';
+// Configuration helpers
 export {
-  getOrderedStepConfigs,
+  calculateTotalSteps,
+  getRequiredSteps,
+  getSkippableSteps,
   getStepConfig,
-  stepConfigs as onboardingStepConfigs,
+  getStepConfigByState,
 } from './config';
-// Re-export everything from the modular structure
-export { useOnboardingStore } from './store';
-export { transitions } from './transitions';
-export * from './utils';
-
-// ========================================================================================
-// Helper Functions and Exports
-// ========================================================================================
-
-/**
- * Initialize onboarding for a user
- */
-export function initializeOnboarding(userId: string, organizationId?: string) {
-  const store = useOnboardingStore.getState();
-
-  store.updateContext({
-    userId,
-    organizationId: organizationId ?? null,
-  });
-
-  // Start the flow
-  store.sendEvent(OnboardingEvent.BEGIN);
-
-  // Skip organization setup if user already has an organization
-  if (organizationId) {
-    store.sendEvent(OnboardingEvent.HAS_ORGANIZATION);
-  } else {
-    store.sendEvent(OnboardingEvent.NO_ORGANIZATION);
-  }
-}
-
-/**
- * Get route for current state
- */
-export function getCurrentRoute(state: OnboardingState): string {
-  const config = getStepConfig(state.type);
-  return config?.route ?? '/onboarding/organization';
-}
+// Guards (for testing or custom usage)
+export * as guards from './guards';
+// Main store and initialization
+export {
+  getCurrentRoute,
+  initializeOnboarding,
+  useOnboardingStore,
+} from './machine';
+// Transitions (for visualization or debugging)
+export { findTransition, getAvailableTransitions } from './transitions';
+export type {
+  OnboardingContext,
+  OnboardingEventPayload,
+  OnboardingStore,
+  StepConfig,
+  TransitionConfig,
+} from './types';
+// Types
+export { OnboardingEvents, OnboardingStates } from './types';

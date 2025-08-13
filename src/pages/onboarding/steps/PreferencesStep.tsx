@@ -35,12 +35,13 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { Switch } from '@/components/ui/Switch';
-import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   type PreferencesFormData,
   preferencesSchema,
 } from '@/lib/validations/onboarding';
+import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 import type { PreferencesDraft } from '@/utils/onboardingDrafts';
+import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
 
 export interface PreferencesStepProps {
   onComplete?: () => void;
@@ -98,21 +99,8 @@ const alertFrequencies = [
 ] as const;
 
 export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
-  // Use the new onboarding hook instead of directly accessing stores
-  const {
-    draft,
-    saveDraft,
-    autoSave,
-    completeStep,
-    skipStep,
-    goBack,
-    canProceed,
-    isFirstStep,
-    hasErrors,
-    latestError,
-    clearErrors,
-    progress,
-  } = useOnboarding();
+  const { actions, capabilities, context } = useOnboarding();
+  const progress = useOnboardingProgress();
 
   // Initialize form with existing draft data
   const form = useForm<PreferencesFormData>({
@@ -136,7 +124,7 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as PreferencesDraft | null;
+    const existingDraft = getDraft('preferences') as PreferencesDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
@@ -157,7 +145,7 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
       if (existingDraft.alertFrequency)
         setValue('alertFrequency', existingDraft.alertFrequency);
     }
-  }, [setValue, draft]);
+  }, [setValue]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -166,52 +154,53 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
         (key) => formData[key as keyof typeof formData]
       )
     ) {
-      saveDraft(formData as PreferencesDraft);
+      saveDraft('preferences', formData as PreferencesDraft);
     }
-  }, [formData, saveDraft]);
+  }, [formData]);
 
   // Handle form submission
   const handleSubmit = (data: PreferencesFormData) => {
     try {
       // Clear any previous errors
-      clearErrors();
+      actions.clearErrors();
 
-      // Complete the step using the state machine
-      const success = completeStep(data as PreferencesDraft);
+      // Save preferences and complete the step
+      actions.updateContext(data as Partial<typeof context>);
+      const success = actions.savePreferences();
 
       if (success) {
         // Call completion callbacks for backward compatibility
         onComplete?.();
-        if (onNext) {
-          onNext();
-        }
+        onNext?.();
       } else {
-        // Error handling is managed by the state machine
         console.error('Failed to complete preferences step');
       }
     } catch (error) {
       console.error('Failed to complete preferences step:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      actions.addError(errorMessage);
     }
   };
 
   // Handle skip action
   const handleSkip = () => {
-    skipStep();
+    const success = actions.skipPreferences();
 
-    // Call completion callbacks for backward compatibility
-    onComplete?.();
-    if (onNext) {
-      onNext();
+    if (success) {
+      // Call completion callbacks for backward compatibility
+      onComplete?.();
+      onNext?.();
     }
   };
 
   // Handle back navigation
   const handleBack = () => {
-    goBack();
+    actions.goBack();
   };
 
   // Since all fields are optional, we can always proceed
-  const canSubmit = canProceed;
+  const canSubmit = capabilities.canProceed;
 
   // Get current browser timezone as suggestion
   const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -512,51 +501,20 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
                 </div>
               </div>
 
-              {/* Save Status and Error Handling */}
+              {/* Error Handling */}
               <div className="space-y-2">
-                {(hasErrors || latestError) && (
+                {context.errors.length > 0 && (
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
-                      <span>{latestError?.error ?? 'An error occurred'}</span>
+                      <span>
+                        {context.errors[context.errors.length - 1]?.message ??
+                          'An error occurred'}
+                      </span>
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={clearErrors}
-                        aria-label="Dismiss error"
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  </Alert>
-                )}
-
-                {autoSave.isSaving && (
-                  <div className="text-sm text-muted-foreground flex items-center gap-2">
-                    <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full" />
-                    Saving preferences...
-                  </div>
-                )}
-
-                {autoSave.lastSaved &&
-                  !autoSave.isSaving &&
-                  !autoSave.error && (
-                    <div className="text-sm text-muted-foreground flex items-center gap-2">
-                      <CheckCircle className="h-3 w-3 text-green-500" />
-                      Preferences saved at{' '}
-                      {autoSave.lastSaved.toLocaleTimeString()}
-                    </div>
-                  )}
-
-                {autoSave.error && (
-                  <Alert variant="destructive">
-                    <div className="flex items-center justify-between">
-                      <span>Failed to save preferences: {autoSave.error}</span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={autoSave.clearError}
+                        onClick={actions.clearErrors}
                         aria-label="Dismiss error"
                       >
                         ×
@@ -576,15 +534,21 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  {!isFirstStep && (
+                  {capabilities.canGoBack && (
                     <Button type="button" variant="ghost" onClick={handleBack}>
                       Back
                     </Button>
                   )}
 
-                  <Button type="button" variant="outline" onClick={handleSkip}>
-                    Skip for now
-                  </Button>
+                  {capabilities.canSkip && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleSkip}
+                    >
+                      Skip for now
+                    </Button>
+                  )}
 
                   <Button
                     type="submit"
@@ -602,8 +566,8 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
 
       {/* Progress Indicator */}
       <div className="text-center text-sm text-muted-foreground">
-        Step {progress.currentStep} of {progress.totalSteps} (
-        {progress.percentage}% complete)
+        Step {progress.current} of {progress.total} ({progress.percentage}%
+        complete)
       </div>
     </div>
   );

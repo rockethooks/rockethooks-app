@@ -1,60 +1,154 @@
-import type { OnboardingStepConfig } from '@/types/onboarding';
+/**
+ * Configuration for the onboarding state machine
+ */
+
+import type { OnboardingContext, StepConfig } from './types';
+import { OnboardingStates } from './types';
 
 /**
- * Step configurations for validation and navigation
- * Maps state types to their corresponding step configurations
+ * Step configurations for the onboarding flow
  */
-export const stepConfigs: Record<string, OnboardingStepConfig> = {
-  ORGANIZATION_SETUP: {
+export const stepConfigs: Record<string, StepConfig> = {
+  organization: {
     id: 'organization',
-    name: 'Organization Setup',
+    title: 'Organization Setup',
+    description: 'Create or join an organization',
+    isRequired: false,
     canSkip: true,
-    canGoBack: false,
-    requiresValidation: true,
-    order: 1,
-    route: '/onboarding/organization',
+    state: OnboardingStates.ORGANIZATION_SETUP,
+    validationRules: [
+      {
+        field: 'name',
+        rule: 'required',
+        message: 'Organization name is required',
+      },
+      {
+        field: 'name',
+        rule: 'minLength:3',
+        message: 'Organization name must be at least 3 characters',
+      },
+    ],
   },
-  PROFILE_COMPLETION: {
+  profile: {
     id: 'profile',
-    name: 'Profile Completion',
+    title: 'Complete Your Profile',
+    description: 'Tell us a bit about yourself',
+    isRequired: true,
     canSkip: false,
-    canGoBack: true,
-    requiresValidation: false,
-    order: 2,
-    route: '/onboarding/profile',
+    state: OnboardingStates.PROFILE_COMPLETION,
+    validationRules: [
+      {
+        field: 'displayName',
+        rule: 'required',
+        message: 'Display name is required',
+      },
+      {
+        field: 'role',
+        rule: 'required',
+        message: 'Please select your role',
+      },
+    ],
   },
-  PREFERENCES: {
+  preferences: {
     id: 'preferences',
-    name: 'Preferences',
+    title: 'Set Your Preferences',
+    description: 'Customize your experience',
+    isRequired: false,
     canSkip: true,
-    canGoBack: true,
-    requiresValidation: false,
-    order: 3,
-    route: '/onboarding/preferences',
+    state: OnboardingStates.PREFERENCES_SETUP,
+    validationRules: [],
   },
-  COMPLETION: {
-    id: 'completion',
-    name: 'Completion',
-    canSkip: false,
-    canGoBack: false,
-    requiresValidation: false,
-    order: 4,
-    route: '/onboarding/complete',
+  account: {
+    id: 'account',
+    title: 'Account Settings',
+    description: 'Configure your account settings',
+    isRequired: false,
+    canSkip: true,
+    state: OnboardingStates.ACCOUNT_SETUP,
+    validationRules: [],
   },
-} as const;
+};
 
 /**
- * Type-safe helper to get step config for a given state type
+ * Calculate total steps dynamically
  */
-export function getStepConfig(
-  stateType: string
-): OnboardingStepConfig | undefined {
-  return stepConfigs[stateType];
-}
+export const calculateTotalSteps = (): number => {
+  return Object.keys(stepConfigs).length;
+};
 
 /**
- * Get all step configs ordered by their order property
+ * Get step configuration by ID
  */
-export function getOrderedStepConfigs(): OnboardingStepConfig[] {
-  return Object.values(stepConfigs).sort((a, b) => a.order - b.order);
-}
+export const getStepConfig = (stepId: string): StepConfig | undefined => {
+  return stepConfigs[stepId];
+};
+
+/**
+ * Get step configuration by state
+ */
+export const getStepConfigByState = (
+  state: OnboardingStates
+): StepConfig | undefined => {
+  return Object.values(stepConfigs).find((config) => config.state === state);
+};
+
+/**
+ * Get required steps
+ */
+export const getRequiredSteps = (): StepConfig[] => {
+  return Object.values(stepConfigs).filter((config) => config.isRequired);
+};
+
+/**
+ * Get skippable steps
+ */
+export const getSkippableSteps = (): StepConfig[] => {
+  return Object.values(stepConfigs).filter((config) => config.canSkip);
+};
+
+/**
+ * Initial context configuration
+ */
+export const getInitialContext = (): OnboardingContext => ({
+  currentStep: 1,
+  totalSteps: calculateTotalSteps(),
+  completedSteps: new Set<string>(),
+  skippedSteps: new Set<string>(),
+  isComplete: false,
+  isLoading: false,
+  errors: [],
+});
+
+/**
+ * Storage configuration
+ */
+export const STORAGE_KEY = 'onboarding-state';
+export const STORAGE_VERSION = 1;
+
+/**
+ * Allowed fields for context updates
+ */
+export const ALLOWED_CONTEXT_FIELDS = [
+  'userId',
+  'organizationId',
+  'currentStep',
+  'totalSteps',
+  'completedSteps',
+  'skippedSteps',
+  'isComplete',
+  'isLoading',
+  'errors',
+  'draftData',
+  'startedAt',
+  'completedAt',
+  'lastUpdatedAt',
+] as const;
+
+/**
+ * DevTools configuration
+ */
+export const DEVTOOLS_CONFIG = {
+  name: 'Onboarding State Machine',
+  trace: true,
+  anonymize: false,
+};
