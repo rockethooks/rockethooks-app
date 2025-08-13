@@ -113,7 +113,8 @@ interface AuthStoreState {
   isAuthenticated: boolean;
   user: User | null;
   sessionId: string | null;
-  token: string | null;
+  // Token management is handled entirely by Clerk's getToken() method
+  // which provides automatic refresh and caching. See Apollo auth link.
 
   // Extended state
   profile: Profile | null;
@@ -127,9 +128,8 @@ interface AuthStoreState {
   isOnboardingLoaded: boolean;
 
   // Authentication actions
-  setAuthenticated: (user: User, sessionId: string, token: string) => void;
+  setAuthenticated: (user: User, sessionId: string) => void;
   setUnauthenticated: () => void;
-  updateToken: (token: string) => void;
   clearAuth: () => void;
 
   // Profile actions
@@ -220,7 +220,6 @@ export const useAuthStore = create<AuthStoreState>()(
         isAuthenticated: false,
         user: null,
         sessionId: null,
-        token: null,
 
         // Initial extended state
         profile: null,
@@ -234,13 +233,14 @@ export const useAuthStore = create<AuthStoreState>()(
         isOnboardingLoaded: false,
 
         // Authentication actions
-        setAuthenticated: (user, sessionId, token) => {
+        setAuthenticated: (user, sessionId) => {
           set(
             {
               isAuthenticated: true,
               user,
               sessionId,
-              token,
+              // Token management is handled entirely by Clerk's getToken() method
+              // which provides automatic refresh and caching. See Apollo auth link.
             },
             false,
             'auth/setAuthenticated'
@@ -253,21 +253,9 @@ export const useAuthStore = create<AuthStoreState>()(
               isAuthenticated: false,
               user: null,
               sessionId: null,
-              token: null,
             },
             false,
             'auth/setUnauthenticated'
-          );
-        },
-
-        updateToken: (token) => {
-          set(
-            (state) => ({
-              ...state,
-              token,
-            }),
-            false,
-            'auth/updateToken'
           );
         },
 
@@ -277,7 +265,6 @@ export const useAuthStore = create<AuthStoreState>()(
               isAuthenticated: false,
               user: null,
               sessionId: null,
-              token: null,
               profile: null,
               preferences: null,
               onboarding: null,
