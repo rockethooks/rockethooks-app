@@ -9,6 +9,7 @@ import {
   OnboardingStates,
   useOnboardingStore,
 } from '@/store/onboarding';
+import { loggers } from '@/utils';
 import {
   clearStepDraft,
   type DraftData,
@@ -16,6 +17,8 @@ import {
   saveDraft,
   useAutoSaveDraft,
 } from '@/utils/onboardingDrafts';
+
+const logger = loggers.onboarding;
 
 /**
  * Hook configuration options
@@ -71,7 +74,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
       initializeOnboarding(user.id, organizationId);
 
       if (debug) {
-        console.log('[useOnboarding] Initialized with:', {
+        logger.debug('Initialized with:', {
           userId: user.id,
           organizationId,
           currentState: store.currentState,
@@ -89,7 +92,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
 
     if (route !== currentPath) {
       if (debug) {
-        console.log('[useOnboarding] Navigating:', {
+        logger.debug('Navigating:', {
           from: currentPath,
           to: route,
           state: store.currentState,
@@ -123,7 +126,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
       saveDraft(currentStep, data);
 
       if (debug) {
-        console.log('[useOnboarding] Draft saved:', {
+        logger.debug('Draft saved:', {
           step: currentStep,
           data,
         });
@@ -137,7 +140,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
     setDraftData(null);
 
     if (debug) {
-      console.log('[useOnboarding] Draft cleared:', currentStep);
+      logger.debug('Draft cleared:', currentStep);
     }
   }, [currentStep, setDraftData, debug]);
 

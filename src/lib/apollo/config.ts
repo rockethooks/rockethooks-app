@@ -3,6 +3,10 @@
  * Environment-specific configuration for AWS AppSync GraphQL endpoints
  */
 
+import { loggers } from '@/utils';
+
+const logger = loggers.api;
+
 interface AppSyncConfig {
   graphqlUrl: string;
   region: string;
@@ -35,7 +39,7 @@ export const getGraphqlUrl = (): string => {
     import.meta.env.VITE_APPSYNC_GRAPHQL_URL ||
     import.meta.env.VITE_GRAPHQL_URL;
   if (!url) {
-    console.warn(
+    logger.warn(
       'VITE_APPSYNC_GRAPHQL_URL or VITE_GRAPHQL_URL not found, falling back to localhost'
     );
     return 'http://localhost:4000/graphql';

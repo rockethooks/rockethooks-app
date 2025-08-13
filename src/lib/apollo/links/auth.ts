@@ -4,6 +4,9 @@
  */
 
 import { setContext } from '@apollo/client/link/context';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
 
 /**
  * Create authentication link that accepts a token getter function
@@ -23,7 +26,7 @@ export const createAuthLinkWithTokenGetter = (
         },
       };
     } catch (error) {
-      console.error('Failed to get authentication token:', error);
+      logger.error('Failed to get authentication token:', error);
       return {
         headers: {
           ...(headers as Record<string, string>),

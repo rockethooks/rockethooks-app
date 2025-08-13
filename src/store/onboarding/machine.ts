@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { loggers } from '@/utils';
 import { createDevtoolsConfig } from '../devtools.config';
 import {
   ALLOWED_CONTEXT_FIELDS,
@@ -21,6 +22,8 @@ import { canTransition, findTransition, transitions } from './transitions';
 import type { OnboardingContext, OnboardingStore } from './types';
 // Import types
 import { OnboardingEvents, OnboardingStates } from './types';
+
+const logger = loggers.onboarding;
 
 /**
  * Create the onboarding store with state machine logic
@@ -40,29 +43,21 @@ export const useOnboardingStore = create<OnboardingStore>()(
           const transition = findTransition(currentState, event);
 
           if (!transition) {
-            if (process.env.NODE_ENV === 'development') {
-              console.warn(
-                `[Onboarding] No transition found for event ${event} in state ${currentState}`
-              );
-            }
+            logger.warn(
+              `No transition found for event ${event} in state ${currentState}`
+            );
             return false;
           }
 
           // Validate payload if needed
           if (payload && !guards.isValidEventPayload(event, payload)) {
-            if (process.env.NODE_ENV === 'development') {
-              console.error('[Onboarding] Invalid event payload:', payload);
-            }
+            logger.error('Invalid event payload:', payload);
             return false;
           }
 
           // Check guard condition
           if (transition.guard && !transition.guard(context)) {
-            if (process.env.NODE_ENV === 'development') {
-              console.log(
-                `[Onboarding] Guard prevented transition for ${event}`
-              );
-            }
+            logger.debug(`Guard prevented transition for ${event}`);
             return false;
           }
 
@@ -87,9 +82,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
         updateContext: (updates) => {
           // Validate updates
           if (!guards.isValidContextUpdate(updates)) {
-            if (process.env.NODE_ENV === 'development') {
-              console.error('[Onboarding] Invalid context updates:', updates);
-            }
+            logger.error('Invalid context updates:', updates);
             return;
           }
 
@@ -100,8 +93,8 @@ export const useOnboardingStore = create<OnboardingStore>()(
               ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
             ) {
               (filteredUpdates as Record<string, unknown>)[key] = value;
-            } else if (process.env.NODE_ENV === 'development') {
-              console.warn(`[Onboarding] Disallowed field update: ${key}`);
+            } else {
+              logger.warn(`Disallowed field update: ${key}`);
             }
           }
 

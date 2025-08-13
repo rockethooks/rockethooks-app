@@ -2,7 +2,10 @@
  * Guard functions for onboarding state machine transitions
  */
 
+import { loggers } from '@/utils';
 import type { OnboardingContext } from './types';
+
+const logger = loggers.onboarding;
 
 /**
  * Type guard to validate context structure
@@ -121,7 +124,7 @@ export const hasOrganization = (context: OnboardingContext): boolean => {
   try {
     return isValidContext(context) && context.organizationId !== undefined;
   } catch (error) {
-    console.error('Guard hasOrganization failed:', error);
+    logger.error('Guard hasOrganization failed:', error);
     return false;
   }
 };
@@ -133,7 +136,7 @@ export const noOrganization = (context: OnboardingContext): boolean => {
   try {
     return isValidContext(context) && context.organizationId === undefined;
   } catch (error) {
-    console.error('Guard noOrganization failed:', error);
+    logger.error('Guard noOrganization failed:', error);
     return false;
   }
 };
@@ -145,7 +148,7 @@ export const organizationSkipped = (context: OnboardingContext): boolean => {
   try {
     return isValidContext(context) && context.skippedSteps.has('organization');
   } catch (error) {
-    console.error('Guard organizationSkipped failed:', error);
+    logger.error('Guard organizationSkipped failed:', error);
     return false;
   }
 };
@@ -157,7 +160,7 @@ export const profileCompleted = (context: OnboardingContext): boolean => {
   try {
     return isValidContext(context) && context.completedSteps.has('profile');
   } catch (error) {
-    console.error('Guard profileCompleted failed:', error);
+    logger.error('Guard profileCompleted failed:', error);
     return false;
   }
 };
@@ -169,7 +172,7 @@ export const canGoBackGuard = (context: OnboardingContext): boolean => {
   try {
     return isValidContext(context) && context.currentStep > 1;
   } catch (error) {
-    console.error('Guard canGoBackGuard failed:', error);
+    logger.error('Guard canGoBackGuard failed:', error);
     return false;
   }
 };
@@ -187,7 +190,7 @@ export const canSkipGuard = (context: OnboardingContext): boolean => {
 
     return skippableSteps.includes(currentStepName);
   } catch (error) {
-    console.error('Guard canSkipGuard failed:', error);
+    logger.error('Guard canSkipGuard failed:', error);
     return false;
   }
 };
@@ -205,7 +208,7 @@ export const isOnboardingComplete = (context: OnboardingContext): boolean => {
         context.completedSteps.has(step) || context.skippedSteps.has(step)
     );
   } catch (error) {
-    console.error('Guard isOnboardingComplete failed:', error);
+    logger.error('Guard isOnboardingComplete failed:', error);
     return false;
   }
 };

@@ -7,6 +7,10 @@ import { ApolloProvider } from '@apollo/client';
 import { useAuth } from '@clerk/clerk-react';
 import type React from 'react';
 import { useMemo } from 'react';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
+
 import { getApolloClient } from './client';
 
 interface ApolloWrapperProps {
@@ -26,7 +30,7 @@ export function ApolloWrapper({ children }: ApolloWrapperProps) {
         // Get JWT token using Clerk's getToken method with the AppSync template
         return await getToken({ template: '1day-template' });
       } catch (error) {
-        console.error('Failed to get Clerk token:', error);
+        logger.error('Failed to get Clerk token:', error);
         return null;
       }
     });

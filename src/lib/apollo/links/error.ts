@@ -9,6 +9,9 @@ import { RetryLink } from '@apollo/client/link/retry';
 import toast from 'react-hot-toast';
 import { GraphQLErrorClassifier } from '@/lib/errors/classifier';
 import { ErrorType, RateLimitError } from '@/lib/errors/types';
+import { loggers } from '@/utils';
+
+const logger = loggers.graphql;
 
 interface RetryErrorWithNetwork {
   networkError?: unknown;
@@ -39,16 +42,16 @@ const handleAuthError = () => {
  */
 const logError = (error: ErrorResponse) => {
   if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
-    console.group('Apollo Client Error');
-    console.error('Operation:', error.operation.operationName);
-    console.error('Variables:', error.operation.variables);
+    logger.group('Apollo Client Error');
+    logger.error('Operation:', error.operation.operationName);
+    logger.error('Variables:', error.operation.variables);
     if (error.graphQLErrors) {
-      console.error('GraphQL Errors:', error.graphQLErrors);
+      logger.error('GraphQL Errors:', error.graphQLErrors);
     }
     if (error.networkError) {
-      console.error('Network Error:', error.networkError);
+      logger.error('Network Error:', error.networkError);
     }
-    console.groupEnd();
+    logger.groupEnd();
   }
 };
 

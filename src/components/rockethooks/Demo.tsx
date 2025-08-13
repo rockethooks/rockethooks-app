@@ -1,5 +1,8 @@
 import { subHours, subMinutes } from 'date-fns';
 import { useState } from 'react';
+import { loggers } from '@/utils';
+
+const logger = loggers.ui;
 
 import {
   APIConnectionCard,
@@ -166,13 +169,13 @@ export function ComponentsDemo() {
             avgResponseTime={245}
             sparklineData={sampleSparklineData}
             onTest={() => {
-              console.log('Test clicked');
+              logger.debug('Test clicked');
             }}
             onEdit={() => {
-              console.log('Edit clicked');
+              logger.debug('Edit clicked');
             }}
             onToggle={() => {
-              console.log('Toggle clicked');
+              logger.debug('Toggle clicked');
             }}
           />
 
@@ -187,13 +190,13 @@ export function ComponentsDemo() {
             successRate={87.2}
             avgResponseTime={1250}
             onTest={() => {
-              console.log('Test clicked');
+              logger.debug('Test clicked');
             }}
             onEdit={() => {
-              console.log('Edit clicked');
+              logger.debug('Edit clicked');
             }}
             onToggle={() => {
-              console.log('Toggle clicked');
+              logger.debug('Toggle clicked');
             }}
           />
         </div>
@@ -208,7 +211,7 @@ export function ComponentsDemo() {
             onChange={setJsonPath}
             sampleData={sampleJSONData}
             onTest={() => {
-              console.log('Testing JSONPath');
+              logger.debug('Testing JSONPath');
             }}
           />
         </div>
@@ -243,7 +246,7 @@ export function ComponentsDemo() {
                 events={sampleEvents}
                 view="compact"
                 onEventClick={(event) => {
-                  console.log('Event clicked:', event);
+                  logger.debug('Event clicked:', event);
                 }}
               />
             </div>
@@ -256,7 +259,7 @@ export function ComponentsDemo() {
                 events={sampleEvents}
                 view="detailed"
                 onEventClick={(event) => {
-                  console.log('Event clicked:', event);
+                  logger.debug('Event clicked:', event);
                 }}
               />
             </div>

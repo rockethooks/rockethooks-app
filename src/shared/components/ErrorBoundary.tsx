@@ -1,5 +1,9 @@
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { loggers } from '@/utils';
+
+const logger = loggers.dev;
+
 import { Alert, AlertDescription } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import {
@@ -39,7 +43,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logger.error('ErrorBoundary caught an error:', error, errorInfo);
 
     this.setState({
       error,
@@ -58,7 +62,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private reportError = (error: Error, errorInfo: ErrorInfo) => {
     // Error reporting logic would go here
-    console.warn('Error reported to tracking service:', { error, errorInfo });
+    logger.warn('Error reported to tracking service:', { error, errorInfo });
   };
 
   private handleRetry = () => {

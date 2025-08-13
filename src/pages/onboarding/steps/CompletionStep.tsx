@@ -25,6 +25,7 @@ import {
   getExperienceLevelLabel,
   getProfileRoleLabel,
 } from '@/lib/validations/onboarding';
+import { loggers } from '@/utils';
 import {
   clearDrafts,
   getAllDrafts,
@@ -32,6 +33,8 @@ import {
   type PreferencesDraft,
   type ProfileDraft,
 } from '@/utils/onboardingDrafts';
+
+const logger = loggers.onboarding;
 
 export interface CompletionStepProps {
   onComplete?: () => void;
@@ -78,7 +81,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
         // Clear all onboarding drafts from localStorage
         const draftsClearSuccess = clearDrafts();
         if (!draftsClearSuccess) {
-          console.warn('Failed to clear onboarding drafts from localStorage');
+          logger.warn('Failed to clear onboarding drafts from localStorage');
         }
 
         // Call completion callbacks for backward compatibility
@@ -97,7 +100,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
         setError('Failed to complete onboarding');
       }
     } catch (completionError) {
-      console.error('Failed to complete onboarding:', completionError);
+      logger.error('Failed to complete onboarding:', completionError);
       const errorMessage =
         completionError instanceof Error
           ? completionError.message

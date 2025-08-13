@@ -1,37 +1,35 @@
-# RocketHooks Frontend - Project Overview
+# RocketHooks WebApp Project Overview
 
 ## Purpose
-RocketHooks is a React-based SaaS platform for API monitoring and webhook management. It provides real-time monitoring, webhook handling, and comprehensive API management features for developers and teams.
+RocketHooks is a React-based SaaS platform for API monitoring and webhook management with real-time features, OAuth authentication, and organization-based access control.
 
 ## Tech Stack
-- **Frontend Framework**: React 19 with TypeScript
-- **Build Tool**: Vite 6.0
-- **Styling**: Tailwind CSS v4.1.11 (CRITICAL: Not v3!)
-- **UI Components**: ShadCN/UI components library
-- **State Management**: Zustand 5.0
-- **Routing**: React Router DOM 7.8
-- **Authentication**: Clerk (OAuth with Google/GitHub)
-- **API Client**: Apollo Client 3.13 with GraphQL
-- **Forms**: React Hook Form 7.62 with Zod validation
-- **Testing**: Playwright for E2E testing
-- **Component Development**: Storybook 8.6
-
-## Architecture
-- GraphQL APIs with real-time capabilities via Apollo Client
-- Clerk authentication with OAuth providers
-- Component-based architecture with ShadCN UI system
-- Mobile-first responsive design
-- Path aliases using `@/*` for src imports
+- **Language**: TypeScript 5.7.2 with strict mode enabled
+- **Framework**: React 19.0.0 with React Router 7.8.0
+- **State Management**: Zustand 5.0.7 with Immer for immutable updates
+- **UI Framework**: Tailwind CSS v4.1.11 + ShadCN components
+- **GraphQL Client**: Apollo Client 3.13.9
+- **Authentication**: Clerk 5.40.0 (OAuth with Google/GitHub)
+- **Build Tool**: Vite 6.0.1 with React plugin
+- **Package Manager**: Yarn (preferred over npm)
+- **Code Quality**: ESLint 9.15.0, Biome 2.1.3, TypeScript strict mode
+- **Git Hooks**: Lefthook for pre-commit and pre-push validation
+- **Testing**: Playwright for E2E (configured but no unit tests present)
+- **Component Development**: Storybook 8.6.14
 
 ## Key Features
-- API monitoring and webhook management
-- Real-time data updates via GraphQL subscriptions
-- OAuth authentication (Google, GitHub)
+- OAuth authentication with Clerk
 - Organization-based access control
-- Multi-step onboarding process
-- Dashboard with analytics
+- Real-time features via GraphQL subscriptions
+- Multi-step onboarding flow with state machine
+- Dark/light theme support
+- Component library with Storybook
+- Comprehensive error handling
+- Performance tracking and logging
 
-## Related Projects
-- Backend API: `/Users/adnene/Projects/RocketHooks/services/api-service`
-- Data Models: `/Users/adnene/Projects/RocketHooks/03_Back/data-model`
-- GitHub Repo: https://github.com/rockethooks/rockethooks-app
+## Development Environment
+- Node.js project with ESM modules
+- Vite dev server with HMR
+- TypeScript strict mode with comprehensive checks
+- Automated code quality with git hooks
+- Environment variables for configuration
