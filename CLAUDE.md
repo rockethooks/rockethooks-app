@@ -255,6 +255,73 @@ Enforced by Lefthook commit-msg hook:
 - **Playwright MCP**: For E2E testing
 - **DynamoDB MCP**: For database operations
 
+## Logging Guidelines
+
+### Professional Logging System
+The project uses a professional logging utility with automatic production optimization.
+
+#### Logger Usage
+```typescript
+import { logger, loggers } from '@/utils';
+
+// Basic logging
+logger.info('Application started');
+logger.error('Failed to load data', error);
+
+// Namespaced loggers for different modules
+loggers.onboarding.debug('State transition', { from, to });
+loggers.auth.success('User authenticated');
+loggers.api.warn('Rate limit approaching');
+loggers.graphql.error('Query failed', error);
+
+// Performance tracking
+const result = logger.measure('expensive-operation', () => {
+  return performExpensiveOperation();
+});
+
+const { result, measurement } = await logger.measureAsync('api-call', async () => {
+  return await fetchData();
+});
+
+// Child loggers for components
+const componentLogger = loggers.ui.child('Button');
+componentLogger.debug('Rendered with props:', props);
+```
+
+#### Available Namespaced Loggers
+- `loggers.onboarding` - Onboarding flow and state machine
+- `loggers.auth` - Authentication and authorization
+- `loggers.api` - API calls and responses
+- `loggers.graphql` - GraphQL queries and mutations
+- `loggers.store` - State management
+- `loggers.router` - Routing and navigation
+- `loggers.ui` - UI components and interactions
+- `loggers.performance` - Performance monitoring
+- `loggers.validation` - Form and data validation
+- `loggers.dev` - Development utilities
+- `loggers.debug` - Debug-specific logging
+
+#### Log Levels
+- `debug` - Detailed debugging information (dev only)
+- `info` - General informational messages
+- `success` - Success confirmations
+- `warn` - Warning messages (preserved in production)
+- `error` - Error messages (preserved in production)
+
+#### Production Behavior
+- Console.log and console.debug are automatically removed in production builds
+- Console.error and console.warn are preserved for critical issues
+- Production logging can be enabled via localStorage: `enableDebugLogging()`
+- All sensitive data is automatically sanitized (passwords, tokens, keys)
+
+#### Testing
+Run the logger test suite:
+```bash
+yarn test:unit         # Run all unit tests
+yarn test:watch       # Run tests in watch mode
+yarn test:coverage    # Generate coverage report
+```
+
 ## Common Issues & Solutions
 - **Port conflicts**: Use `yarn debug` for port 8080
 - **Auth issues**: Check `VITE_CLERK_PUBLISHABLE_KEY` in `.env`
