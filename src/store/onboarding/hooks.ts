@@ -27,10 +27,9 @@ export function useOnboarding() {
     }),
     [store.currentState]
   );
-
+  const baseProgress = store.getProgress();
   // Memoized progress with extended properties
   const progress = useMemo(() => {
-    const baseProgress = store.getProgress();
     return {
       ...baseProgress,
       currentStep: baseProgress.current, // alias
@@ -39,7 +38,7 @@ export function useOnboarding() {
       isLastStep: baseProgress.current === baseProgress.total,
       stepsRemaining: baseProgress.total - baseProgress.current,
     };
-  }, [store]);
+  }, [baseProgress]);
 
   // Memoized actions with helper methods
   const actions = useMemo(
