@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
+import { createDevtoolsConfig } from './devtools.config';
 
 interface AppState {
   theme: 'light' | 'dark' | 'system';
@@ -9,19 +10,26 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      theme: 'system',
-      sidebarOpen: true,
-      setTheme: (theme) => {
-        set({ theme });
-      },
-      toggleSidebar: () => {
-        set((state) => ({ sidebarOpen: !state.sidebarOpen }));
-      },
-    }),
-    {
-      name: 'app-storage',
-    }
+  devtools(
+    persist(
+      (set) => ({
+        theme: 'system',
+        sidebarOpen: true,
+        setTheme: (theme) => {
+          set({ theme }, false, 'app/setTheme');
+        },
+        toggleSidebar: () => {
+          set(
+            (state) => ({ sidebarOpen: !state.sidebarOpen }),
+            false,
+            'app/toggleSidebar'
+          );
+        },
+      }),
+      {
+        name: 'app-storage',
+      }
+    ),
+    createDevtoolsConfig('App')
   )
 );

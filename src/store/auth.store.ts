@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import type { User } from '@/services/auth/AuthService';
+import { createDevtoolsConfig } from './devtools.config';
 
 // Profile information beyond basic authentication
 export interface Profile {
@@ -212,321 +213,412 @@ const getDefaultOnboarding = (): OnboardingState => ({
 // Performance optimization: Reuse timestamp generation
 const getCurrentTimestamp = () => new Date().toISOString();
 export const useAuthStore = create<AuthStoreState>()(
-  persist(
-    (set, get) => ({
-      // Initial authentication state
-      isAuthenticated: false,
-      user: null,
-      sessionId: null,
-      token: null,
+  devtools(
+    persist(
+      (set, get) => ({
+        // Initial authentication state
+        isAuthenticated: false,
+        user: null,
+        sessionId: null,
+        token: null,
 
-      // Initial extended state
-      profile: null,
-      preferences: null,
-      onboarding: null,
+        // Initial extended state
+        profile: null,
+        preferences: null,
+        onboarding: null,
 
-      // Initial initialization state
-      isInitialized: false,
-      isProfileLoaded: false,
-      isPreferencesLoaded: false,
-      isOnboardingLoaded: false,
+        // Initial initialization state
+        isInitialized: false,
+        isProfileLoaded: false,
+        isPreferencesLoaded: false,
+        isOnboardingLoaded: false,
 
-      // Authentication actions
-      setAuthenticated: (user, sessionId, token) => {
-        set({
-          isAuthenticated: true,
-          user,
-          sessionId,
-          token,
-        });
-      },
+        // Authentication actions
+        setAuthenticated: (user, sessionId, token) => {
+          set(
+            {
+              isAuthenticated: true,
+              user,
+              sessionId,
+              token,
+            },
+            false,
+            'auth/setAuthenticated'
+          );
+        },
 
-      setUnauthenticated: () => {
-        set({
-          isAuthenticated: false,
-          user: null,
-          sessionId: null,
-          token: null,
-        });
-      },
+        setUnauthenticated: () => {
+          set(
+            {
+              isAuthenticated: false,
+              user: null,
+              sessionId: null,
+              token: null,
+            },
+            false,
+            'auth/setUnauthenticated'
+          );
+        },
 
-      updateToken: (token) => {
-        set((state) => ({
-          ...state,
-          token,
-        }));
-      },
+        updateToken: (token) => {
+          set(
+            (state) => ({
+              ...state,
+              token,
+            }),
+            false,
+            'auth/updateToken'
+          );
+        },
 
-      clearAuth: () => {
-        set({
-          isAuthenticated: false,
-          user: null,
-          sessionId: null,
-          token: null,
-          profile: null,
-          preferences: null,
-          onboarding: null,
-          isInitialized: false,
-          isProfileLoaded: false,
-          isPreferencesLoaded: false,
-          isOnboardingLoaded: false,
-        });
-      },
+        clearAuth: () => {
+          set(
+            {
+              isAuthenticated: false,
+              user: null,
+              sessionId: null,
+              token: null,
+              profile: null,
+              preferences: null,
+              onboarding: null,
+              isInitialized: false,
+              isProfileLoaded: false,
+              isPreferencesLoaded: false,
+              isOnboardingLoaded: false,
+            },
+            false,
+            'auth/clearAuth'
+          );
+        },
 
-      // Profile actions
-      setProfile: (profile) => {
-        set({
-          profile: {
-            ...profile,
-            lastProfileUpdate: getCurrentTimestamp(),
-          },
-          isProfileLoaded: true,
-        });
-      },
-
-      updateProfile: (updates) => {
-        const currentProfile = get().profile;
-        set({
-          profile: currentProfile
-            ? {
-                ...currentProfile,
-                ...updates,
+        // Profile actions
+        setProfile: (profile) => {
+          set(
+            {
+              profile: {
+                ...profile,
                 lastProfileUpdate: getCurrentTimestamp(),
-              }
-            : null,
-        });
-      },
+              },
+              isProfileLoaded: true,
+            },
+            false,
+            'auth/setProfile'
+          );
+        },
 
-      clearProfile: () => {
-        set({
-          profile: null,
-          isProfileLoaded: false,
-        });
-      },
+        updateProfile: (updates) => {
+          const currentProfile = get().profile;
+          set(
+            {
+              profile: currentProfile
+                ? {
+                    ...currentProfile,
+                    ...updates,
+                    lastProfileUpdate: getCurrentTimestamp(),
+                  }
+                : null,
+            },
+            false,
+            'auth/updateProfile'
+          );
+        },
 
-      // Preferences actions
-      setPreferences: (preferences) => {
-        set({
-          preferences: {
-            ...preferences,
-            lastPreferencesUpdate: getCurrentTimestamp(),
-          },
-          isPreferencesLoaded: true,
-        });
-      },
+        clearProfile: () => {
+          set(
+            {
+              profile: null,
+              isProfileLoaded: false,
+            },
+            false,
+            'auth/clearProfile'
+          );
+        },
 
-      updatePreferences: (updates) => {
-        const currentPreferences = get().preferences;
-        set({
-          preferences: currentPreferences
-            ? {
-                ...currentPreferences,
-                ...updates,
+        // Preferences actions
+        setPreferences: (preferences) => {
+          set(
+            {
+              preferences: {
+                ...preferences,
                 lastPreferencesUpdate: getCurrentTimestamp(),
-              }
-            : null,
-        });
-      },
-
-      updateTheme: (theme) => {
-        const currentPreferences = get().preferences;
-        if (currentPreferences) {
-          set({
-            preferences: {
-              ...currentPreferences,
-              theme,
-              lastPreferencesUpdate: getCurrentTimestamp(),
-            },
-          });
-        }
-      },
-
-      updateNotifications: (notifications) => {
-        const currentPreferences = get().preferences;
-        if (currentPreferences) {
-          set({
-            preferences: {
-              ...currentPreferences,
-              notifications: {
-                ...currentPreferences.notifications,
-                ...notifications,
               },
-              lastPreferencesUpdate: getCurrentTimestamp(),
+              isPreferencesLoaded: true,
             },
-          });
-        }
-      },
+            false,
+            'auth/setPreferences'
+          );
+        },
 
-      updateAccessibility: (accessibility) => {
-        const currentPreferences = get().preferences;
-        if (currentPreferences) {
-          set({
-            preferences: {
-              ...currentPreferences,
-              accessibility: {
-                ...currentPreferences.accessibility,
-                ...accessibility,
+        updatePreferences: (updates) => {
+          const currentPreferences = get().preferences;
+          set(
+            {
+              preferences: currentPreferences
+                ? {
+                    ...currentPreferences,
+                    ...updates,
+                    lastPreferencesUpdate: getCurrentTimestamp(),
+                  }
+                : null,
+            },
+            false,
+            'auth/updatePreferences'
+          );
+        },
+
+        updateTheme: (theme) => {
+          const currentPreferences = get().preferences;
+          if (currentPreferences) {
+            set(
+              {
+                preferences: {
+                  ...currentPreferences,
+                  theme,
+                  lastPreferencesUpdate: getCurrentTimestamp(),
+                },
               },
-              lastPreferencesUpdate: getCurrentTimestamp(),
+              false,
+              'auth/updateTheme'
+            );
+          }
+        },
+
+        updateNotifications: (notifications) => {
+          const currentPreferences = get().preferences;
+          if (currentPreferences) {
+            set(
+              {
+                preferences: {
+                  ...currentPreferences,
+                  notifications: {
+                    ...currentPreferences.notifications,
+                    ...notifications,
+                  },
+                  lastPreferencesUpdate: getCurrentTimestamp(),
+                },
+              },
+              false,
+              'auth/updateNotifications'
+            );
+          }
+        },
+
+        updateAccessibility: (accessibility) => {
+          const currentPreferences = get().preferences;
+          if (currentPreferences) {
+            set(
+              {
+                preferences: {
+                  ...currentPreferences,
+                  accessibility: {
+                    ...currentPreferences.accessibility,
+                    ...accessibility,
+                  },
+                  lastPreferencesUpdate: getCurrentTimestamp(),
+                },
+              },
+              false,
+              'auth/updateAccessibility'
+            );
+          }
+        },
+
+        clearPreferences: () => {
+          set(
+            {
+              preferences: null,
+              isPreferencesLoaded: false,
             },
-          });
-        }
-      },
+            false,
+            'auth/clearPreferences'
+          );
+        },
 
-      clearPreferences: () => {
-        set({
-          preferences: null,
-          isPreferencesLoaded: false,
-        });
-      },
-
-      // Onboarding actions
-      setOnboarding: (onboarding) => {
-        set({
-          onboarding: {
-            ...onboarding,
-            lastInteractionAt: getCurrentTimestamp(),
-          },
-          isOnboardingLoaded: true,
-        });
-      },
-
-      updateOnboarding: (updates) => {
-        const currentOnboarding = get().onboarding;
-        set({
-          onboarding: currentOnboarding
-            ? {
-                ...currentOnboarding,
-                ...updates,
+        // Onboarding actions
+        setOnboarding: (onboarding) => {
+          set(
+            {
+              onboarding: {
+                ...onboarding,
                 lastInteractionAt: getCurrentTimestamp(),
-              }
-            : null,
-        });
-      },
-
-      completeOnboardingStep: (stepName) => {
-        const currentOnboarding = get().onboarding;
-        if (currentOnboarding) {
-          const newCompletedSteps = [...currentOnboarding.completedSteps];
-          if (!newCompletedSteps.includes(stepName)) {
-            newCompletedSteps.push(stepName);
-          }
-
-          const newSkippedSteps = currentOnboarding.skippedSteps.filter(
-            (step) => step !== stepName
-          );
-
-          const newCurrentStep = Math.min(
-            currentOnboarding.currentStep + 1,
-            currentOnboarding.totalSteps
-          );
-
-          set({
-            onboarding: {
-              ...currentOnboarding,
-              completedSteps: newCompletedSteps,
-              skippedSteps: newSkippedSteps,
-              currentStep: newCurrentStep,
-              data: {
-                ...currentOnboarding.data,
-                [stepName]: true,
               },
-              lastInteractionAt: getCurrentTimestamp(),
+              isOnboardingLoaded: true,
             },
-          });
-        }
-      },
+            false,
+            'auth/setOnboarding'
+          );
+        },
 
-      skipOnboardingStep: (stepName) => {
-        const currentOnboarding = get().onboarding;
-        if (currentOnboarding) {
-          const newSkippedSteps = [...currentOnboarding.skippedSteps];
-          if (!newSkippedSteps.includes(stepName)) {
-            newSkippedSteps.push(stepName);
+        updateOnboarding: (updates) => {
+          const currentOnboarding = get().onboarding;
+          set(
+            {
+              onboarding: currentOnboarding
+                ? {
+                    ...currentOnboarding,
+                    ...updates,
+                    lastInteractionAt: getCurrentTimestamp(),
+                  }
+                : null,
+            },
+            false,
+            'auth/updateOnboarding'
+          );
+        },
+
+        completeOnboardingStep: (stepName) => {
+          const currentOnboarding = get().onboarding;
+          if (currentOnboarding) {
+            const newCompletedSteps = [...currentOnboarding.completedSteps];
+            if (!newCompletedSteps.includes(stepName)) {
+              newCompletedSteps.push(stepName);
+            }
+
+            const newSkippedSteps = currentOnboarding.skippedSteps.filter(
+              (step) => step !== stepName
+            );
+
+            const newCurrentStep = Math.min(
+              currentOnboarding.currentStep + 1,
+              currentOnboarding.totalSteps
+            );
+
+            set(
+              {
+                onboarding: {
+                  ...currentOnboarding,
+                  completedSteps: newCompletedSteps,
+                  skippedSteps: newSkippedSteps,
+                  currentStep: newCurrentStep,
+                  data: {
+                    ...currentOnboarding.data,
+                    [stepName]: true,
+                  },
+                  lastInteractionAt: getCurrentTimestamp(),
+                },
+              },
+              false,
+              'auth/completeOnboardingStep'
+            );
           }
+        },
 
-          const newCompletedSteps = currentOnboarding.completedSteps.filter(
-            (step) => step !== stepName
-          );
+        skipOnboardingStep: (stepName) => {
+          const currentOnboarding = get().onboarding;
+          if (currentOnboarding) {
+            const newSkippedSteps = [...currentOnboarding.skippedSteps];
+            if (!newSkippedSteps.includes(stepName)) {
+              newSkippedSteps.push(stepName);
+            }
 
-          const newCurrentStep = Math.min(
-            currentOnboarding.currentStep + 1,
-            currentOnboarding.totalSteps
-          );
+            const newCompletedSteps = currentOnboarding.completedSteps.filter(
+              (step) => step !== stepName
+            );
 
-          set({
-            onboarding: {
-              ...currentOnboarding,
-              completedSteps: newCompletedSteps,
-              skippedSteps: newSkippedSteps,
-              currentStep: newCurrentStep,
-              lastInteractionAt: getCurrentTimestamp(),
+            const newCurrentStep = Math.min(
+              currentOnboarding.currentStep + 1,
+              currentOnboarding.totalSteps
+            );
+
+            set(
+              {
+                onboarding: {
+                  ...currentOnboarding,
+                  completedSteps: newCompletedSteps,
+                  skippedSteps: newSkippedSteps,
+                  currentStep: newCurrentStep,
+                  lastInteractionAt: getCurrentTimestamp(),
+                },
+              },
+              false,
+              'auth/skipOnboardingStep'
+            );
+          }
+        },
+
+        completeOnboarding: () => {
+          const currentOnboarding = get().onboarding;
+          if (currentOnboarding) {
+            set(
+              {
+                onboarding: {
+                  ...currentOnboarding,
+                  isCompleted: true,
+                  completedAt: getCurrentTimestamp(),
+                  lastInteractionAt: getCurrentTimestamp(),
+                },
+              },
+              false,
+              'auth/completeOnboarding'
+            );
+          }
+        },
+
+        resetOnboarding: () => {
+          set(
+            {
+              onboarding: getDefaultOnboarding(),
             },
-          });
-        }
-      },
+            false,
+            'auth/resetOnboarding'
+          );
+        },
 
-      completeOnboarding: () => {
-        const currentOnboarding = get().onboarding;
-        if (currentOnboarding) {
-          set({
-            onboarding: {
-              ...currentOnboarding,
-              isCompleted: true,
-              completedAt: getCurrentTimestamp(),
-              lastInteractionAt: getCurrentTimestamp(),
+        clearOnboarding: () => {
+          set(
+            {
+              onboarding: null,
+              isOnboardingLoaded: false,
             },
-          });
-        }
-      },
+            false,
+            'auth/clearOnboarding'
+          );
+        },
 
-      resetOnboarding: () => {
-        set({
-          onboarding: getDefaultOnboarding(),
-        });
-      },
+        // Initialization actions
+        setInitialized: (initialized) => {
+          set({ isInitialized: initialized }, false, 'auth/setInitialized');
+        },
 
-      clearOnboarding: () => {
-        set({
-          onboarding: null,
-          isOnboardingLoaded: false,
-        });
-      },
+        setProfileLoaded: (loaded) => {
+          set({ isProfileLoaded: loaded }, false, 'auth/setProfileLoaded');
+        },
 
-      // Initialization actions
-      setInitialized: (initialized) => {
-        set({ isInitialized: initialized });
-      },
+        setPreferencesLoaded: (loaded) => {
+          set(
+            { isPreferencesLoaded: loaded },
+            false,
+            'auth/setPreferencesLoaded'
+          );
+        },
 
-      setProfileLoaded: (loaded) => {
-        set({ isProfileLoaded: loaded });
-      },
-
-      setPreferencesLoaded: (loaded) => {
-        set({ isPreferencesLoaded: loaded });
-      },
-
-      setOnboardingLoaded: (loaded) => {
-        set({ isOnboardingLoaded: loaded });
-      },
-    }),
-    {
-      name: 'auth-storage',
-      // Only persist essential data, excluding sensitive tokens
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        user: state.user,
-        sessionId: state.sessionId,
-        profile: state.profile,
-        preferences: state.preferences,
-        onboarding: state.onboarding,
-        isInitialized: state.isInitialized,
-        isProfileLoaded: state.isProfileLoaded,
-        isPreferencesLoaded: state.isPreferencesLoaded,
-        isOnboardingLoaded: state.isOnboardingLoaded,
-        // Note: token is not persisted for security reasons
+        setOnboardingLoaded: (loaded) => {
+          set(
+            { isOnboardingLoaded: loaded },
+            false,
+            'auth/setOnboardingLoaded'
+          );
+        },
       }),
-    }
+      {
+        name: 'auth-storage',
+        // Only persist essential data, excluding sensitive tokens
+        partialize: (state) => ({
+          isAuthenticated: state.isAuthenticated,
+          user: state.user,
+          sessionId: state.sessionId,
+          profile: state.profile,
+          preferences: state.preferences,
+          onboarding: state.onboarding,
+          isInitialized: state.isInitialized,
+          isProfileLoaded: state.isProfileLoaded,
+          isPreferencesLoaded: state.isPreferencesLoaded,
+          isOnboardingLoaded: state.isOnboardingLoaded,
+          // Note: token is not persisted for security reasons
+        }),
+      }
+    ),
+    createDevtoolsConfig('Auth')
   )
 );
 
