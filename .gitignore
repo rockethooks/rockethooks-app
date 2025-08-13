@@ -54,3 +54,4 @@ yarn-error.log
 # Storybook build outputs
 storybook-static/
 .debug
+tsconfig.tsbuildinfo
