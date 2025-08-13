@@ -30,7 +30,7 @@
     }
   },
   "files": {
-    "includes": ["src/**/*", "*.config.js", ".claude/**/*"],
+    "includes": ["src/**/*", "*.config.js", "*.config.ts", ".claude/**/*"],
     "ignoreUnknown": false
   },
   "vcs": {
