@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import { AuthSync } from '@/components';
 import { Toaster } from '@/components/ui/Sonner';
 import { TooltipProvider } from '@/components/ui/Tooltip';
 import { ThemeProvider } from '@/providers/ThemeProvider';
@@ -11,6 +12,7 @@ interface RootLayoutProps {
 export function RootLayout({ children }: RootLayoutProps) {
   return (
     <AppErrorBoundary>
+      <AuthSync />
       <ThemeProvider defaultTheme="system" storageKey="rockethooks-ui-theme">
         <TooltipProvider>
           <div className="min-h-screen bg-background font-sans antialiased">
