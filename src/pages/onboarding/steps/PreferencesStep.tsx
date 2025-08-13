@@ -40,8 +40,11 @@ import {
   preferencesSchema,
 } from '@/lib/validations/onboarding';
 import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
+import { loggers } from '@/utils';
 import type { PreferencesDraft } from '@/utils/onboardingDrafts';
 import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
+
+const logger = loggers.onboarding;
 
 export interface PreferencesStepProps {
   onComplete?: () => void;
@@ -173,10 +176,10 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
         onComplete?.();
         onNext?.();
       } else {
-        console.error('Failed to complete preferences step');
+        logger.error('Failed to complete preferences step');
       }
     } catch (error) {
-      console.error('Failed to complete preferences step:', error);
+      logger.error('Failed to complete preferences step:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       actions.addError(errorMessage);

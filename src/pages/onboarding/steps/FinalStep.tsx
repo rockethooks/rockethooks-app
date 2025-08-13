@@ -1,6 +1,10 @@
 import { ArrowRight, CheckCircle, Sparkles, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loggers } from '@/utils';
+
+const logger = loggers.onboarding;
+
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import {
@@ -40,7 +44,7 @@ export function FinalStep({ onComplete, onNext }: FinalStepProps) {
       // Clear all onboarding drafts from localStorage
       const draftsClearSuccess = clearDrafts();
       if (!draftsClearSuccess) {
-        console.warn('Failed to clear onboarding drafts from localStorage');
+        logger.warn('Failed to clear onboarding drafts from localStorage');
       }
 
       // Call completion callback if provided
@@ -56,7 +60,7 @@ export function FinalStep({ onComplete, onNext }: FinalStepProps) {
         void navigate('/dashboard');
       }
     } catch (completionError) {
-      console.error('Failed to complete onboarding:', completionError);
+      logger.error('Failed to complete onboarding:', completionError);
       setError(
         completionError instanceof Error
           ? completionError.message

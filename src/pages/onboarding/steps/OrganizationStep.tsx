@@ -38,8 +38,11 @@ import {
 import { OnboardingEvents } from '@/store/onboarding';
 import { useOnboarding } from '@/store/onboarding/hooks';
 import type { OrganizationData } from '@/types/onboarding';
+import { loggers } from '@/utils';
 import type { OrganizationDraft } from '@/utils/onboardingDrafts';
 import { getDraft, saveDraft } from '@/utils/onboardingDrafts';
+
+const logger = loggers.onboarding;
 
 export interface OrganizationStepProps {
   onComplete?: () => void;
@@ -119,10 +122,10 @@ export function OrganizationStep({
         onComplete?.();
         onNext?.();
       } else {
-        console.error('Failed to complete organization step');
+        logger.error('Failed to complete organization step');
       }
     } catch (error) {
-      console.error('Failed to complete organization step:', error);
+      logger.error('Failed to complete organization step:', error);
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error occurred';
       actions.addError(errorMessage);

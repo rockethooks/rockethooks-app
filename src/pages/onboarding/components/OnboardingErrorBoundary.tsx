@@ -1,5 +1,9 @@
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { loggers } from '@/utils';
+
+const logger = loggers.onboarding;
+
 import { Alert } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -32,7 +36,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
 
     // Log error to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
-      console.error(
+      logger.error(
         'Onboarding Error Boundary caught an error:',
         error,
         errorInfo

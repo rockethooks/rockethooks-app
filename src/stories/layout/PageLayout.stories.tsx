@@ -14,6 +14,9 @@ import {
   PageLayout,
   SettingsPage,
 } from '@/shared/components/PageLayout';
+import { loggers } from '@/utils';
+
+const logger = loggers.ui;
 
 /**
  * PageLayout component provides a consistent structure for application pages
@@ -451,13 +454,13 @@ export const DetailLayout: Story = {
       description="GET https://api.example.com/users/profile"
       breadcrumb="Dashboard / API Connections / User Profile API"
       backAction={() => {
-        console.log('Back clicked');
+        logger.debug('Back clicked');
       }}
       editAction={() => {
-        console.log('Edit clicked');
+        logger.debug('Edit clicked');
       }}
       deleteAction={() => {
-        console.log('Delete clicked');
+        logger.debug('Delete clicked');
       }}
       customActions={
         <Button variant="outline">

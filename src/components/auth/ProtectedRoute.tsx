@@ -3,6 +3,10 @@ import { useAuth, useUser } from '@clerk/clerk-react';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
+
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 import type { GuardResult, RouteGuard } from '@/types/auth';
 
@@ -83,7 +87,7 @@ export function ProtectedRoute({
         setGuardsResult({ allowed: true });
       } catch (error) {
         // If guard evaluation fails, deny access
-        console.error('Guard evaluation failed:', error);
+        logger.error('Guard evaluation failed:', error);
         setGuardsResult({
           allowed: false,
           redirectTo: fallbackPath,

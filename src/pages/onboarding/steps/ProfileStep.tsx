@@ -39,7 +39,10 @@ import {
   profileRoles,
   profileSchema,
 } from '@/lib/validations/onboarding';
+import { loggers } from '@/utils';
 import type { ProfileDraft } from '@/utils/onboardingDrafts';
+
+const logger = loggers.onboarding;
 
 export interface ProfileStepProps {
   onComplete?: () => void;
@@ -179,10 +182,10 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
         }
       } else {
         // Error handling is managed by the state machine
-        console.error('Failed to complete profile step');
+        logger.error('Failed to complete profile step');
       }
     } catch (error) {
-      console.error('Failed to complete profile step:', error);
+      logger.error('Failed to complete profile step:', error);
     }
   };
 

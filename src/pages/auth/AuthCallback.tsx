@@ -3,6 +3,10 @@ import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
+
 import { Card, CardContent } from '@/components/ui/Card';
 import { useReturnUrl } from '@/hooks/auth/useReturnUrl';
 import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
@@ -39,7 +43,7 @@ export function AuthCallback() {
 
     // Handle onboarding status error
     if (error) {
-      console.error('Error determining onboarding status:', error);
+      logger.error('Error determining onboarding status:', error);
       toast.error('Welcome to RocketHooks!', {
         description:
           'There was an issue loading your profile, but you can still continue.',

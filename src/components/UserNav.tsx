@@ -1,5 +1,9 @@
 import { LogOut, Settings, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import {
@@ -22,7 +26,7 @@ export function UserNav() {
       await authService.signOut();
       void navigate('/login');
     } catch (error) {
-      console.error('Sign out failed:', error);
+      logger.error('Sign out failed:', error);
     }
   };
 

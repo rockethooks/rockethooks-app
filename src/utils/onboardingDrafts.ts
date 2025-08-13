@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { z } from 'zod';
 import { organizationSchema } from '@/lib/validations/onboarding';
+import { loggers } from '@/utils';
+
+const logger = loggers.onboarding;
 
 // ========================================================================================
 // Type Definitions
@@ -236,7 +239,7 @@ function validateDraftData(
     const validated = schema.parse(data);
     return validated as DraftData;
   } catch (error) {
-    console.warn(`Draft data validation failed for step ${step}:`, error);
+    logger.warn(`Draft data validation failed for step ${step}:`, error);
     return null;
   }
 }
@@ -278,7 +281,7 @@ function safeParse(json: string): DraftWrapper | null {
   try {
     return JSON.parse(json) as DraftWrapper;
   } catch (error) {
-    console.error('Failed to parse draft JSON:', error);
+    logger.error('Failed to parse draft JSON:', error);
     return null;
   }
 }
@@ -324,7 +327,7 @@ function cleanupExpiredDrafts(): void {
       }
     }
   } catch (error) {
-    console.error('Failed to cleanup expired drafts:', error);
+    logger.error('Failed to cleanup expired drafts:', error);
   }
 }
 
@@ -337,7 +340,7 @@ function cleanupExpiredDrafts(): void {
  */
 export function saveDraft(step: OnboardingStep, data: DraftData): boolean {
   if (!isLocalStorageAvailable()) {
-    console.error('localStorage is not available');
+    logger.error('localStorage is not available');
     return false;
   }
 
@@ -355,7 +358,7 @@ export function saveDraft(step: OnboardingStep, data: DraftData): boolean {
     localStorage.setItem(key, JSON.stringify(wrapper));
     return true;
   } catch (error) {
-    console.error(`Failed to save draft for step ${step}:`, error);
+    logger.error(`Failed to save draft for step ${step}:`, error);
     return false;
   }
 }
@@ -366,7 +369,7 @@ export function saveDraft(step: OnboardingStep, data: DraftData): boolean {
  */
 export function getDraft(step: OnboardingStep): DraftData | null {
   if (!isLocalStorageAvailable()) {
-    console.error('localStorage is not available');
+    logger.error('localStorage is not available');
     return null;
   }
 
@@ -395,7 +398,7 @@ export function getDraft(step: OnboardingStep): DraftData | null {
     const validatedData = validateDraftData(step, wrapper.data);
     if (!validatedData) {
       // Data doesn't match current schema, remove it to prevent errors
-      console.warn(
+      logger.warn(
         `Removing invalid draft for step ${step} due to schema mismatch`
       );
       localStorage.removeItem(key);
@@ -404,7 +407,7 @@ export function getDraft(step: OnboardingStep): DraftData | null {
 
     return validatedData;
   } catch (error) {
-    console.error(`Failed to get draft for step ${step}:`, error);
+    logger.error(`Failed to get draft for step ${step}:`, error);
     return null;
   }
 }
@@ -437,7 +440,7 @@ export function getAllDrafts(): Partial<Record<OnboardingStep, DraftData>> {
  */
 export function clearDrafts(): boolean {
   if (!isLocalStorageAvailable()) {
-    console.error('localStorage is not available');
+    logger.error('localStorage is not available');
     return false;
   }
 
@@ -451,7 +454,7 @@ export function clearDrafts(): boolean {
 
     return true;
   } catch (error) {
-    console.error('Failed to clear all drafts:', error);
+    logger.error('Failed to clear all drafts:', error);
     return false;
   }
 }
@@ -461,7 +464,7 @@ export function clearDrafts(): boolean {
  */
 export function clearStepDraft(step: OnboardingStep): boolean {
   if (!isLocalStorageAvailable()) {
-    console.error('localStorage is not available');
+    logger.error('localStorage is not available');
     return false;
   }
 
@@ -470,7 +473,7 @@ export function clearStepDraft(step: OnboardingStep): boolean {
     localStorage.removeItem(key);
     return true;
   } catch (error) {
-    console.error(`Failed to clear draft for step ${step}:`, error);
+    logger.error(`Failed to clear draft for step ${step}:`, error);
     return false;
   }
 }
@@ -563,7 +566,7 @@ export function useAutoSaveDraftAdvanced(
         const errorMessage =
           saveError instanceof Error ? saveError.message : 'Unknown save error';
         setError(errorMessage);
-        console.error(`Auto-save failed for step ${step}:`, saveError);
+        logger.error(`Auto-save failed for step ${step}:`, saveError);
       } finally {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         if (isMountedRef.current) {

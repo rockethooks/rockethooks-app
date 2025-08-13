@@ -1,6 +1,9 @@
 import { useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { initializeNewUser, useAuthStore } from '@/store/auth.store';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
 
 export function AuthSync() {
   const { isLoaded: authLoaded, isSignedIn, sessionId } = useAuth();
@@ -26,7 +29,7 @@ export function AuthSync() {
       try {
         initializeNewUser();
       } catch (error) {
-        console.error('Failed to initialize user profile:', error);
+        logger.error('Failed to initialize user profile:', error);
       }
     } else {
       setUnauthenticated();

@@ -3,6 +3,10 @@ import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { loggers } from '@/utils';
+
+const logger = loggers.auth;
+
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
 import { Button } from '@/components/ui/Button';
 import {
@@ -71,7 +75,7 @@ const logError = (error: unknown, context: string) => {
 
   // Log to console in development
   if (import.meta.env.DEV) {
-    console.error('[OAuth Error]', errorInfo);
+    logger.error('[OAuth Error]', errorInfo);
   }
 
   // TODO: In production, send to error tracking service (e.g., Sentry)

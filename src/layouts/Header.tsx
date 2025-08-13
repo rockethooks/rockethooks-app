@@ -27,6 +27,9 @@ import {
 import { Input } from '@/components/ui/Input';
 import { useTheme } from '@/providers/useTheme';
 import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary';
+import { loggers } from '@/utils';
+
+const logger = loggers.ui;
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -41,13 +44,13 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log('Search query:', searchQuery);
+      logger.debug('Search query:', searchQuery);
       // TODO: Implement search functionality
     }
   };
 
   const handleLogout = () => {
-    console.log('Logout clicked');
+    logger.debug('Logout clicked');
     // TODO: Implement logout functionality
   };
 
