@@ -57,21 +57,19 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   const { isLoaded, orgId } = useAuth();
   const { user } = useUser();
 
-  // State machine store
-  const {
-    currentState,
-    context,
-    sendEvent,
-    canTransition,
-    reset,
-    goBack,
-    skip,
-    canGoBack,
-    canSkip,
-    getProgress,
-    addError,
-    clearErrors,
-  } = useOnboardingStore();
+  // State machine store with optimized selectors
+  const currentState = useOnboardingStore((state) => state.currentState);
+  const context = useOnboardingStore((state) => state.context);
+  const sendEvent = useOnboardingStore((state) => state.sendEvent);
+  const canTransition = useOnboardingStore((state) => state.canTransition);
+  const reset = useOnboardingStore((state) => state.reset);
+  const goBack = useOnboardingStore((state) => state.goBack);
+  const skip = useOnboardingStore((state) => state.skip);
+  const canGoBack = useOnboardingStore((state) => state.canGoBack);
+  const canSkip = useOnboardingStore((state) => state.canSkip);
+  const getProgress = useOnboardingStore((state) => state.getProgress);
+  const addError = useOnboardingStore((state) => state.addError);
+  const clearErrors = useOnboardingStore((state) => state.clearErrors);
 
   // Auth store for legacy compatibility
   const { completeOnboardingStep, updateProfile } = useAuthStore();

@@ -153,22 +153,22 @@ export function useOnboarding(): UseOnboardingReturn {
     [store.currentState, store.context.isComplete]
   );
 
-  // Context data for easy access
-  const context = useMemo<OnboardingContextData>(
-    () => ({
-      userId: store.context.userId,
-      organizationId: store.context.organizationId,
-      currentStep: store.context.currentStep,
-      totalSteps: store.context.totalSteps,
-      completedSteps: store.context.completedSteps,
-      skippedSteps: store.context.skippedSteps,
-      isComplete: store.context.isComplete,
-      startedAt: store.context.startedAt,
-      completedAt: store.context.completedAt,
-      errors: store.context.errors,
-    }),
-    [store.context]
-  );
+  // Context data with optimized selectors
+  const context = useMemo<OnboardingContextData>(() => {
+    const ctx = store.context;
+    return {
+      userId: ctx.userId,
+      organizationId: ctx.organizationId,
+      currentStep: ctx.currentStep,
+      totalSteps: ctx.totalSteps,
+      completedSteps: ctx.completedSteps,
+      skippedSteps: ctx.skippedSteps,
+      isComplete: ctx.isComplete,
+      startedAt: ctx.startedAt,
+      completedAt: ctx.completedAt,
+      errors: ctx.errors,
+    };
+  }, [store.context]);
 
   // Progress information with proper Zustand selector
   const progress = useMemo<OnboardingProgress>(

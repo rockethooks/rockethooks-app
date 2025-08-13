@@ -9,6 +9,92 @@ import { getDraft, validateDraft } from '@/utils/onboardingDrafts';
 // } from '@/types/onboarding';
 import { createDevtoolsConfig } from '../devtools.config';
 
+/**
+ * Type guard to validate context structure
+ */
+function isValidContext(context: unknown): context is OnboardingContext {
+  if (!context || typeof context !== 'object') {
+    return false;
+  }
+
+  const ctx = context as Partial<OnboardingContext>;
+
+  return (
+    typeof ctx.userId === 'string' &&
+    (ctx.organizationId === null || typeof ctx.organizationId === 'string') &&
+    typeof ctx.currentStep === 'number' &&
+    typeof ctx.totalSteps === 'number' &&
+    ctx.completedSteps instanceof Set &&
+    ctx.skippedSteps instanceof Set &&
+    typeof ctx.isComplete === 'boolean' &&
+    Array.isArray(ctx.errors)
+  );
+}
+
+/**
+ * Type guard to validate context updates
+ */
+function isValidContextUpdate(
+  updates: unknown
+): updates is Partial<OnboardingContext> {
+  if (!updates || typeof updates !== 'object') {
+    return false;
+  }
+
+  const upd = updates as Record<string, unknown>;
+
+  // Check each provided field is valid
+  for (const [key, value] of Object.entries(upd)) {
+    switch (key) {
+      case 'userId':
+        if (typeof value !== 'string') return false;
+        break;
+      case 'organizationId':
+        if (value !== null && typeof value !== 'string') return false;
+        break;
+      case 'currentStep':
+      case 'totalSteps':
+        if (typeof value !== 'number') return false;
+        break;
+      case 'completedSteps':
+      case 'skippedSteps':
+        if (!(value instanceof Set)) return false;
+        break;
+      case 'isComplete':
+        if (typeof value !== 'boolean') return false;
+        break;
+      case 'startedAt':
+      case 'completedAt':
+        if (value !== null && typeof value !== 'string') return false;
+        break;
+      case 'errors':
+        if (!Array.isArray(value)) return false;
+        break;
+      default:
+        // Unknown field - allow it but log warning
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`[Onboarding] Unknown context field: ${key}`);
+        }
+        break;
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Type guard for event payloads
+ */
+function isValidEventPayload(
+  payload: unknown
+): payload is Record<string, unknown> | null | undefined {
+  return (
+    payload === null ||
+    payload === undefined ||
+    (typeof payload === 'object' && !Array.isArray(payload))
+  );
+}
+
 // ========================================================================================
 // Onboarding State Machine Enums and Types
 // ========================================================================================
@@ -184,7 +270,13 @@ const transitions: StateTransition[] = [
     from: OnboardingStates.CHECK_ORGANIZATION,
     event: OnboardingEvents.HAS_ORGANIZATION,
     to: OnboardingStates.PROFILE_COMPLETION,
-    guard: (context) => !!context.organizationId,
+    guard: (context) => {
+      if (!isValidContext(context)) {
+        console.warn('[Onboarding] Invalid context in guard:', context);
+        return false;
+      }
+      return !!context.organizationId;
+    },
     action: (context) => {
       context.skippedSteps.add('organization');
       context.currentStep = 2;
@@ -204,7 +296,14 @@ const transitions: StateTransition[] = [
     from: OnboardingStates.ORGANIZATION_SETUP,
     event: OnboardingEvents.ORGANIZATION_CREATED,
     to: OnboardingStates.PROFILE_COMPLETION,
-    guard: (_context) => {
+    guard: (context) => {
+      if (!isValidContext(context)) {
+        console.warn(
+          '[Onboarding] Invalid context in organization guard:',
+          context
+        );
+        return false;
+      }
       const draft = getDraft('organization');
       return validateDraft('organization', draft);
     },
@@ -272,7 +371,13 @@ const transitions: StateTransition[] = [
     from: OnboardingStates.PROFILE_COMPLETION,
     event: OnboardingEvents.GO_BACK,
     to: OnboardingStates.ORGANIZATION_SETUP,
-    guard: (context) => !context.skippedSteps.has('organization'),
+    guard: (context) => {
+      if (!isValidContext(context)) {
+        console.warn('[Onboarding] Invalid context in go back guard:', context);
+        return false;
+      }
+      return !context.skippedSteps.has('organization');
+    },
     action: (context) => {
       context.currentStep = Math.max(1, context.currentStep - 1);
     },
@@ -442,6 +547,26 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
         sendEvent: (event, payload) => {
           const { currentState, transitions: allTransitions, context } = get();
+
+          // Runtime validation of event payload
+          if (!isValidEventPayload(payload)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('[Onboarding] Invalid event payload:', payload);
+            }
+            return false;
+          }
+
+          // Runtime validation of context before processing
+          if (!isValidContext(context)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error(
+                '[Onboarding] Invalid context structure in sendEvent:',
+                context
+              );
+            }
+            return false;
+          }
+
           const transition = findTransition(
             currentState,
             event,
@@ -457,11 +582,24 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
           // Check guard with draft validation
           if (transition.guard) {
-            if (
-              !transition.guard(context, payload as Record<string, unknown>)
-            ) {
+            try {
+              if (
+                !transition.guard(context, payload as Record<string, unknown>)
+              ) {
+                if (process.env.NODE_ENV === 'development') {
+                  console.warn(
+                    `[Onboarding] Guard condition failed for ${currentState} -> ${transition.to} on ${event}`,
+                    { context, payload }
+                  );
+                }
+                return false;
+              }
+            } catch (error) {
               if (process.env.NODE_ENV === 'development') {
-                console.warn('Guard condition failed');
+                console.error(
+                  `[Onboarding] Guard function error for ${currentState} -> ${transition.to} on ${event}:`,
+                  error
+                );
               }
               return false;
             }
@@ -598,6 +736,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
         },
 
         updateContext: (updates) => {
+          // Runtime validation of updates
+          if (!isValidContextUpdate(updates)) {
+            if (process.env.NODE_ENV === 'development') {
+              console.error('[Onboarding] Invalid context updates:', updates);
+            }
+            return;
+          }
+
           // Define allowed context fields to prevent arbitrary updates
           const allowedFields = new Set([
             'userId',
@@ -613,24 +759,25 @@ export const useOnboardingStore = create<OnboardingStore>()(
           ]);
 
           // Filter out disallowed fields using safer typing
-          const filteredUpdates = Object.keys(updates).reduce<
-            Partial<OnboardingContext>
-          >((acc, key) => {
+          const filteredUpdates: Record<string, unknown> = {};
+          for (const [key, value] of Object.entries(updates)) {
             if (allowedFields.has(key)) {
-              return { ...acc, [key]: updates[key as keyof typeof updates] };
+              filteredUpdates[key] = value;
             } else {
               console.warn(
                 `Attempted to update disallowed context field: ${key}`
               );
-              return acc;
             }
-          }, {});
+          }
 
           set(
             (state) => {
               return {
                 ...state,
-                context: { ...state.context, ...filteredUpdates },
+                context: {
+                  ...state.context,
+                  ...(filteredUpdates as Partial<OnboardingContext>),
+                },
               };
             },
             false,
@@ -705,40 +852,24 @@ export const useOnboardingStore = create<OnboardingStore>()(
         onRehydrateStorage: () => (state) => {
           // Convert arrays back to Sets after rehydration
           if (state?.context) {
-            const completedArray = Array.isArray(state.context.completedSteps)
+            // Simplified: always expect arrays from storage
+            const completedSteps = Array.isArray(state.context.completedSteps)
               ? state.context.completedSteps
-              : Array.from(state.context.completedSteps);
-            const skippedArray = Array.isArray(state.context.skippedSteps)
+              : [];
+            const skippedSteps = Array.isArray(state.context.skippedSteps)
               ? state.context.skippedSteps
-              : Array.from(state.context.skippedSteps);
+              : [];
 
-            state.context.completedSteps = new Set(completedArray as string[]);
-            state.context.skippedSteps = new Set(skippedArray as string[]);
+            state.context.completedSteps = new Set(completedSteps as string[]);
+            state.context.skippedSteps = new Set(skippedSteps as string[]);
           }
         },
         version: 1,
         migrate: (persistedState: unknown, version: number) => {
           // Handle migrations if state structure changes
           if (version === 0) {
-            // Migration from version 0 to 1 - convert arrays to Sets
-            const state = persistedState as {
-              context?: {
-                completedSteps?: string[];
-                skippedSteps?: string[];
-              };
-            };
-            if (state.context) {
-              const contextWithSets = state.context as unknown as {
-                completedSteps: Set<string>;
-                skippedSteps: Set<string>;
-              };
-              contextWithSets.completedSteps = new Set(
-                state.context.completedSteps ?? []
-              );
-              contextWithSets.skippedSteps = new Set(
-                state.context.skippedSteps ?? []
-              );
-            }
+            // Migration from version 0 to 1 - simplified
+            // Just ensure we have valid structure, onRehydrateStorage handles Set conversion
           }
           return persistedState as OnboardingStore;
         },

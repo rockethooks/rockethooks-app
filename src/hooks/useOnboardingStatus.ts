@@ -1,5 +1,5 @@
 import { useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 export interface OnboardingStatus {
   isLoading: boolean;
@@ -15,44 +15,41 @@ export interface OnboardingStatus {
  */
 export function useOnboardingStatus(): OnboardingStatus {
   const { user, isLoaded } = useUser();
-  const [status, setStatus] = useState<OnboardingStatus>({
-    isLoading: true,
-    isNewUser: false,
-    shouldRedirectToOnboarding: false,
-    error: null,
-  });
 
-  useEffect(() => {
+  // Memoized computation of onboarding status
+  const status = useMemo<OnboardingStatus>(() => {
     if (!isLoaded) {
-      setStatus((prev) => ({ ...prev, isLoading: true }));
-      return;
+      return {
+        isLoading: true,
+        isNewUser: false,
+        shouldRedirectToOnboarding: false,
+        error: null,
+      };
     }
 
     if (!user) {
-      setStatus({
+      return {
         isLoading: false,
         isNewUser: false,
         shouldRedirectToOnboarding: false,
         error: new Error('No user found'),
-      });
-      return;
+      };
     }
 
     try {
-      const now = new Date();
       const userCreatedAt = user.createdAt;
 
       if (!userCreatedAt) {
-        setStatus({
+        return {
           isLoading: false,
           isNewUser: false,
           shouldRedirectToOnboarding: false,
           error: new Error('User creation date not available'),
-        });
-        return;
+        };
       }
 
       // Calculate time difference in milliseconds
+      const now = new Date();
       const timeDiff = now.getTime() - userCreatedAt.getTime();
       // Consider user as "new" if created within the last 60 seconds (60000 ms)
       const isNewUser = timeDiff <= 60000;
@@ -62,20 +59,20 @@ export function useOnboardingStatus(): OnboardingStatus {
       // For now, we assume new users always need onboarding
       const shouldRedirectToOnboarding = isNewUser;
 
-      setStatus({
+      return {
         isLoading: false,
         isNewUser,
         shouldRedirectToOnboarding,
         error: null,
-      });
+      };
     } catch (error) {
-      setStatus({
+      return {
         isLoading: false,
         isNewUser: false,
         shouldRedirectToOnboarding: false,
         error:
           error instanceof Error ? error : new Error('Unknown error occurred'),
-      });
+      };
     }
   }, [user, isLoaded]);
 
