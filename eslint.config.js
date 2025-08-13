@@ -6,7 +6,15 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'vite.config.ts', '.storybook/**/*'] },
+  {
+    ignores: [
+      'dist',
+      'node_modules',
+      'vite.config.ts',
+      'vitest.config.ts',
+      '.storybook/**/*',
+    ],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     files: ['**/*.{ts,tsx}'],
