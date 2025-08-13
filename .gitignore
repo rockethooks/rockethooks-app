@@ -55,3 +55,4 @@ yarn-error.log
 storybook-static/
 .debug
 tsconfig.tsbuildinfo
+.serena/cache/
