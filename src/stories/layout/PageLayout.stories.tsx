@@ -1,19 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 import {
   DetailPage,
   PageLayout,
   SettingsPage,
-} from '@/shared/components/PageLayout'
+} from '@/shared/components/PageLayout';
 
 /**
  * PageLayout component provides a consistent structure for application pages
@@ -80,10 +80,10 @@ import { PageLayout, PageHeader, PageContent, PageActions } from '@/shared/compo
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof PageLayout>
+} satisfies Meta<typeof PageLayout>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 function SampleContent() {
   return (
@@ -107,7 +107,7 @@ function SampleContent() {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 /**
@@ -118,7 +118,7 @@ export const Default: Story = {
     title: 'Dashboard',
     children: <SampleContent />,
   },
-}
+};
 
 /**
  * Page with title, description, and actions
@@ -136,7 +136,7 @@ export const WithDescription: Story = {
     ),
     children: <SampleContent />,
   },
-}
+};
 
 /**
  * Page with breadcrumb navigation
@@ -197,7 +197,7 @@ export const WithBreadcrumb: Story = {
       </div>
     ),
   },
-}
+};
 
 /**
  * Full width page layout
@@ -335,7 +335,7 @@ export const FullWidth: Story = {
       </div>
     ),
   },
-}
+};
 
 /**
  * Settings page layout with specialized styling
@@ -438,7 +438,7 @@ export const SettingsLayout: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Detail page layout with entity actions
@@ -451,13 +451,13 @@ export const DetailLayout: Story = {
       description="GET https://api.example.com/users/profile"
       breadcrumb="Dashboard / API Connections / User Profile API"
       backAction={() => {
-        console.log('Back clicked')
+        console.log('Back clicked');
       }}
       editAction={() => {
-        console.log('Edit clicked')
+        console.log('Edit clicked');
       }}
       deleteAction={() => {
-        console.log('Delete clicked')
+        console.log('Delete clicked');
       }}
       customActions={
         <Button variant="outline">
@@ -575,7 +575,7 @@ export const DetailLayout: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Empty state page layout
@@ -657,7 +657,7 @@ export const EmptyState: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing page layout properties
@@ -675,4 +675,4 @@ export const Playground: Story = {
       </>
     ),
   },
-}
+};

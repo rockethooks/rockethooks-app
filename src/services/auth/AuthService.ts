@@ -1,32 +1,32 @@
-import { useAuth, useUser } from '@clerk/clerk-react'
+import { useAuth, useUser } from '@clerk/clerk-react';
 
 export interface User {
-  id: string
-  email: string
-  firstName?: string
-  lastName?: string
-  imageUrl?: string
-  organizationId?: string
+  id: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  imageUrl?: string;
+  organizationId?: string;
 }
 
 export interface AuthState {
-  isLoaded: boolean
-  isSignedIn: boolean
-  user: User | null
-  sessionId?: string
+  isLoaded: boolean;
+  isSignedIn: boolean;
+  user: User | null;
+  sessionId?: string;
 }
 
 export interface AuthService {
-  getAuthState(): AuthState
-  getToken(template?: string): Promise<string | null>
-  signOut(): Promise<void>
-  refreshToken(): Promise<string | null>
+  getAuthState(): AuthState;
+  getToken(template?: string): Promise<string | null>;
+  signOut(): Promise<void>;
+  refreshToken(): Promise<string | null>;
 }
 
 // Hook-based implementation that returns an AuthService object
 export function useClerkAuthService(): AuthService {
-  const auth = useAuth()
-  const user = useUser()
+  const auth = useAuth();
+  const user = useUser();
 
   const getAuthState = (): AuthState => {
     const result: AuthState = {
@@ -48,31 +48,31 @@ export function useClerkAuthService(): AuthService {
             ...(auth.orgId && { organizationId: auth.orgId }),
           }
         : null,
-    }
+    };
 
     if (auth.sessionId) {
-      result.sessionId = auth.sessionId
+      result.sessionId = auth.sessionId;
     }
 
-    return result
-  }
+    return result;
+  };
 
   const getToken = async (template?: string): Promise<string | null> => {
-    return await auth.getToken(template ? { template } : undefined)
-  }
+    return await auth.getToken(template ? { template } : undefined);
+  };
 
   const signOut = async (): Promise<void> => {
-    await auth.signOut()
-  }
+    await auth.signOut();
+  };
 
   const refreshToken = async (): Promise<string | null> => {
-    return await auth.getToken()
-  }
+    return await auth.getToken();
+  };
 
   return {
     getAuthState,
     getToken,
     signOut,
     refreshToken,
-  }
+  };
 }

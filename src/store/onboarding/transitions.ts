@@ -1,5 +1,5 @@
-import { OnboardingEvent, type StateTransition } from '@/types/onboarding'
-import { getDraft, validateDraft } from '@/utils/onboardingDrafts'
+import { OnboardingEvent, type StateTransition } from '@/types/onboarding';
+import { getDraft, validateDraft } from '@/utils/onboardingDrafts';
 
 /**
  * All state transitions for the onboarding flow
@@ -11,7 +11,7 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.BEGIN,
     to: 'CHECK_ORGANIZATION',
     action: (context) => {
-      context.startedAt = new Date().toISOString()
+      context.startedAt = new Date().toISOString();
     },
   },
 
@@ -22,8 +22,8 @@ export const transitions: StateTransition[] = [
     to: 'PROFILE_COMPLETION',
     guard: (context) => !!context.organizationId,
     action: (context) => {
-      context.skippedSteps.add('organization')
-      context.currentStep = 2
+      context.skippedSteps.add('organization');
+      context.currentStep = 2;
     },
   },
   {
@@ -31,7 +31,7 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.NO_ORGANIZATION,
     to: 'ORGANIZATION_SETUP',
     action: (context) => {
-      context.currentStep = 1
+      context.currentStep = 1;
     },
   },
 
@@ -41,12 +41,12 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.ORGANIZATION_CREATED,
     to: 'PROFILE_COMPLETION',
     guard: (_context) => {
-      const draft = getDraft('organization')
-      return validateDraft('organization', draft)
+      const draft = getDraft('organization');
+      return validateDraft('organization', draft);
     },
     action: (context) => {
-      context.completedSteps.add('organization')
-      context.currentStep = 2
+      context.completedSteps.add('organization');
+      context.currentStep = 2;
     },
   },
 
@@ -56,8 +56,8 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.SKIP_PREFERENCES,
     to: 'PROFILE_COMPLETION',
     action: (context) => {
-      context.skippedSteps.add('organization')
-      context.currentStep = 2
+      context.skippedSteps.add('organization');
+      context.currentStep = 2;
     },
   },
 
@@ -67,8 +67,8 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.PROFILE_COMPLETED,
     to: 'PREFERENCES',
     action: (context) => {
-      context.completedSteps.add('profile')
-      context.currentStep = 3
+      context.completedSteps.add('profile');
+      context.currentStep = 3;
     },
   },
 
@@ -78,8 +78,8 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.PREFERENCES_SAVED,
     to: 'COMPLETION',
     action: (context) => {
-      context.completedSteps.add('preferences')
-      context.currentStep = 4
+      context.completedSteps.add('preferences');
+      context.currentStep = 4;
     },
   },
   {
@@ -87,8 +87,8 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.SKIP_PREFERENCES,
     to: 'COMPLETION',
     action: (context) => {
-      context.skippedSteps.add('preferences')
-      context.currentStep = 4
+      context.skippedSteps.add('preferences');
+      context.currentStep = 4;
     },
   },
 
@@ -98,8 +98,8 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.COMPLETE,
     to: 'DASHBOARD',
     action: (context) => {
-      context.isComplete = true
-      context.completedAt = new Date().toISOString()
+      context.isComplete = true;
+      context.completedAt = new Date().toISOString();
     },
   },
 
@@ -110,7 +110,7 @@ export const transitions: StateTransition[] = [
     to: 'ORGANIZATION_SETUP',
     guard: (context) => !context.skippedSteps.has('organization'),
     action: (context) => {
-      context.currentStep = Math.max(1, context.currentStep - 1)
+      context.currentStep = Math.max(1, context.currentStep - 1);
     },
   },
   {
@@ -118,7 +118,7 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.GO_BACK,
     to: 'PROFILE_COMPLETION',
     action: (context) => {
-      context.currentStep = Math.max(2, context.currentStep - 1)
+      context.currentStep = Math.max(2, context.currentStep - 1);
     },
   },
 
@@ -182,4 +182,4 @@ export const transitions: StateTransition[] = [
     event: OnboardingEvent.RESET,
     to: 'START',
   },
-]
+];

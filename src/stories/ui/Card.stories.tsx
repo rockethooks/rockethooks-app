@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 
 /**
  * Card component providing a flexible container for content with header, body, and footer sections.
@@ -70,10 +70,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Card>
+} satisfies Meta<typeof Card>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Basic card with all sections
@@ -102,7 +102,7 @@ export const Default: Story = {
       </CardFooter>
     </Card>
   ),
-}
+};
 
 /**
  * Card with only header and content
@@ -129,7 +129,7 @@ export const SimpleCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Card with status and metrics - common in RocketHooks
@@ -175,7 +175,7 @@ export const StatusCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Metric card for dashboard display
@@ -238,7 +238,7 @@ export const MetricCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Event card showing webhook activity
@@ -293,7 +293,7 @@ export const EventCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Form card with input elements
@@ -367,7 +367,7 @@ export const FormCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Multiple cards in a grid layout
@@ -474,7 +474,7 @@ export const CardGrid: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Card with hover effects and interactions
@@ -515,7 +515,7 @@ export const InteractiveCard: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Empty state card
@@ -574,7 +574,7 @@ export const EmptyState: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing card properties
@@ -602,4 +602,4 @@ export const Playground: Story = {
       </CardFooter>
     </Card>
   ),
-}
+};

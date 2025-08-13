@@ -6,7 +6,7 @@ import {
   type PreferencesData,
   type ProfileData,
   type StateTransition,
-} from '@/types/onboarding'
+} from '@/types/onboarding';
 
 /**
  * Create initial context
@@ -23,7 +23,7 @@ export function createInitialContext(): OnboardingContext {
     startedAt: null,
     completedAt: null,
     errors: [],
-  }
+  };
 }
 
 /**
@@ -37,7 +37,7 @@ export function findTransition(
   return (
     transitions.find((t) => t.from === currentState && t.event === event) ??
     null
-  )
+  );
 }
 
 /**
@@ -49,34 +49,34 @@ export function createStateObject(
 ): OnboardingState {
   switch (type) {
     case 'START':
-      return { type: 'START' }
+      return { type: 'START' };
     case 'CHECK_ORGANIZATION':
       return {
         type: 'CHECK_ORGANIZATION',
         checking: (payload?.checking as boolean | undefined) ?? true,
-      }
+      };
     case 'ORGANIZATION_SETUP': {
-      const draft = payload?.draft as OrganizationData | undefined
+      const draft = payload?.draft as OrganizationData | undefined;
       return draft
         ? { type: 'ORGANIZATION_SETUP', draft }
-        : { type: 'ORGANIZATION_SETUP' }
+        : { type: 'ORGANIZATION_SETUP' };
     }
     case 'PROFILE_COMPLETION': {
-      const draft = payload?.draft as ProfileData | undefined
+      const draft = payload?.draft as ProfileData | undefined;
       return {
         type: 'PROFILE_COMPLETION',
         organizationId: (payload?.organizationId as string) || '',
         ...(draft && { draft }),
-      }
+      };
     }
     case 'PREFERENCES': {
-      const draft = payload?.draft as PreferencesData | undefined
-      return draft ? { type: 'PREFERENCES', draft } : { type: 'PREFERENCES' }
+      const draft = payload?.draft as PreferencesData | undefined;
+      return draft ? { type: 'PREFERENCES', draft } : { type: 'PREFERENCES' };
     }
     case 'COMPLETION':
-      return { type: 'COMPLETION' }
+      return { type: 'COMPLETION' };
     case 'DASHBOARD':
-      return { type: 'DASHBOARD' }
+      return { type: 'DASHBOARD' };
     case 'ERROR':
       return {
         type: 'ERROR',
@@ -86,9 +86,9 @@ export function createStateObject(
           | undefined) ?? {
           type: 'START',
         },
-      }
+      };
     default:
-      return { type: 'START' }
+      return { type: 'START' };
   }
 }
 
@@ -98,18 +98,18 @@ export function createStateObject(
 export function getNextEvent(state: OnboardingState): OnboardingEvent {
   switch (state.type) {
     case 'START':
-      return OnboardingEvent.BEGIN
+      return OnboardingEvent.BEGIN;
     case 'CHECK_ORGANIZATION':
-      return OnboardingEvent.NO_ORGANIZATION // Default assumption
+      return OnboardingEvent.NO_ORGANIZATION; // Default assumption
     case 'ORGANIZATION_SETUP':
-      return OnboardingEvent.ORGANIZATION_CREATED
+      return OnboardingEvent.ORGANIZATION_CREATED;
     case 'PROFILE_COMPLETION':
-      return OnboardingEvent.PROFILE_COMPLETED
+      return OnboardingEvent.PROFILE_COMPLETED;
     case 'PREFERENCES':
-      return OnboardingEvent.PREFERENCES_SAVED
+      return OnboardingEvent.PREFERENCES_SAVED;
     case 'COMPLETION':
-      return OnboardingEvent.COMPLETE
+      return OnboardingEvent.COMPLETE;
     default:
-      return OnboardingEvent.BEGIN
+      return OnboardingEvent.BEGIN;
   }
 }

@@ -3,8 +3,8 @@
  * Configures HTTP transport for GraphQL requests to AWS AppSync
  */
 
-import { createHttpLink } from '@apollo/client/link/http'
-import { getGraphqlUrl } from '../config'
+import { createHttpLink } from '@apollo/client/link/http';
+import { getGraphqlUrl } from '../config';
 
 /**
  * Create HTTP link for GraphQL requests
@@ -25,7 +25,7 @@ export const createAppSyncHttpLink = () => {
     fetch: (uri, options) => {
       // Add any custom fetch logic here if needed
       // For example, request/response interceptors
-      return fetch(uri, options)
+      return fetch(uri, options);
     },
-  })
-}
+  });
+};

@@ -1,7 +1,7 @@
-import { LogOut, Settings, User } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Button } from '@/components/ui/Button'
+import { LogOut, Settings, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,49 +9,49 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu'
-import { useClerkAuthService } from '@/services/auth'
+} from '@/components/ui/DropdownMenu';
+import { useClerkAuthService } from '@/services/auth';
 
 export function UserNav() {
-  const authService = useClerkAuthService()
-  const { isLoaded, isSignedIn, user } = authService.getAuthState()
-  const navigate = useNavigate()
+  const authService = useClerkAuthService();
+  const { isLoaded, isSignedIn, user } = authService.getAuthState();
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
-      await authService.signOut()
-      void navigate('/login')
+      await authService.signOut();
+      void navigate('/login');
     } catch (error) {
-      console.error('Sign out failed:', error)
+      console.error('Sign out failed:', error);
     }
-  }
+  };
 
   const handleProfileClick = () => {
-    void navigate('/settings/profile')
-  }
+    void navigate('/settings/profile');
+  };
 
   const handleSettingsClick = () => {
-    void navigate('/settings')
-  }
+    void navigate('/settings');
+  };
 
   // Don't render if not loaded or not signed in
   if (!isLoaded || !isSignedIn || !user) {
-    return null
+    return null;
   }
 
   // Generate user initials for fallback avatar
-  const firstName = user.firstName?.[0]
-  const lastName = user.lastName?.[0]
-  const emailFirst = user.email[0]
+  const firstName = user.firstName?.[0];
+  const lastName = user.lastName?.[0];
+  const emailFirst = user.email[0];
 
   const nameInitials = [firstName, lastName]
     .filter(Boolean)
     .join('')
-    .toUpperCase()
-  const userInitials = (nameInitials || emailFirst?.toUpperCase()) ?? 'U'
+    .toUpperCase();
+  const userInitials = (nameInitials || emailFirst?.toUpperCase()) ?? 'U';
 
   const displayName =
-    [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email
+    [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
 
   return (
     <DropdownMenu>
@@ -93,5 +93,5 @@ export function UserNav() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

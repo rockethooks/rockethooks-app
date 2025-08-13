@@ -1,26 +1,26 @@
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
-import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Alert, AlertDescription } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 
 interface Props {
-  children: ReactNode
-  level: 'app' | 'page' | 'component'
-  fallback?: ReactNode
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  children: ReactNode;
+  level: 'app' | 'page' | 'component';
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
-  errorInfo: ErrorInfo | null
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -28,50 +28,50 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
     error: null,
     errorInfo: null,
-  }
+  };
 
   public static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
       error,
       errorInfo: null,
-    }
+    };
   }
 
   public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
 
     this.setState({
       error,
       errorInfo,
-    })
+    });
 
     // Call optional error handler
-    this.props.onError?.(error, errorInfo)
+    this.props.onError?.(error, errorInfo);
 
     // Report to error tracking service in production
     if (import.meta.env.PROD) {
       // TODO: Integrate with error tracking service (Sentry, LogRocket, etc.)
-      this.reportError(error, errorInfo)
+      this.reportError(error, errorInfo);
     }
   }
 
   private reportError = (error: Error, errorInfo: ErrorInfo) => {
     // Error reporting logic would go here
-    console.warn('Error reported to tracking service:', { error, errorInfo })
-  }
+    console.warn('Error reported to tracking service:', { error, errorInfo });
+  };
 
   private handleRetry = () => {
     this.setState({
       hasError: false,
       error: null,
       errorInfo: null,
-    })
-  }
+    });
+  };
 
   private handleGoHome = () => {
-    window.location.href = '/'
-  }
+    window.location.href = '/';
+  };
 
   private renderAppLevelError() {
     return (
@@ -108,7 +108,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   private renderPageLevelError() {
@@ -145,7 +145,7 @@ export class ErrorBoundary extends Component<Props, State> {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   private renderComponentLevelError() {
@@ -172,42 +172,42 @@ export class ErrorBoundary extends Component<Props, State> {
           Retry Component
         </Button>
       </div>
-    )
+    );
   }
 
   public override render() {
     if (this.state.hasError) {
       // If a custom fallback is provided, use it
       if (this.props.fallback) {
-        return this.props.fallback
+        return this.props.fallback;
       }
 
       // Otherwise, render appropriate error UI based on level
       switch (this.props.level) {
         case 'app':
-          return this.renderAppLevelError()
+          return this.renderAppLevelError();
         case 'page':
-          return this.renderPageLevelError()
+          return this.renderPageLevelError();
         case 'component':
-          return this.renderComponentLevelError()
+          return this.renderComponentLevelError();
         default:
-          return this.renderComponentLevelError()
+          return this.renderComponentLevelError();
       }
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
 // Convenience components for each level
 export function AppErrorBoundary(props: Omit<Props, 'level'>) {
-  return <ErrorBoundary {...props} level="app" />
+  return <ErrorBoundary {...props} level="app" />;
 }
 
 export function PageErrorBoundary(props: Omit<Props, 'level'>) {
-  return <ErrorBoundary {...props} level="page" />
+  return <ErrorBoundary {...props} level="page" />;
 }
 
 export function ComponentErrorBoundary(props: Omit<Props, 'level'>) {
-  return <ErrorBoundary {...props} level="component" />
+  return <ErrorBoundary {...props} level="component" />;
 }

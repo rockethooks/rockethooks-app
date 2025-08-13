@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/shared/components/PageLayout'
+import { DashboardPage } from '@/shared/components/PageLayout';
 
 export function PlaceholderOnboardingPage() {
   return (
@@ -14,5 +14,5 @@ export function PlaceholderOnboardingPage() {
         </p>
       </div>
     </DashboardPage>
-  )
+  );
 }

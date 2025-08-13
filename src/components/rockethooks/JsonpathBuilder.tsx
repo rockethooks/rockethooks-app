@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
+import { useEffect, useState } from 'react';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/Select'
-import { Textarea } from '@/components/ui/Textarea'
-import { cn } from '@/lib/utils'
+} from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { cn } from '@/lib/utils';
 
 export interface JSONPathBuilderProps {
-  value: string
-  onChange: (path: string) => void
-  sampleData?: object
-  onTest?: () => void
-  className?: string
+  value: string;
+  onChange: (path: string) => void;
+  sampleData?: object;
+  onTest?: () => void;
+  className?: string;
 }
 
 const commonPatterns = [
@@ -52,7 +52,7 @@ const commonPatterns = [
     pattern: '$.items.length',
     description: 'Get array length',
   },
-]
+];
 
 /**
  * JSONPathBuilder - visual interface for building JSONPath expressions
@@ -74,9 +74,9 @@ function JSONPathBuilder({
   onTest,
   className,
 }: JSONPathBuilderProps) {
-  const [isValid, setIsValid] = useState(true)
-  const [testResult, setTestResult] = useState<string | object | null>(null)
-  const [showSampleData, setShowSampleData] = useState(false)
+  const [isValid, setIsValid] = useState(true);
+  const [testResult, setTestResult] = useState<string | object | null>(null);
+  const [showSampleData, setShowSampleData] = useState(false);
 
   // Basic JSONPath validation
   useEffect(() => {
@@ -85,70 +85,70 @@ function JSONPathBuilder({
       const isValidPath =
         /^\$(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\]|\[\*\]|\[.*?\])*$/.test(value) ||
         value === '$' ||
-        /^\$(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\?.*?\]|\[.*?\])*/.test(value)
-      setIsValid(isValidPath)
+        /^\$(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\?.*?\]|\[.*?\])*/.test(value);
+      setIsValid(isValidPath);
     } catch {
-      setIsValid(false)
+      setIsValid(false);
     }
-  }, [value])
+  }, [value]);
 
   const handlePatternSelect = (pattern: string) => {
-    onChange(pattern)
-  }
+    onChange(pattern);
+  };
 
   const handleTest = () => {
-    if (!sampleData || !isValid) return
+    if (!sampleData || !isValid) return;
 
     try {
       // Simple JSONPath evaluation for demo purposes
       // In a real implementation, you'd use a proper JSONPath library like jsonpath-plus
-      const result = evaluateSimpleJSONPath(sampleData, value)
-      setTestResult(result as string | object | null)
-      onTest?.()
+      const result = evaluateSimpleJSONPath(sampleData, value);
+      setTestResult(result as string | object | null);
+      onTest?.();
     } catch (error) {
       setTestResult(
         `Error: ${error instanceof Error ? error.message : 'Invalid path'}`
-      )
+      );
     }
-  }
+  };
 
   // Simplified JSONPath evaluator for demo purposes
   const evaluateSimpleJSONPath = (data: unknown, path: string): unknown => {
-    if (path === '$') return data
+    if (path === '$') return data;
 
-    const parts = path.slice(2).split('.') // Remove '$.' prefix
-    let current = data
+    const parts = path.slice(2).split('.'); // Remove '$.' prefix
+    let current = data;
 
     for (const part of parts) {
-      if (!part) continue
+      if (!part) continue;
 
       if (part.includes('[') && part.includes(']')) {
-        const bracketIndex = part.indexOf('[')
-        const prop = part.substring(0, bracketIndex)
-        const bracket = part.substring(bracketIndex + 1, part.length - 1)
+        const bracketIndex = part.indexOf('[');
+        const prop = part.substring(0, bracketIndex);
+        const bracket = part.substring(bracketIndex + 1, part.length - 1);
 
         if (prop && typeof current === 'object' && current !== null) {
-          current = (current as Record<string, unknown>)[prop]
+          current = (current as Record<string, unknown>)[prop];
         }
 
         if (bracket === '*') {
-          return Array.isArray(current) ? current : []
+          return Array.isArray(current) ? current : [];
         } else if (!Number.isNaN(Number(bracket))) {
           if (Array.isArray(current)) {
-            current = current[Number(bracket)]
+            current = current[Number(bracket)];
           }
         }
       } else {
         if (typeof current === 'object' && current !== null) {
-          current = (current as Record<string, unknown>)[part]
+          current = (current as Record<string, unknown>)[part];
         }
       }
 
-      if (current === undefined) break
+      if (current === undefined) break;
     }
 
-    return current
-  }
+    return current;
+  };
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -161,7 +161,7 @@ function JSONPathBuilder({
               id="jsonpath-input"
               value={value}
               onChange={(e) => {
-                onChange(e.target.value)
+                onChange(e.target.value);
               }}
               placeholder="$.property"
               className={cn(
@@ -235,7 +235,7 @@ function JSONPathBuilder({
               variant="ghost"
               size="sm"
               onClick={() => {
-                setShowSampleData(!showSampleData)
+                setShowSampleData(!showSampleData);
               }}
             >
               {showSampleData ? 'Hide' : 'Show'}
@@ -274,7 +274,7 @@ function JSONPathBuilder({
         </ul>
       </div>
     </div>
-  )
+  );
 }
 
-export { JSONPathBuilder }
+export { JSONPathBuilder };

@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from 'class-variance-authority'
-import * as React from 'react'
-import { useThemeColor } from '@/hooks/useThemeColor'
-import { cn } from '@/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
+import { useThemeColor } from '@/hooks/useThemeColor';
+import { cn } from '@/lib/utils';
 
 const themeCardVariants = cva(
   'rounded-lg border theme-transition relative overflow-hidden',
@@ -34,7 +34,7 @@ const themeCardVariants = cva(
       size: 'default',
     },
   }
-)
+);
 
 export interface ThemeCardProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -42,12 +42,12 @@ export interface ThemeCardProps
   /**
    * Whether to show theme-aware border accent
    */
-  accent?: boolean
+  accent?: boolean;
   /**
    * Custom gradient colors (overrides variant)
    */
-  gradientFrom?: string
-  gradientTo?: string
+  gradientFrom?: string;
+  gradientTo?: string;
 }
 
 const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
@@ -66,28 +66,28 @@ const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
     },
     ref
   ) => {
-    const primaryColor = useThemeColor('primary')
+    const primaryColor = useThemeColor('primary');
 
     const customStyle: React.CSSProperties = {
       ...style,
-    }
+    };
 
     // Apply custom gradient if provided
     if (gradientFrom && gradientTo) {
-      customStyle.background = `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`
+      customStyle.background = `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`;
     }
 
     // Apply accent border if enabled
     if (accent && !gradientFrom) {
-      const primaryHSL = primaryColor.getHSLString()
-      const primaryHSLA = primaryColor.getHSLAString(0.1)
+      const primaryHSL = primaryColor.getHSLString();
+      const primaryHSLA = primaryColor.getHSLAString(0.1);
 
       if (primaryHSL) {
-        customStyle.borderColor = primaryHSL
+        customStyle.borderColor = primaryHSL;
       }
 
       if (primaryHSLA) {
-        customStyle.boxShadow = `0 0 0 1px ${primaryHSLA}, var(--shadow-elevation-medium)`
+        customStyle.boxShadow = `0 0 0 1px ${primaryHSLA}, var(--shadow-elevation-medium)`;
       }
     }
 
@@ -101,10 +101,10 @@ const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
         {accent &&
           !gradientFrom &&
           (() => {
-            const primaryHSL = primaryColor.getHSLString()
-            const primaryHSLA = primaryColor.getHSLAString(0.3)
+            const primaryHSL = primaryColor.getHSLString();
+            const primaryHSLA = primaryColor.getHSLAString(0.3);
 
-            if (!primaryHSL || !primaryHSLA) return null
+            if (!primaryHSL || !primaryHSLA) return null;
 
             return (
               <div
@@ -113,15 +113,15 @@ const ThemeCard = React.forwardRef<HTMLDivElement, ThemeCardProps>(
                   background: `linear-gradient(90deg, ${primaryHSL}, ${primaryHSLA})`,
                 }}
               />
-            )
+            );
           })()}
         {children}
       </div>
-    )
+    );
   }
-)
+);
 
-ThemeCard.displayName = 'ThemeCard'
+ThemeCard.displayName = 'ThemeCard';
 
 /**
  * Theme-aware card header component
@@ -135,8 +135,8 @@ const ThemeCardHeader = React.forwardRef<
     className={cn('flex flex-col space-y-1.5', className)}
     {...props}
   />
-))
-ThemeCardHeader.displayName = 'ThemeCardHeader'
+));
+ThemeCardHeader.displayName = 'ThemeCardHeader';
 
 /**
  * Theme-aware card title component
@@ -145,8 +145,8 @@ const ThemeCardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
-  const foregroundColor = useThemeColor('card-foreground')
-  const colorValue = foregroundColor.getHSLString()
+  const foregroundColor = useThemeColor('card-foreground');
+  const colorValue = foregroundColor.getHSLString();
 
   return (
     <h3
@@ -160,9 +160,9 @@ const ThemeCardTitle = React.forwardRef<
       }}
       {...props}
     />
-  )
-})
-ThemeCardTitle.displayName = 'ThemeCardTitle'
+  );
+});
+ThemeCardTitle.displayName = 'ThemeCardTitle';
 
 /**
  * Theme-aware card description component
@@ -171,8 +171,8 @@ const ThemeCardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
-  const mutedColor = useThemeColor('muted-foreground')
-  const colorValue = mutedColor.getHSLString()
+  const mutedColor = useThemeColor('muted-foreground');
+  const colorValue = mutedColor.getHSLString();
 
   return (
     <p
@@ -183,9 +183,9 @@ const ThemeCardDescription = React.forwardRef<
       }}
       {...props}
     />
-  )
-})
-ThemeCardDescription.displayName = 'ThemeCardDescription'
+  );
+});
+ThemeCardDescription.displayName = 'ThemeCardDescription';
 
 /**
  * Theme-aware card content component
@@ -195,8 +195,8 @@ const ThemeCardContent = React.forwardRef<
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn('pt-0', className)} {...props} />
-))
-ThemeCardContent.displayName = 'ThemeCardContent'
+));
+ThemeCardContent.displayName = 'ThemeCardContent';
 
 /**
  * Theme-aware card footer component
@@ -210,8 +210,8 @@ const ThemeCardFooter = React.forwardRef<
     className={cn('flex items-center pt-0', className)}
     {...props}
   />
-))
-ThemeCardFooter.displayName = 'ThemeCardFooter'
+));
+ThemeCardFooter.displayName = 'ThemeCardFooter';
 
 export {
   ThemeCard,
@@ -221,4 +221,4 @@ export {
   ThemeCardContent,
   ThemeCardFooter,
   themeCardVariants,
-}
+};

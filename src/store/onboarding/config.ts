@@ -34,4 +34,4 @@ export const stepConfigs = {
     order: 4,
     route: '/onboarding/complete',
   },
-} as const
+} as const;

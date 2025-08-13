@@ -1,12 +1,12 @@
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns';
 
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
-import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { cn } from '@/lib/utils';
 
-import { Sparkline } from './Sparkline'
-import { WebhookStatus } from './WebhookStatus'
+import { Sparkline } from './Sparkline';
+import { WebhookStatus } from './WebhookStatus';
 
 const methodVariants = {
   GET: 'success',
@@ -14,23 +14,23 @@ const methodVariants = {
   PUT: 'warning',
   DELETE: 'destructive',
   PATCH: 'secondary',
-} as const
+} as const;
 
 export interface APIConnectionCardProps {
-  name: string
-  endpoint: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-  status: 'active' | 'polling' | 'error' | 'paused' | 'circuit-open'
-  pollingInterval: number // seconds
-  lastChecked: Date
-  changesDetected: number
-  successRate?: number
-  avgResponseTime?: number
-  sparklineData?: number[]
-  onTest?: () => void
-  onEdit?: () => void
-  onToggle?: () => void
-  className?: string
+  name: string;
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  status: 'active' | 'polling' | 'error' | 'paused' | 'circuit-open';
+  pollingInterval: number; // seconds
+  lastChecked: Date;
+  changesDetected: number;
+  successRate?: number;
+  avgResponseTime?: number;
+  sparklineData?: number[];
+  onTest?: () => void;
+  onEdit?: () => void;
+  onToggle?: () => void;
+  className?: string;
 }
 
 /**
@@ -72,27 +72,27 @@ function APIConnectionCard({
   className,
 }: APIConnectionCardProps) {
   const formatInterval = (seconds: number) => {
-    if (seconds < 60) return `${String(seconds)}s`
-    if (seconds < 3600) return `${String(Math.floor(seconds / 60))}m`
-    return `${String(Math.floor(seconds / 3600))}h`
-  }
+    if (seconds < 60) return `${String(seconds)}s`;
+    if (seconds < 3600) return `${String(Math.floor(seconds / 60))}m`;
+    return `${String(Math.floor(seconds / 3600))}h`;
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
-        return 'text-success'
+        return 'text-success';
       case 'polling':
-        return 'text-info'
+        return 'text-info';
       case 'error':
-        return 'text-destructive'
+        return 'text-destructive';
       case 'paused':
-        return 'text-muted-foreground'
+        return 'text-muted-foreground';
       case 'circuit-open':
-        return 'text-warning'
+        return 'text-warning';
       default:
-        return 'text-muted-foreground'
+        return 'text-muted-foreground';
     }
-  }
+  };
 
   return (
     <Card
@@ -230,7 +230,7 @@ function APIConnectionCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export { APIConnectionCard }
+export { APIConnectionCard };

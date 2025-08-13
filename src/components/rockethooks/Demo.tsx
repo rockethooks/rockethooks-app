@@ -1,5 +1,5 @@
-import { subHours, subMinutes } from 'date-fns'
-import { useState } from 'react'
+import { subHours, subMinutes } from 'date-fns';
+import { useState } from 'react';
 
 import {
   APIConnectionCard,
@@ -9,7 +9,7 @@ import {
   TransformationEditor,
   type WebhookEvent,
   WebhookStatus,
-} from './index'
+} from './index';
 
 /**
  * Demo/Examples for RocketHooks Custom Components
@@ -21,7 +21,7 @@ import {
 // Sample data for demonstrations
 const sampleSparklineData = [
   200, 180, 220, 195, 210, 185, 205, 190, 215, 225, 240, 220, 205,
-]
+];
 
 const sampleEvents: WebhookEvent[] = [
   {
@@ -62,7 +62,7 @@ const sampleEvents: WebhookEvent[] = [
     responseTime: 95,
     statusCode: 201,
   },
-]
+];
 
 const sampleJSONData = {
   user: {
@@ -82,13 +82,13 @@ const sampleJSONData = {
     ],
   },
   timestamp: 1634567890,
-}
+};
 
 export function ComponentsDemo() {
-  const [jsonPath, setJsonPath] = useState('$.user.profile.name')
+  const [jsonPath, setJsonPath] = useState('$.user.profile.name');
   const [transformation, setTransformation] = useState(
     '{\n  "user_name": "$.user.profile.name",\n  "user_email": "$.user.profile.email",\n  "timestamp": "$.timestamp"\n}'
-  )
+  );
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-12">
@@ -166,13 +166,13 @@ export function ComponentsDemo() {
             avgResponseTime={245}
             sparklineData={sampleSparklineData}
             onTest={() => {
-              console.log('Test clicked')
+              console.log('Test clicked');
             }}
             onEdit={() => {
-              console.log('Edit clicked')
+              console.log('Edit clicked');
             }}
             onToggle={() => {
-              console.log('Toggle clicked')
+              console.log('Toggle clicked');
             }}
           />
 
@@ -187,13 +187,13 @@ export function ComponentsDemo() {
             successRate={87.2}
             avgResponseTime={1250}
             onTest={() => {
-              console.log('Test clicked')
+              console.log('Test clicked');
             }}
             onEdit={() => {
-              console.log('Edit clicked')
+              console.log('Edit clicked');
             }}
             onToggle={() => {
-              console.log('Toggle clicked')
+              console.log('Toggle clicked');
             }}
           />
         </div>
@@ -208,7 +208,7 @@ export function ComponentsDemo() {
             onChange={setJsonPath}
             sampleData={sampleJSONData}
             onTest={() => {
-              console.log('Testing JSONPath')
+              console.log('Testing JSONPath');
             }}
           />
         </div>
@@ -243,7 +243,7 @@ export function ComponentsDemo() {
                 events={sampleEvents}
                 view="compact"
                 onEventClick={(event) => {
-                  console.log('Event clicked:', event)
+                  console.log('Event clicked:', event);
                 }}
               />
             </div>
@@ -256,7 +256,7 @@ export function ComponentsDemo() {
                 events={sampleEvents}
                 view="detailed"
                 onEventClick={(event) => {
-                  console.log('Event clicked:', event)
+                  console.log('Event clicked:', event);
                 }}
               />
             </div>
@@ -264,7 +264,7 @@ export function ComponentsDemo() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
-export default ComponentsDemo
+export default ComponentsDemo;

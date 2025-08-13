@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Bell,
   CheckCircle,
@@ -6,18 +6,18 @@ import {
   Globe2,
   Palette,
   Settings,
-} from 'lucide-react'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { Alert } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
+} from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 import {
   Form,
   FormControl,
@@ -26,25 +26,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form'
+} from '@/components/ui/Form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/Select'
-import { Switch } from '@/components/ui/Switch'
-import { useOnboarding } from '@/hooks/useOnboarding'
+} from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   type PreferencesFormData,
   preferencesSchema,
-} from '@/lib/validations/onboarding'
-import type { PreferencesDraft } from '@/utils/onboardingDrafts'
+} from '@/lib/validations/onboarding';
+import type { PreferencesDraft } from '@/utils/onboardingDrafts';
 
 export interface PreferencesStepProps {
-  onComplete?: () => void
-  onNext?: () => void
+  onComplete?: () => void;
+  onNext?: () => void;
 }
 
 // Common timezones organized by region
@@ -62,7 +62,7 @@ const timezones = [
   { value: 'Asia/Kolkata', label: 'India Standard Time' },
   { value: 'Australia/Sydney', label: 'Australian Eastern Time' },
   { value: 'Pacific/Auckland', label: 'New Zealand Standard Time' },
-] as const
+] as const;
 
 // Common languages
 const languages = [
@@ -76,14 +76,14 @@ const languages = [
   { value: 'ja', label: '日本語 (Japanese)' },
   { value: 'ko', label: '한국어 (Korean)' },
   { value: 'zh', label: '中文 (Chinese)' },
-] as const
+] as const;
 
 // Theme options
 const themes = [
   { value: 'light', label: 'Light', description: 'Light mode interface' },
   { value: 'dark', label: 'Dark', description: 'Dark mode interface' },
   { value: 'system', label: 'System', description: 'Follow system preference' },
-] as const
+] as const;
 
 // Alert frequency options
 const alertFrequencies = [
@@ -95,7 +95,7 @@ const alertFrequencies = [
   { value: 'hourly', label: 'Hourly', description: 'Digest every hour' },
   { value: 'daily', label: 'Daily', description: 'Daily summary' },
   { value: 'weekly', label: 'Weekly', description: 'Weekly digest' },
-] as const
+] as const;
 
 export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
   // Use the new onboarding hook instead of directly accessing stores
@@ -112,7 +112,7 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
     latestError,
     clearErrors,
     progress,
-  } = useOnboarding()
+  } = useOnboarding();
 
   // Initialize form with existing draft data
   const form = useForm<PreferencesFormData>({
@@ -129,35 +129,35 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
       theme: 'system', // Default to system theme
       alertFrequency: 'instant', // Default to instant alerts
     },
-  })
+  });
 
-  const { watch, setValue } = form
-  const formData = watch()
+  const { watch, setValue } = form;
+  const formData = watch();
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as PreferencesDraft | null
+    const existingDraft = draft as PreferencesDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
       if (existingDraft.notifications) {
         if (existingDraft.notifications.email !== undefined) {
-          setValue('notifications.email', existingDraft.notifications.email)
+          setValue('notifications.email', existingDraft.notifications.email);
         }
         if (existingDraft.notifications.sms !== undefined) {
-          setValue('notifications.sms', existingDraft.notifications.sms)
+          setValue('notifications.sms', existingDraft.notifications.sms);
         }
         if (existingDraft.notifications.push !== undefined) {
-          setValue('notifications.push', existingDraft.notifications.push)
+          setValue('notifications.push', existingDraft.notifications.push);
         }
       }
-      if (existingDraft.timezone) setValue('timezone', existingDraft.timezone)
-      if (existingDraft.language) setValue('language', existingDraft.language)
-      if (existingDraft.theme) setValue('theme', existingDraft.theme)
+      if (existingDraft.timezone) setValue('timezone', existingDraft.timezone);
+      if (existingDraft.language) setValue('language', existingDraft.language);
+      if (existingDraft.theme) setValue('theme', existingDraft.theme);
       if (existingDraft.alertFrequency)
-        setValue('alertFrequency', existingDraft.alertFrequency)
+        setValue('alertFrequency', existingDraft.alertFrequency);
     }
-  }, [setValue, draft])
+  }, [setValue, draft]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -166,55 +166,55 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
         (key) => formData[key as keyof typeof formData]
       )
     ) {
-      saveDraft(formData as PreferencesDraft)
+      saveDraft(formData as PreferencesDraft);
     }
-  }, [formData, saveDraft])
+  }, [formData, saveDraft]);
 
   // Handle form submission
   const handleSubmit = (data: PreferencesFormData) => {
     try {
       // Clear any previous errors
-      clearErrors()
+      clearErrors();
 
       // Complete the step using the state machine
-      const success = completeStep(data as PreferencesDraft)
+      const success = completeStep(data as PreferencesDraft);
 
       if (success) {
         // Call completion callbacks for backward compatibility
-        onComplete?.()
+        onComplete?.();
         if (onNext) {
-          onNext()
+          onNext();
         }
       } else {
         // Error handling is managed by the state machine
-        console.error('Failed to complete preferences step')
+        console.error('Failed to complete preferences step');
       }
     } catch (error) {
-      console.error('Failed to complete preferences step:', error)
+      console.error('Failed to complete preferences step:', error);
     }
-  }
+  };
 
   // Handle skip action
   const handleSkip = () => {
-    skipStep()
+    skipStep();
 
     // Call completion callbacks for backward compatibility
-    onComplete?.()
+    onComplete?.();
     if (onNext) {
-      onNext()
+      onNext();
     }
-  }
+  };
 
   // Handle back navigation
   const handleBack = () => {
-    goBack()
-  }
+    goBack();
+  };
 
   // Since all fields are optional, we can always proceed
-  const canSubmit = canProceed
+  const canSubmit = canProceed;
 
   // Get current browser timezone as suggestion
-  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -606,5 +606,5 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
         {progress.percentage}% complete)
       </div>
     </div>
-  )
+  );
 }

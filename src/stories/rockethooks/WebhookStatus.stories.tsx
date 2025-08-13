@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
-import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
-import { Badge } from '@/components/ui/Badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus';
+import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 /**
  * WebhookStatus component provides visual status indicators for webhook delivery states.
@@ -82,10 +82,10 @@ import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof WebhookStatus>
+} satisfies Meta<typeof WebhookStatus>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Default success status
@@ -94,7 +94,7 @@ export const Default: Story = {
   args: {
     status: 'success',
   },
-}
+};
 
 /**
  * All webhook status types
@@ -138,7 +138,7 @@ export const AllStatuses: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Status indicators with labels
@@ -161,7 +161,7 @@ export const WithLabels: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Different sizes for various UI contexts
@@ -208,7 +208,7 @@ export const Sizes: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Animation control demonstration
@@ -245,7 +245,7 @@ export const Animations: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Event table integration
@@ -369,7 +369,7 @@ export const EventTable: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Dashboard status cards
@@ -455,7 +455,7 @@ export const DashboardCards: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Status summary with counts
@@ -537,7 +537,7 @@ export const StatusSummary: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Real-time status updates simulation
@@ -547,39 +547,39 @@ export const RealTimeUpdates: Story = {
   render: () => {
     const [statuses, setStatuses] = React.useState<
       Array<{
-        id: number
-        status: 'success' | 'pending' | 'retrying' | 'failed'
-        timestamp: string
+        id: number;
+        status: 'success' | 'pending' | 'retrying' | 'failed';
+        timestamp: string;
       }>
     >([
       { id: 1, status: 'success', timestamp: '2m ago' },
       { id: 2, status: 'pending', timestamp: '3m ago' },
       { id: 3, status: 'retrying', timestamp: '5m ago' },
       { id: 4, status: 'success', timestamp: '7m ago' },
-    ])
+    ]);
 
     React.useEffect(() => {
       const interval = setInterval(() => {
         setStatuses((prev) =>
           prev.map((item) => {
             if (item.status === 'pending' && Math.random() > 0.7) {
-              return { ...item, status: 'success' }
+              return { ...item, status: 'success' };
             }
             if (item.status === 'retrying' && Math.random() > 0.8) {
               return {
                 ...item,
                 status: Math.random() > 0.5 ? 'success' : 'failed',
-              }
+              };
             }
-            return item
+            return item;
           })
-        )
-      }, 2000)
+        );
+      }, 2000);
 
       return () => {
-        clearInterval(interval)
-      }
-    }, [])
+        clearInterval(interval);
+      };
+    }, []);
 
     return (
       <Card>
@@ -608,7 +608,7 @@ export const RealTimeUpdates: Story = {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   },
   parameters: {
     docs: {
@@ -618,7 +618,7 @@ export const RealTimeUpdates: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing all webhook status properties
@@ -630,4 +630,4 @@ export const Playground: Story = {
     showLabel: false,
     pulseAnimation: true,
   },
-}
+};

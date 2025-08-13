@@ -1,2 +1,2 @@
 // Component exports
-export { AuthSync } from './AuthSync'
+export { AuthSync } from './AuthSync';

@@ -1,2 +1,2 @@
-export { OnboardingPage } from './OnboardingPage'
-export * from './steps'
+export { OnboardingPage } from './OnboardingPage';
+export * from './steps';

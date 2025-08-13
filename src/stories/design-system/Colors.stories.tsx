@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import type React from 'react'
+import type { Meta, StoryObj } from '@storybook/react';
+import type React from 'react';
 
 /**
  * Color palette and semantic color system for RocketHooks.
@@ -10,10 +10,10 @@ import type React from 'react'
  */
 
 const ColorSwatch: React.FC<{
-  name: string
-  cssVar: string
-  description?: string
-  textColor?: string
+  name: string;
+  cssVar: string;
+  description?: string;
+  textColor?: string;
 }> = ({ name, cssVar, description, textColor = 'var(--text-primary)' }) => (
   <div className="flex flex-col">
     <div
@@ -33,16 +33,16 @@ const ColorSwatch: React.FC<{
       )}
     </div>
   </div>
-)
+);
 
 const ColorSection: React.FC<{
-  title: string
-  description: string
+  title: string;
+  description: string;
   colors: Array<{
-    name: string
-    cssVar: string
-    description?: string
-  }>
+    name: string;
+    cssVar: string;
+    description?: string;
+  }>;
 }> = ({ title, description, colors }) => (
   <div className="mb-8">
     <h3
@@ -60,7 +60,7 @@ const ColorSection: React.FC<{
       ))}
     </div>
   </div>
-)
+);
 
 function ColorsComponent() {
   return (
@@ -313,7 +313,7 @@ function ColorsComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const meta = {
@@ -338,13 +338,13 @@ All colors are defined as CSS custom properties and support both light and dark 
       },
     },
   },
-} satisfies Meta<typeof ColorsComponent>
+} satisfies Meta<typeof ColorsComponent>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Complete color palette showing all available colors in the design system.
  * Use the theme toggle in the toolbar to see how colors adapt to dark mode.
  */
-export const ColorPalette: Story = {}
+export const ColorPalette: Story = {};

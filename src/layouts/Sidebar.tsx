@@ -9,26 +9,26 @@ import {
   Users,
   Webhook,
   Zap,
-} from 'lucide-react'
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Button } from '@/components/ui/Button'
-import { Separator } from '@/components/ui/Separator'
-import { cn } from '@/lib/utils'
-import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Separator } from '@/components/ui/Separator';
+import { cn } from '@/lib/utils';
+import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary';
 
 interface SidebarProps {
-  collapsed?: boolean
-  onCollapsedChange?: (collapsed: boolean) => void
-  className?: string
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+  className?: string;
 }
 
 interface NavItem {
-  title: string
-  href: string
-  icon: React.ComponentType<{ className?: string }>
-  badge?: string
+  title: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string;
 }
 
 const navItems: NavItem[] = [
@@ -68,28 +68,28 @@ const navItems: NavItem[] = [
     href: '/settings',
     icon: Settings,
   },
-]
+];
 
 export function Sidebar({
   collapsed = false,
   onCollapsedChange,
   className,
 }: SidebarProps) {
-  const location = useLocation()
-  const [isCollapsed, setIsCollapsed] = useState(collapsed)
+  const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   const toggleCollapsed = () => {
-    const newCollapsed = !isCollapsed
-    setIsCollapsed(newCollapsed)
-    onCollapsedChange?.(newCollapsed)
-  }
+    const newCollapsed = !isCollapsed;
+    setIsCollapsed(newCollapsed);
+    onCollapsedChange?.(newCollapsed);
+  };
 
   const isActive = (href: string) => {
     if (href === '/') {
-      return location.pathname === '/'
+      return location.pathname === '/';
     }
-    return location.pathname.startsWith(href)
-  }
+    return location.pathname.startsWith(href);
+  };
 
   return (
     <ComponentErrorBoundary>
@@ -118,8 +118,8 @@ export function Sidebar({
         {/* Navigation */}
         <nav className="flex-1 space-y-2 p-2">
           {navItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.href)
+            const Icon = item.icon;
+            const active = isActive(item.href);
 
             return (
               <Link
@@ -144,7 +144,7 @@ export function Sidebar({
                   </>
                 )}
               </Link>
-            )
+            );
           })}
         </nav>
 
@@ -195,5 +195,5 @@ export function Sidebar({
         </div>
       </div>
     </ComponentErrorBoundary>
-  )
+  );
 }

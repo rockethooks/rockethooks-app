@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/Button';
 
 /**
  * The Button component is a versatile interactive element that supports multiple variants,
@@ -93,10 +93,10 @@ import { Button } from '@/components/ui/Button'
   },
   args: { onClick: fn() },
   tags: ['autodocs'],
-} satisfies Meta<typeof Button>
+} satisfies Meta<typeof Button>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * The default primary button variant used for main actions
@@ -105,7 +105,7 @@ export const Default: Story = {
   args: {
     children: 'Button',
   },
-}
+};
 
 /**
  * All button variants demonstrating different semantic meanings
@@ -132,7 +132,7 @@ export const Variants: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Different button sizes for various contexts
@@ -153,7 +153,7 @@ export const Sizes: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Buttons with icons demonstrating proper spacing and alignment
@@ -222,7 +222,7 @@ export const WithIcons: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Icon-only buttons for actions where space is limited
@@ -294,7 +294,7 @@ export const IconOnly: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Loading state with spinner animation
@@ -319,7 +319,7 @@ export const Loading: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Disabled state demonstration
@@ -343,7 +343,7 @@ export const Disabled: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Semantic variants for different states and actions
@@ -414,7 +414,7 @@ export const SemanticVariants: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Button groups and layouts for common patterns
@@ -512,7 +512,7 @@ export const ButtonGroups: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing all button properties
@@ -525,4 +525,4 @@ export const Playground: Story = {
     loading: false,
     disabled: false,
   },
-}
+};

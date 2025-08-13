@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
-import { WebhookStatus } from '@/components/rockethooks/WebhookStatus'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
+import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import { WebhookStatus } from '@/components/rockethooks/WebhookStatus';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/Table'
+} from '@/components/ui/Table';
 
 /**
  * Table component providing consistent data presentation with proper semantic structure.
@@ -77,10 +77,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Table>
+} satisfies Meta<typeof Table>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Basic table with simple data
@@ -126,7 +126,7 @@ export const Default: Story = {
       </Table>
     </Card>
   ),
-}
+};
 
 /**
  * API endpoints table with status and actions
@@ -259,7 +259,7 @@ export const APIEndpoints: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Webhook events table with rich content
@@ -394,7 +394,7 @@ export const WebhookEvents: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Minimal table with simple structure
@@ -435,39 +435,39 @@ export const Minimal: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Table with sortable headers
  */
 export const SortableHeaders: Story = {
   render: () => {
-    const [sortField, setSortField] = React.useState<string | null>('name')
+    const [sortField, setSortField] = React.useState<string | null>('name');
     const [sortDirection, setSortDirection] = React.useState<'asc' | 'desc'>(
       'asc'
-    )
+    );
 
     const handleSort = (field: string) => {
       if (sortField === field) {
-        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+        setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
       } else {
-        setSortField(field)
-        setSortDirection('asc')
+        setSortField(field);
+        setSortDirection('asc');
       }
-    }
+    };
 
     function SortableHeader({
       field,
       children,
     }: {
-      field: string
-      children: React.ReactNode
+      field: string;
+      children: React.ReactNode;
     }) {
       return (
         <TableHead
           className="cursor-pointer hover:bg-muted/50 select-none"
           onClick={() => {
-            handleSort(field)
+            handleSort(field);
           }}
         >
           <div className="flex items-center gap-2">
@@ -493,7 +493,7 @@ export const SortableHeaders: Story = {
             )}
           </div>
         </TableHead>
-      )
+      );
     }
 
     return (
@@ -545,7 +545,7 @@ export const SortableHeaders: Story = {
           </TableBody>
         </Table>
       </Card>
-    )
+    );
   },
   parameters: {
     docs: {
@@ -555,7 +555,7 @@ export const SortableHeaders: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Table with row selection
@@ -564,25 +564,25 @@ export const RowSelection: Story = {
   render: () => {
     const [selectedRows, setSelectedRows] = React.useState<Set<string>>(
       new Set()
-    )
+    );
 
     const handleRowSelect = (id: string) => {
-      const newSelected = new Set(selectedRows)
+      const newSelected = new Set(selectedRows);
       if (newSelected.has(id)) {
-        newSelected.delete(id)
+        newSelected.delete(id);
       } else {
-        newSelected.add(id)
+        newSelected.add(id);
       }
-      setSelectedRows(newSelected)
-    }
+      setSelectedRows(newSelected);
+    };
 
     const handleSelectAll = () => {
       if (selectedRows.size === 3) {
-        setSelectedRows(new Set())
+        setSelectedRows(new Set());
       } else {
-        setSelectedRows(new Set(['1', '2', '3']))
+        setSelectedRows(new Set(['1', '2', '3']));
       }
-    }
+    };
 
     return (
       <Card>
@@ -634,7 +634,7 @@ export const RowSelection: Story = {
                     type="checkbox"
                     checked={selectedRows.has(item.id)}
                     onChange={() => {
-                      handleRowSelect(item.id)
+                      handleRowSelect(item.id);
                     }}
                     className="rounded"
                     aria-label={`Select ${item.name}`}
@@ -682,7 +682,7 @@ export const RowSelection: Story = {
           </div>
         )}
       </Card>
-    )
+    );
   },
   parameters: {
     docs: {
@@ -691,7 +691,7 @@ export const RowSelection: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Empty state table
@@ -750,7 +750,7 @@ export const EmptyState: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Responsive table with horizontal scroll
@@ -849,7 +849,7 @@ export const ResponsiveTable: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing table properties
@@ -880,4 +880,4 @@ export const Playground: Story = {
       </Table>
     </Card>
   ),
-}
+};

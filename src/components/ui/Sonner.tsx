@@ -1,4 +1,4 @@
-import { Toaster as Sonner, type ToasterProps } from 'sonner'
+import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
 function Toaster({ theme = 'system', ...props }: ToasterProps) {
   return (
@@ -14,7 +14,7 @@ function Toaster({ theme = 'system', ...props }: ToasterProps) {
       }
       {...props}
     />
-  )
+  );
 }
 
-export { Toaster }
+export { Toaster };

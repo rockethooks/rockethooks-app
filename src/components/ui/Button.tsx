@@ -1,15 +1,15 @@
-import { Slot } from '@radix-ui/react-slot'
-import type { VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import { Slot } from '@radix-ui/react-slot';
+import type { VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
-import { buttonVariants } from './buttonVariants'
+import { cn } from '@/lib/utils';
+import { buttonVariants } from './buttonVariants';
 
 export interface ButtonProps
   extends React.ComponentProps<'button'>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean
-  loading?: boolean
+  asChild?: boolean;
+  loading?: boolean;
 }
 
 /**
@@ -33,7 +33,7 @@ function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : 'button'
+  const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
@@ -68,7 +68,7 @@ function Button({
       )}
       {children}
     </Comp>
-  )
+  );
 }
 
-export { Button }
+export { Button };

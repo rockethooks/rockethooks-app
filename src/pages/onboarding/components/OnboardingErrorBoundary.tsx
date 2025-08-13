@@ -1,34 +1,34 @@
-import { AlertTriangle, RefreshCw } from 'lucide-react'
-import { Component, type ErrorInfo, type ReactNode } from 'react'
-import { Alert } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 interface Props {
-  children: ReactNode
+  children: ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error?: Error
-  errorInfo?: ErrorInfo
+  hasError: boolean;
+  error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 export class OnboardingErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false }
+    super(props);
+    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
       errorInfo,
-    })
+    });
 
     // Log error to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
@@ -36,7 +36,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
         'Onboarding Error Boundary caught an error:',
         error,
         errorInfo
-      )
+      );
     }
   }
 
@@ -82,7 +82,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button
                   onClick={() => {
-                    this.setState({ hasError: false })
+                    this.setState({ hasError: false });
                   }}
                   className="gap-2"
                 >
@@ -92,7 +92,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    window.location.href = '/onboarding/organization'
+                    window.location.href = '/onboarding/organization';
                   }}
                 >
                   Restart Onboarding
@@ -100,7 +100,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    window.location.href = '/dashboard'
+                    window.location.href = '/dashboard';
                   }}
                 >
                   Go to Dashboard
@@ -113,9 +113,9 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
             </CardContent>
           </Card>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

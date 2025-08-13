@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/shared/components/PageLayout'
+import { DashboardPage } from '@/shared/components/PageLayout';
 
 export function SettingsPage() {
   return (
@@ -10,5 +10,5 @@ export function SettingsPage() {
         Settings page - Coming soon!
       </div>
     </DashboardPage>
-  )
+  );
 }

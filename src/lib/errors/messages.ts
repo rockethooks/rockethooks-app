@@ -34,11 +34,11 @@ export const errorMessages: Record<string, string> = {
   'Bad request': "The request couldn't be processed. Please check your input.",
   'Service unavailable':
     'The service is temporarily unavailable. Please try again later.',
-}
+};
 
 export function getUserFriendlyMessage(error?: Error): string {
-  const errorString = error?.toString() ?? ''
-  const errorMessage = error?.message ?? ''
+  const errorString = error?.toString() ?? '';
+  const errorMessage = error?.message ?? '';
 
   // Check for exact matches first
 
@@ -46,16 +46,16 @@ export function getUserFriendlyMessage(error?: Error): string {
     return (
       errorMessages[errorMessage] ??
       'An unexpected error occurred. Please try again.'
-    )
+    );
   }
 
   // Check for pattern matches
   for (const [pattern, message] of Object.entries(errorMessages)) {
     if (errorString.includes(pattern) || errorMessage.includes(pattern)) {
-      return message
+      return message;
     }
   }
 
   // Default message
-  return 'An unexpected error occurred. Please try again.'
+  return 'An unexpected error occurred. Please try again.';
 }

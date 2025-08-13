@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { Badge } from '@/components/ui/Badge'
+import { Badge } from '@/components/ui/Badge';
 
 /**
  * Badge component for displaying status, labels, and categorical information.
@@ -65,10 +65,10 @@ import { Badge } from '@/components/ui/Badge'
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Badge>
+} satisfies Meta<typeof Badge>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Default badge variant
@@ -77,7 +77,7 @@ export const Default: Story = {
   args: {
     children: 'Badge',
   },
-}
+};
 
 /**
  * All badge variants demonstrating different semantic meanings
@@ -102,7 +102,7 @@ export const Variants: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Badges with status indicators showing API connection states
@@ -140,7 +140,7 @@ export const StatusBadges: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Badges with icons for enhanced meaning
@@ -234,7 +234,7 @@ export const WithIcons: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Badges showing counts and numbers
@@ -255,7 +255,7 @@ export const CountBadges: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Different badge sizes and styles
@@ -301,7 +301,7 @@ export const Sizes: Story = {
       },
     },
   },
-}
+};
 
 /**
  * RocketHooks-specific badge usage patterns
@@ -379,7 +379,7 @@ export const RocketHooksPatterns: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Interactive badges with hover states
@@ -431,7 +431,7 @@ export const Interactive: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing all badge properties
@@ -441,4 +441,4 @@ export const Playground: Story = {
     children: 'Badge',
     variant: 'default',
   },
-}
+};

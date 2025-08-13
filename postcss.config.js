@@ -3,4 +3,4 @@ export default {
     // Tailwind CSS is now handled by the Vite plugin
     autoprefixer: {},
   },
-}
+};

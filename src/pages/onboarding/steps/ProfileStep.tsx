@@ -1,18 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Briefcase, Plus, Target, User, UserCheck, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { Alert } from '@/components/ui/Alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Briefcase, Plus, Target, User, UserCheck, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Alert } from '@/components/ui/Alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 import {
   Form,
   FormControl,
@@ -21,16 +21,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form'
-import { Input } from '@/components/ui/Input'
+} from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/Select'
-import { useOnboarding } from '@/hooks/useOnboarding'
+} from '@/components/ui/Select';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   experienceLevels,
   getExperienceLevelLabel,
@@ -38,12 +38,12 @@ import {
   type ProfileFormData,
   profileRoles,
   profileSchema,
-} from '@/lib/validations/onboarding'
-import type { ProfileDraft } from '@/utils/onboardingDrafts'
+} from '@/lib/validations/onboarding';
+import type { ProfileDraft } from '@/utils/onboardingDrafts';
 
 export interface ProfileStepProps {
-  onComplete?: () => void
-  onNext?: () => void
+  onComplete?: () => void;
+  onNext?: () => void;
 }
 
 // Common use cases for API monitoring and webhook management
@@ -58,7 +58,7 @@ const commonUseCases = [
   'Third-party Integrations',
   'DevOps Automation',
   'Business Intelligence',
-] as const
+] as const;
 
 export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
   // Use the new onboarding hook instead of directly accessing stores
@@ -75,11 +75,11 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
     latestError,
     clearErrors,
     progress,
-  } = useOnboarding()
+  } = useOnboarding();
 
   // State for managing use cases
-  const [customUseCase, setCustomUseCase] = useState('')
-  const [selectedUseCases, setSelectedUseCases] = useState<string[]>([])
+  const [customUseCase, setCustomUseCase] = useState('');
+  const [selectedUseCases, setSelectedUseCases] = useState<string[]>([]);
 
   // Initialize form with existing draft data
   const form = useForm<ProfileFormData>({
@@ -93,34 +93,34 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
       useCases: [],
       avatar: '',
     },
-  })
+  });
 
   const {
     watch,
     setValue,
     formState: { isValid },
-  } = form
-  const formData = watch()
+  } = form;
+  const formData = watch();
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as ProfileDraft | null
+    const existingDraft = draft as ProfileDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
       if (existingDraft.firstName)
-        setValue('firstName', existingDraft.firstName)
-      if (existingDraft.lastName) setValue('lastName', existingDraft.lastName)
-      if (existingDraft.role) setValue('role', existingDraft.role)
+        setValue('firstName', existingDraft.firstName);
+      if (existingDraft.lastName) setValue('lastName', existingDraft.lastName);
+      if (existingDraft.role) setValue('role', existingDraft.role);
       if (existingDraft.experience)
-        setValue('experience', existingDraft.experience)
+        setValue('experience', existingDraft.experience);
       if (existingDraft.useCases) {
-        setValue('useCases', existingDraft.useCases)
-        setSelectedUseCases(existingDraft.useCases)
+        setValue('useCases', existingDraft.useCases);
+        setSelectedUseCases(existingDraft.useCases);
       }
-      if (existingDraft.avatar) setValue('avatar', existingDraft.avatar)
+      if (existingDraft.avatar) setValue('avatar', existingDraft.avatar);
     }
-  }, [setValue, draft])
+  }, [setValue, draft]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -132,10 +132,10 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
       const draftData = {
         ...formData,
         useCases: selectedUseCases,
-      } as ProfileDraft
-      saveDraft(draftData)
+      } as ProfileDraft;
+      saveDraft(draftData);
     }
-  }, [formData, selectedUseCases, saveDraft])
+  }, [formData, selectedUseCases, saveDraft]);
 
   // Handle adding a use case
   const handleAddUseCase = (useCase: string) => {
@@ -144,75 +144,75 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
       !selectedUseCases.includes(useCase) &&
       selectedUseCases.length < 5
     ) {
-      const newUseCases = [...selectedUseCases, useCase.trim()]
-      setSelectedUseCases(newUseCases)
-      setValue('useCases', newUseCases)
-      setCustomUseCase('')
+      const newUseCases = [...selectedUseCases, useCase.trim()];
+      setSelectedUseCases(newUseCases);
+      setValue('useCases', newUseCases);
+      setCustomUseCase('');
     }
-  }
+  };
 
   // Handle removing a use case
   const handleRemoveUseCase = (useCase: string) => {
-    const newUseCases = selectedUseCases.filter((uc) => uc !== useCase)
-    setSelectedUseCases(newUseCases)
-    setValue('useCases', newUseCases)
-  }
+    const newUseCases = selectedUseCases.filter((uc) => uc !== useCase);
+    setSelectedUseCases(newUseCases);
+    setValue('useCases', newUseCases);
+  };
 
   // Handle form submission
   const handleSubmit = (data: ProfileFormData) => {
     try {
       // Clear any previous errors
-      clearErrors()
+      clearErrors();
 
       // Include selected use cases in the submitted data
       const submissionData = {
         ...data,
         useCases: selectedUseCases,
-      } as ProfileDraft
+      } as ProfileDraft;
 
       // Complete the step using the state machine
-      const success = completeStep(submissionData)
+      const success = completeStep(submissionData);
 
       if (success) {
         // Call completion callbacks for backward compatibility
-        onComplete?.()
+        onComplete?.();
         if (onNext) {
-          onNext()
+          onNext();
         }
       } else {
         // Error handling is managed by the state machine
-        console.error('Failed to complete profile step')
+        console.error('Failed to complete profile step');
       }
     } catch (error) {
-      console.error('Failed to complete profile step:', error)
+      console.error('Failed to complete profile step:', error);
     }
-  }
+  };
 
   // Handle skip action
   const handleSkip = () => {
-    skipStep()
+    skipStep();
 
     // Call completion callbacks for backward compatibility
-    onComplete?.()
+    onComplete?.();
     if (onNext) {
-      onNext()
+      onNext();
     }
-  }
+  };
 
   // Handle back navigation
   const handleBack = () => {
-    goBack()
-  }
+    goBack();
+  };
 
   // Check if form is valid and we can proceed
-  const canSubmit = isValid && canProceed
+  const canSubmit = isValid && canProceed;
 
   // Generate avatar initials
   const getAvatarInitials = () => {
-    const firstName = form.getValues('firstName') || ''
-    const lastName = form.getValues('lastName') || ''
-    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
-  }
+    const firstName = form.getValues('firstName') || '';
+    const lastName = form.getValues('lastName') || '';
+    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -392,7 +392,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                             <button
                               type="button"
                               onClick={() => {
-                                handleRemoveUseCase(useCase)
+                                handleRemoveUseCase(useCase);
                               }}
                               className="ml-1 h-3 w-3 rounded-full hover:bg-muted-foreground/20"
                               aria-label={`Remove ${useCase}`}
@@ -422,7 +422,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  handleAddUseCase(useCase)
+                                  handleAddUseCase(useCase);
                                 }}
                                 className="h-8 text-xs"
                               >
@@ -438,12 +438,12 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                             placeholder="Add a custom use case..."
                             value={customUseCase}
                             onChange={(e) => {
-                              setCustomUseCase(e.target.value)
+                              setCustomUseCase(e.target.value);
                             }}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddUseCase(customUseCase)
+                                e.preventDefault();
+                                handleAddUseCase(customUseCase);
                               }
                             }}
                             className="flex-1"
@@ -454,7 +454,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              handleAddUseCase(customUseCase)
+                              handleAddUseCase(customUseCase);
                             }}
                             disabled={
                               !customUseCase.trim() ||
@@ -600,5 +600,5 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
         {progress.percentage}% complete)
       </div>
     </div>
-  )
+  );
 }

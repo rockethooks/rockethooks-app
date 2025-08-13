@@ -20,4 +20,4 @@ export {
   // Hooks
   useAutoSaveDraft,
   type WebhookDraft,
-} from './onboardingDrafts'
+} from './onboardingDrafts';

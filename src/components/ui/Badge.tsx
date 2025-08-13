@@ -1,8 +1,8 @@
-import type { VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import type { VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
-import { badgeVariants } from './badgeVariants'
+import { cn } from '@/lib/utils';
+import { badgeVariants } from './badgeVariants';
 
 export interface BadgeProps
   extends React.HTMLAttributes<HTMLSpanElement>,
@@ -26,7 +26,7 @@ function Badge({ className, variant, size, ...props }: BadgeProps) {
       className={cn(badgeVariants({ variant, size }), className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Badge }
+export { Badge };

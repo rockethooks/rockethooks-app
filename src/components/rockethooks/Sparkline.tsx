@@ -1,16 +1,16 @@
-import type * as React from 'react'
-import { useState } from 'react'
+import type * as React from 'react';
+import { useState } from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 export interface SparklineProps {
-  data: number[]
-  width?: number
-  height?: number
-  color?: string
-  showTooltip?: boolean
-  gradient?: boolean
-  className?: string
+  data: number[];
+  width?: number;
+  height?: number;
+  color?: string;
+  showTooltip?: boolean;
+  gradient?: boolean;
+  className?: string;
 }
 
 /**
@@ -33,11 +33,11 @@ function Sparkline({
   className,
 }: SparklineProps) {
   const [hoveredPoint, setHoveredPoint] = useState<{
-    index: number
-    value: number
-    x: number
-    y: number
-  } | null>(null)
+    index: number;
+    value: number;
+    x: number;
+    y: number;
+  } | null>(null);
 
   if (data.length === 0) {
     return (
@@ -50,59 +50,59 @@ function Sparkline({
       >
         No data
       </div>
-    )
+    );
   }
 
-  const max = Math.max(...data)
-  const min = Math.min(...data)
-  const range = max - min || 1 // Prevent division by zero
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min || 1; // Prevent division by zero
 
   // Create SVG path
   const points = data
     .map((value, index) => {
-      const x = (index / (data.length - 1)) * width
-      const y = height - ((value - min) / range) * height
-      return `${String(x)},${String(y)}`
+      const x = (index / (data.length - 1)) * width;
+      const y = height - ((value - min) / range) * height;
+      return `${String(x)},${String(y)}`;
     })
-    .join(' ')
+    .join(' ');
 
   const pathD =
     data.length > 1
       ? `M ${points.split(' ').join(' L ')}`
-      : `M 0,${String(height / 2)} L ${String(width)},${String(height / 2)}`
+      : `M 0,${String(height / 2)} L ${String(width)},${String(height / 2)}`;
 
   // Create area path for gradient fill
   const areaD =
     data.length > 1
       ? `${pathD} L ${String(width)},${String(height)} L 0,${String(height)} Z`
-      : `M 0,${String(height)} L ${String(width)},${String(height)} L ${String(width)},${String(height / 2)} L 0,${String(height / 2)} Z`
+      : `M 0,${String(height)} L ${String(width)},${String(height)} L ${String(width)},${String(height / 2)} L 0,${String(height / 2)} Z`;
 
   const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (!showTooltip) return
+    if (!showTooltip) return;
 
-    const rect = event.currentTarget.getBoundingClientRect()
-    const mouseX = event.clientX - rect.left
-    const dataIndex = Math.round((mouseX / width) * (data.length - 1))
-    const clampedIndex = Math.max(0, Math.min(data.length - 1, dataIndex))
+    const rect = event.currentTarget.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const dataIndex = Math.round((mouseX / width) * (data.length - 1));
+    const clampedIndex = Math.max(0, Math.min(data.length - 1, dataIndex));
 
-    const pointValue = data[clampedIndex]
-    if (pointValue === undefined) return
+    const pointValue = data[clampedIndex];
+    if (pointValue === undefined) return;
 
     setHoveredPoint({
       index: clampedIndex,
       value: pointValue,
       x: (clampedIndex / (data.length - 1)) * width,
       y: height - ((pointValue - min) / range) * height,
-    })
-  }
+    });
+  };
 
   const handleMouseLeave = () => {
     if (showTooltip) {
-      setHoveredPoint(null)
+      setHoveredPoint(null);
     }
-  }
+  };
 
-  const gradientId = `sparkline-gradient-${Math.random().toString(36).substring(2, 11)}`
+  const gradientId = `sparkline-gradient-${Math.random().toString(36).substring(2, 11)}`;
 
   return (
     <div className={cn('relative inline-block', className)}>
@@ -167,7 +167,7 @@ function Sparkline({
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export { Sparkline }
+export { Sparkline };

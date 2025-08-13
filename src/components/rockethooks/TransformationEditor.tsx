@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react'
-import { Alert, AlertDescription } from '@/components/ui/Alert'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Label } from '@/components/ui/Label'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { Textarea } from '@/components/ui/Textarea'
-import { cn } from '@/lib/utils'
+import { useEffect, useState } from 'react';
+import { Alert, AlertDescription } from '@/components/ui/Alert';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { cn } from '@/lib/utils';
 
 export interface TransformationEditorProps {
-  mode: 'visual' | 'code'
-  value: string
-  onChange: (value: string) => void
-  inputSchema?: object
-  outputPreview?: object
-  className?: string
+  mode: 'visual' | 'code';
+  value: string;
+  onChange: (value: string) => void;
+  inputSchema?: object;
+  outputPreview?: object;
+  className?: string;
 }
 
 /**
@@ -38,31 +38,33 @@ function TransformationEditor({
   outputPreview,
   className,
 }: TransformationEditorProps) {
-  const [currentMode, setCurrentMode] = useState<'visual' | 'code'>(initialMode)
-  const [isValid, setIsValid] = useState(true)
-  const [validationError, setValidationError] = useState<string | null>(null)
+  const [currentMode, setCurrentMode] = useState<'visual' | 'code'>(
+    initialMode
+  );
+  const [isValid, setIsValid] = useState(true);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   // Validate JSON syntax
   useEffect(() => {
     if (currentMode === 'code' && value.trim()) {
       try {
-        JSON.parse(value)
-        setIsValid(true)
-        setValidationError(null)
+        JSON.parse(value);
+        setIsValid(true);
+        setValidationError(null);
       } catch (error) {
-        setIsValid(false)
+        setIsValid(false);
         setValidationError(
           error instanceof Error ? error.message : 'Invalid JSON syntax'
-        )
+        );
       }
     } else {
-      setIsValid(true)
-      setValidationError(null)
+      setIsValid(true);
+      setValidationError(null);
     }
-  }, [value, currentMode])
+  }, [value, currentMode]);
 
   const handleModeChange = (newMode: 'visual' | 'code') => {
-    setCurrentMode(newMode)
+    setCurrentMode(newMode);
 
     // Convert between modes if needed
     if (newMode === 'code' && currentMode === 'visual') {
@@ -70,23 +72,23 @@ function TransformationEditor({
       // For now, we'll just ensure proper JSON format
       try {
         if (value && !value.startsWith('{')) {
-          onChange(`{\n  ${value}\n}`)
+          onChange(`{\n  ${value}\n}`);
         }
       } catch {
         // Keep existing value if conversion fails
       }
     }
-  }
+  };
 
   const formatCode = () => {
     try {
-      const parsed = JSON.parse(value) as unknown
-      const formatted = JSON.stringify(parsed, null, 2)
-      onChange(formatted)
+      const parsed = JSON.parse(value) as unknown;
+      const formatted = JSON.stringify(parsed, null, 2);
+      onChange(formatted);
     } catch {
       // Do nothing if JSON is invalid
     }
-  }
+  };
 
   const sampleTransformations = [
     {
@@ -104,13 +106,13 @@ function TransformationEditor({
       transformation:
         '{\n  "user_type": "$.data.user.role == \'admin\' ? \'administrator\' : \'user\'",\n  "permissions": "$.data.user.permissions[*]"\n}',
     },
-  ]
+  ];
 
   const placeholderText = `{
   // Define your transformation rules here
   "output_field": "$.input.field",
   "computed_field": "$.data.value * 2"
-}`
+}`;
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -125,7 +127,7 @@ function TransformationEditor({
           <Tabs
             value={currentMode}
             onValueChange={(value) => {
-              handleModeChange(value as 'visual' | 'code')
+              handleModeChange(value as 'visual' | 'code');
             }}
           >
             <TabsList className="grid w-full grid-cols-2 h-8">
@@ -182,7 +184,7 @@ function TransformationEditor({
               id="transformation-code"
               value={value}
               onChange={(e) => {
-                onChange(e.target.value)
+                onChange(e.target.value);
               }}
               className={cn(
                 'font-mono text-sm min-h-[200px] resize-none',
@@ -202,7 +204,7 @@ function TransformationEditor({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    onChange(sample.transformation)
+                    onChange(sample.transformation);
                   }}
                   className="h-auto p-3 justify-start"
                 >
@@ -266,7 +268,7 @@ function TransformationEditor({
         </ul>
       </div>
     </div>
-  )
+  );
 }
 
-export { TransformationEditor }
+export { TransformationEditor };

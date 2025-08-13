@@ -1,14 +1,14 @@
-import type * as React from 'react'
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
-export type CardProps = React.ComponentProps<'div'>
-export type CardHeaderProps = React.ComponentProps<'div'>
-export type CardTitleProps = React.ComponentProps<'div'>
-export type CardDescriptionProps = React.ComponentProps<'div'>
-export type CardActionProps = React.ComponentProps<'div'>
-export type CardContentProps = React.ComponentProps<'div'>
-export type CardFooterProps = React.ComponentProps<'div'>
+export type CardProps = React.ComponentProps<'div'>;
+export type CardHeaderProps = React.ComponentProps<'div'>;
+export type CardTitleProps = React.ComponentProps<'div'>;
+export type CardDescriptionProps = React.ComponentProps<'div'>;
+export type CardActionProps = React.ComponentProps<'div'>;
+export type CardContentProps = React.ComponentProps<'div'>;
+export type CardFooterProps = React.ComponentProps<'div'>;
 
 /**
  * Card component with compound pattern for flexible layouts
@@ -42,7 +42,7 @@ function Card({ className, ...props }: CardProps) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -58,7 +58,7 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -71,7 +71,7 @@ function CardTitle({ className, ...props }: CardTitleProps) {
       className={cn('leading-none font-semibold', className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -84,7 +84,7 @@ function CardDescription({ className, ...props }: CardDescriptionProps) {
       className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -100,7 +100,7 @@ function CardAction({ className, ...props }: CardActionProps) {
       )}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -113,7 +113,7 @@ function CardContent({ className, ...props }: CardContentProps) {
       className={cn('px-6', className)}
       {...props}
     />
-  )
+  );
 }
 
 /**
@@ -126,7 +126,7 @@ function CardFooter({ className, ...props }: CardFooterProps) {
       className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -137,4 +137,4 @@ export {
   CardAction,
   CardDescription,
   CardContent,
-}
+};

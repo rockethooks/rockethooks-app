@@ -1,11 +1,11 @@
-import { useAuth } from '@clerk/clerk-react'
-import { Loader2 } from 'lucide-react'
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
-import { Card, CardContent } from '@/components/ui/Card'
-import { useReturnUrl } from '@/hooks/auth/useReturnUrl'
-import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
+import { useAuth } from '@clerk/clerk-react';
+import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Card, CardContent } from '@/components/ui/Card';
+import { useReturnUrl } from '@/hooks/auth/useReturnUrl';
+import { useOnboardingStatus } from '@/hooks/useOnboardingStatus';
 
 /**
  * AuthCallback component handles post-authentication logic
@@ -15,39 +15,39 @@ import { useOnboardingStatus } from '@/hooks/useOnboardingStatus'
  * - Handles return URLs for redirecting users to their intended destination
  */
 export function AuthCallback() {
-  const { isLoaded, isSignedIn } = useAuth()
-  const navigate = useNavigate()
-  const { getReturnUrl, clearReturnUrl } = useReturnUrl()
+  const { isLoaded, isSignedIn } = useAuth();
+  const navigate = useNavigate();
+  const { getReturnUrl, clearReturnUrl } = useReturnUrl();
   const {
     isLoading: onboardingLoading,
     isNewUser,
     shouldRedirectToOnboarding,
     error,
-  } = useOnboardingStatus()
+  } = useOnboardingStatus();
 
   useEffect(() => {
     // Wait for both auth and onboarding status to load
     if (!isLoaded || onboardingLoading) {
-      return
+      return;
     }
 
     // If not signed in, redirect to login
     if (!isSignedIn) {
-      void navigate('/login', { replace: true })
-      return
+      void navigate('/login', { replace: true });
+      return;
     }
 
     // Handle onboarding status error
     if (error) {
-      console.error('Error determining onboarding status:', error)
+      console.error('Error determining onboarding status:', error);
       toast.error('Welcome to RocketHooks!', {
         description:
           'There was an issue loading your profile, but you can still continue.',
         duration: 5000,
-      })
+      });
       // Fallback to dashboard on error
-      void navigate('/dashboard', { replace: true })
-      return
+      void navigate('/dashboard', { replace: true });
+      return;
     }
 
     // Show welcome toast for new users
@@ -55,21 +55,21 @@ export function AuthCallback() {
       toast.success('Welcome to RocketHooks! 🎉', {
         description: "Let's get you set up with a quick onboarding process.",
         duration: 6000,
-      })
+      });
     }
 
     // Navigate based on onboarding status
     if (shouldRedirectToOnboarding) {
-      void navigate('/onboarding/1', { replace: true })
+      void navigate('/onboarding/1', { replace: true });
     } else {
       // Check for return URL for existing users
-      const returnUrl = getReturnUrl()
+      const returnUrl = getReturnUrl();
       if (returnUrl) {
-        clearReturnUrl()
-        void navigate(returnUrl, { replace: true })
+        clearReturnUrl();
+        void navigate(returnUrl, { replace: true });
       } else {
         // Default to dashboard if no return URL
-        void navigate('/dashboard', { replace: true })
+        void navigate('/dashboard', { replace: true });
       }
     }
   }, [
@@ -82,7 +82,7 @@ export function AuthCallback() {
     navigate,
     getReturnUrl,
     clearReturnUrl,
-  ])
+  ]);
 
   // Show loading state while processing
   return (
@@ -103,7 +103,7 @@ export function AuthCallback() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
-export default AuthCallback
+export default AuthCallback;

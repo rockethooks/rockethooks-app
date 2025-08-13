@@ -1,7 +1,7 @@
-import { cva, type VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
 const statusVariants = cva(
   'inline-flex items-center gap-2 text-sm font-medium',
@@ -16,7 +16,7 @@ const statusVariants = cva(
       },
     },
   }
-)
+);
 
 const dotVariants = cva('h-2 w-2 rounded-full transition-colors', {
   variants: {
@@ -36,15 +36,15 @@ const dotVariants = cva('h-2 w-2 rounded-full transition-colors', {
   defaultVariants: {
     size: 'md',
   },
-})
+});
 
 export interface WebhookStatusProps
   extends Omit<React.HTMLAttributes<HTMLOutputElement>, 'status'>,
     VariantProps<typeof statusVariants> {
-  status: 'success' | 'pending' | 'retrying' | 'failed' | 'circuit-open'
-  size?: 'sm' | 'md' | 'lg'
-  showLabel?: boolean
-  pulseAnimation?: boolean
+  status: 'success' | 'pending' | 'retrying' | 'failed' | 'circuit-open';
+  size?: 'sm' | 'md' | 'lg';
+  showLabel?: boolean;
+  pulseAnimation?: boolean;
 }
 
 const statusLabels = {
@@ -53,7 +53,7 @@ const statusLabels = {
   retrying: 'Retrying',
   failed: 'Failed',
   'circuit-open': 'Circuit Open',
-}
+};
 
 /**
  * WebhookStatus component - animated status indicators for webhook states
@@ -74,7 +74,7 @@ function WebhookStatus({
   ...props
 }: WebhookStatusProps) {
   const isPulsing =
-    pulseAnimation && (status === 'pending' || status === 'retrying')
+    pulseAnimation && (status === 'pending' || status === 'retrying');
 
   return (
     <output
@@ -95,7 +95,7 @@ function WebhookStatus({
         <span className="text-sm font-medium">{statusLabels[status]}</span>
       )}
     </output>
-  )
+  );
 }
 
-export { WebhookStatus }
+export { WebhookStatus };

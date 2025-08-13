@@ -1,13 +1,13 @@
-import type { VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import type { VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
-import { inputVariants } from './inputVariants'
+import { cn } from '@/lib/utils';
+import { inputVariants } from './inputVariants';
 
 export interface InputProps
   extends Omit<React.ComponentProps<'input'>, 'size'>,
     VariantProps<typeof inputVariants> {
-  size?: React.ComponentProps<'input'>['size']
+  size?: React.ComponentProps<'input'>['size'];
 }
 
 /**
@@ -36,7 +36,7 @@ function Input({
       size={size}
       {...props}
     />
-  )
+  );
 }
 
-export { Input }
+export { Input };

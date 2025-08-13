@@ -8,11 +8,11 @@ import {
   Settings,
   Sun,
   User,
-} from 'lucide-react'
-import { useState } from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+} from 'lucide-react';
+import { useState } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,33 +23,33 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@/components/ui/DropdownMenu'
-import { Input } from '@/components/ui/Input'
-import { useTheme } from '@/providers/useTheme'
-import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary'
+} from '@/components/ui/DropdownMenu';
+import { Input } from '@/components/ui/Input';
+import { useTheme } from '@/providers/useTheme';
+import { ComponentErrorBoundary } from '@/shared/components/ErrorBoundary';
 
 interface HeaderProps {
-  onMenuToggle?: () => void
-  showMenuButton?: boolean
+  onMenuToggle?: () => void;
+  showMenuButton?: boolean;
 }
 
 export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [notificationCount] = useState(3) // Mock notification count
-  const { setTheme } = useTheme()
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount] = useState(3); // Mock notification count
+  const { setTheme } = useTheme();
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      console.log('Search query:', searchQuery)
+      console.log('Search query:', searchQuery);
       // TODO: Implement search functionality
     }
-  }
+  };
 
   const handleLogout = () => {
-    console.log('Logout clicked')
+    console.log('Logout clicked');
     // TODO: Implement logout functionality
-  }
+  };
 
   return (
     <ComponentErrorBoundary>
@@ -89,7 +89,7 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
                   className="pl-8 md:w-[300px]"
                   value={searchQuery}
                   onChange={(e) => {
-                    setSearchQuery(e.target.value)
+                    setSearchQuery(e.target.value);
                   }}
                 />
               </form>
@@ -156,7 +156,7 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
                     <DropdownMenuSubContent>
                       <DropdownMenuItem
                         onClick={() => {
-                          setTheme('light')
+                          setTheme('light');
                         }}
                       >
                         <Sun className="mr-2 h-4 w-4" />
@@ -164,7 +164,7 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setTheme('dark')
+                          setTheme('dark');
                         }}
                       >
                         <Moon className="mr-2 h-4 w-4" />
@@ -172,7 +172,7 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setTheme('system')
+                          setTheme('system');
                         }}
                       >
                         <Monitor className="mr-2 h-4 w-4" />
@@ -193,5 +193,5 @@ export function Header({ onMenuToggle, showMenuButton = true }: HeaderProps) {
         </div>
       </header>
     </ComponentErrorBoundary>
-  )
+  );
 }

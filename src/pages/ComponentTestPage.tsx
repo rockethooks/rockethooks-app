@@ -1,5 +1,5 @@
-import { ComponentTest } from '@/pages/ComponentTest'
-import { DashboardPage } from '@/shared/components/PageLayout'
+import { ComponentTest } from '@/pages/ComponentTest';
+import { DashboardPage } from '@/shared/components/PageLayout';
 
 export function ComponentTestPage() {
   return (
@@ -9,5 +9,5 @@ export function ComponentTestPage() {
     >
       <ComponentTest />
     </DashboardPage>
-  )
+  );
 }

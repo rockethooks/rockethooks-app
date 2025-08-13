@@ -1,16 +1,16 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Building2, FileText, Globe, Users } from 'lucide-react'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import { Alert } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Building2, FileText, Globe, Users } from 'lucide-react';
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 import {
   Form,
   FormControl,
@@ -19,29 +19,29 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/Form'
-import { Input } from '@/components/ui/Input'
+} from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/Select'
-import { Textarea } from '@/components/ui/Textarea'
-import { useOnboarding } from '@/hooks/useOnboarding'
+} from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   getOrganizationSizeLabel,
   type OrganizationFormData,
   organizationSchema,
   organizationSizes,
-} from '@/lib/validations/onboarding'
-import type { OrganizationData } from '@/types/onboarding'
-import type { OrganizationDraft } from '@/utils/onboardingDrafts'
+} from '@/lib/validations/onboarding';
+import type { OrganizationData } from '@/types/onboarding';
+import type { OrganizationDraft } from '@/utils/onboardingDrafts';
 
 export interface OrganizationStepProps {
-  onComplete?: () => void
-  onNext?: () => void
+  onComplete?: () => void;
+  onNext?: () => void;
 }
 
 export function OrganizationStep({
@@ -62,7 +62,7 @@ export function OrganizationStep({
     latestError,
     clearErrors,
     progress,
-  } = useOnboarding()
+  } = useOnboarding();
 
   // Initialize form with existing draft data
   const form = useForm<OrganizationFormData>({
@@ -75,29 +75,29 @@ export function OrganizationStep({
       website: '',
       description: '',
     },
-  })
+  });
 
   const {
     watch,
     setValue,
     formState: { isValid },
-  } = form
-  const formData = watch()
+  } = form;
+  const formData = watch();
 
   // Load existing draft data on mount
   useEffect(() => {
-    const existingDraft = draft as OrganizationDraft | null
+    const existingDraft = draft as OrganizationDraft | null;
 
     if (existingDraft) {
       // Populate form with existing draft data
-      if (existingDraft.name) setValue('name', existingDraft.name)
-      if (existingDraft.size) setValue('size', existingDraft.size)
-      if (existingDraft.industry) setValue('industry', existingDraft.industry)
-      if (existingDraft.website) setValue('website', existingDraft.website)
+      if (existingDraft.name) setValue('name', existingDraft.name);
+      if (existingDraft.size) setValue('size', existingDraft.size);
+      if (existingDraft.industry) setValue('industry', existingDraft.industry);
+      if (existingDraft.website) setValue('website', existingDraft.website);
       if (existingDraft.description)
-        setValue('description', existingDraft.description)
+        setValue('description', existingDraft.description);
     }
-  }, [setValue, draft])
+  }, [setValue, draft]);
 
   // Auto-save form changes with debouncing
   useEffect(() => {
@@ -106,52 +106,52 @@ export function OrganizationStep({
         (key) => formData[key as keyof typeof formData]
       )
     ) {
-      saveDraft(formData as OrganizationData)
+      saveDraft(formData as OrganizationData);
     }
-  }, [formData, saveDraft])
+  }, [formData, saveDraft]);
 
   // Handle form submission
   const handleSubmit = (data: OrganizationFormData) => {
     try {
       // Clear any previous errors
-      clearErrors()
+      clearErrors();
 
       // Complete the step using the state machine
-      const success = completeStep(data as OrganizationData)
+      const success = completeStep(data as OrganizationData);
 
       if (success) {
         // Call completion callbacks for backward compatibility
-        onComplete?.()
+        onComplete?.();
         if (onNext) {
-          onNext()
+          onNext();
         }
       } else {
         // Error handling is managed by the state machine
-        console.error('Failed to complete organization step')
+        console.error('Failed to complete organization step');
       }
     } catch (error) {
-      console.error('Failed to complete organization step:', error)
+      console.error('Failed to complete organization step:', error);
     }
-  }
+  };
 
   // Handle skip action
   const handleSkip = () => {
-    skipStep()
+    skipStep();
 
     // Call completion callbacks for backward compatibility
-    onComplete?.()
+    onComplete?.();
     if (onNext) {
-      onNext()
+      onNext();
     }
-  }
+  };
 
   // Handle back navigation
   const handleBack = () => {
-    goBack()
-  }
+    goBack();
+  };
 
   // Check if form is valid and we can proceed
-  const canSubmit = isValid && canProceed
+  const canSubmit = isValid && canProceed;
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -406,5 +406,5 @@ export function OrganizationStep({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useTheme } from '@/providers/useTheme'
+import { useEffect, useMemo, useState } from 'react';
+import { useTheme } from '@/providers/useTheme';
 
 // Global MutationObserver instance to prevent multiple observers
 class GlobalThemeObserver {
-  private observer: MutationObserver | null = null
-  private callbacks = new Set<() => void>()
-  private isInitialized = false
+  private observer: MutationObserver | null = null;
+  private callbacks = new Set<() => void>();
+  private isInitialized = false;
 
   init() {
-    if (this.isInitialized) return
+    if (this.isInitialized) return;
 
     this.observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -16,37 +16,37 @@ class GlobalThemeObserver {
           // Debounce the callbacks to prevent excessive updates
           setTimeout(() => {
             this.callbacks.forEach((callback) => {
-              callback()
-            })
-          }, 0)
+              callback();
+            });
+          }, 0);
         }
-      })
-    })
+      });
+    });
 
     this.observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ['class'],
-    })
+    });
 
-    this.isInitialized = true
+    this.isInitialized = true;
   }
 
   subscribe(callback: () => void) {
-    this.init()
-    this.callbacks.add(callback)
+    this.init();
+    this.callbacks.add(callback);
 
     return () => {
-      this.callbacks.delete(callback)
+      this.callbacks.delete(callback);
       if (this.callbacks.size === 0 && this.observer) {
-        this.observer.disconnect()
-        this.observer = null
-        this.isInitialized = false
+        this.observer.disconnect();
+        this.observer = null;
+        this.isInitialized = false;
       }
-    }
+    };
   }
 }
 
-const globalThemeObserver = new GlobalThemeObserver()
+const globalThemeObserver = new GlobalThemeObserver();
 
 /**
  * Hook to get CSS variable values and react to theme changes
@@ -54,37 +54,37 @@ const globalThemeObserver = new GlobalThemeObserver()
  * @returns The current value of the CSS variable
  */
 export function useCSSVariable(cssVariable: string): string {
-  const [value, setValue] = useState<string>('')
+  const [value, setValue] = useState<string>('');
 
   useEffect(() => {
     const updateValue = () => {
-      const root = document.documentElement
+      const root = document.documentElement;
       const computedValue = getComputedStyle(root)
         .getPropertyValue(`--${cssVariable}`)
-        .trim()
-      setValue(computedValue)
-    }
+        .trim();
+      setValue(computedValue);
+    };
 
     // Update immediately
-    updateValue()
+    updateValue();
 
     // Listen for theme changes
     const handleThemeChange = () => {
-      updateValue()
-    }
+      updateValue();
+    };
 
-    window.addEventListener('theme-change', handleThemeChange)
+    window.addEventListener('theme-change', handleThemeChange);
 
     // Subscribe to global theme observer
-    const unsubscribe = globalThemeObserver.subscribe(updateValue)
+    const unsubscribe = globalThemeObserver.subscribe(updateValue);
 
     return () => {
-      window.removeEventListener('theme-change', handleThemeChange)
-      unsubscribe()
-    }
-  }, [cssVariable])
+      window.removeEventListener('theme-change', handleThemeChange);
+      unsubscribe();
+    };
+  }, [cssVariable]);
 
-  return value
+  return value;
 }
 
 /**
@@ -93,37 +93,37 @@ export function useCSSVariable(cssVariable: string): string {
  * @returns Object with HSL values and utility functions
  */
 export function useThemeColor(colorName: string) {
-  const hslValue = useCSSVariable(colorName)
-  const { resolvedTheme } = useTheme()
+  const hslValue = useCSSVariable(colorName);
+  const { resolvedTheme } = useTheme();
 
   const getHSLString = () => {
-    return hslValue ? `hsl(${hslValue})` : ''
-  }
+    return hslValue ? `hsl(${hslValue})` : '';
+  };
 
   const getHSLAString = (alpha: number) => {
-    return hslValue ? `hsla(${hslValue} / ${alpha.toString()})` : ''
-  }
+    return hslValue ? `hsla(${hslValue} / ${alpha.toString()})` : '';
+  };
 
   const getCSSVariable = () => {
-    return `hsl(var(--${colorName}))`
-  }
+    return `hsl(var(--${colorName}))`;
+  };
 
   const getCSSVariableWithAlpha = (alpha: number) => {
-    return `hsl(var(--${colorName}) / ${alpha.toString()})`
-  }
+    return `hsl(var(--${colorName}) / ${alpha.toString()})`;
+  };
 
   const parseHSL = () => {
-    if (!hslValue) return null
+    if (!hslValue) return null;
 
-    const values = hslValue.split(' ')
-    if (values.length !== 3) return null
+    const values = hslValue.split(' ');
+    if (values.length !== 3) return null;
 
     return {
       hue: parseInt(values[0] ?? '0'),
       saturation: parseInt((values[1] ?? '0').replace('%', '')),
       lightness: parseInt((values[2] ?? '0').replace('%', '')),
-    }
-  }
+    };
+  };
 
   return {
     hslValue,
@@ -136,7 +136,7 @@ export function useThemeColor(colorName: string) {
     // Utility properties
     isDark: resolvedTheme === 'dark',
     isLight: resolvedTheme === 'light',
-  }
+  };
 }
 
 /**
@@ -148,51 +148,51 @@ export function useThemeColor(colorName: string) {
  * @returns Object with color variants
  */
 export function useColorVariants(baseColor: string, variants: number[] = []) {
-  const { resolvedTheme } = useTheme()
-  const [colorValues, setColorValues] = useState<Record<number, string>>({})
+  const { resolvedTheme } = useTheme();
+  const [colorValues, setColorValues] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const updateColorValues = () => {
-      const root = document.documentElement
-      const newColorValues: Record<number, string> = {}
+      const root = document.documentElement;
+      const newColorValues: Record<number, string> = {};
 
       variants.forEach((variant) => {
-        const colorName = `${baseColor}-${variant.toString()}`
+        const colorName = `${baseColor}-${variant.toString()}`;
         const computedValue = getComputedStyle(root)
           .getPropertyValue(`--${colorName}`)
-          .trim()
-        newColorValues[variant] = computedValue
-      })
+          .trim();
+        newColorValues[variant] = computedValue;
+      });
 
-      setColorValues(newColorValues)
-    }
+      setColorValues(newColorValues);
+    };
 
     // Update immediately
-    updateColorValues()
+    updateColorValues();
 
     // Listen for theme changes
     const handleThemeChange = () => {
-      updateColorValues()
-    }
+      updateColorValues();
+    };
 
-    window.addEventListener('theme-change', handleThemeChange)
+    window.addEventListener('theme-change', handleThemeChange);
 
     // Subscribe to global theme observer
-    const unsubscribe = globalThemeObserver.subscribe(updateColorValues)
+    const unsubscribe = globalThemeObserver.subscribe(updateColorValues);
 
     return () => {
-      window.removeEventListener('theme-change', handleThemeChange)
-      unsubscribe()
-    }
-  }, [baseColor, variants])
+      window.removeEventListener('theme-change', handleThemeChange);
+      unsubscribe();
+    };
+  }, [baseColor, variants]);
 
   // Memoize the final color objects to prevent unnecessary re-renders
   return useMemo(() => {
-    const colors: Record<number, ReturnType<typeof useThemeColor>> = {}
+    const colors: Record<number, ReturnType<typeof useThemeColor>> = {};
 
     variants.forEach((variant) => {
-      const colorName = `${baseColor}-${variant.toString()}`
-      const hslValue = colorValues[variant] ?? ''
+      const colorName = `${baseColor}-${variant.toString()}`;
+      const hslValue = colorValues[variant] ?? '';
 
       colors[variant] = {
         hslValue,
@@ -204,39 +204,39 @@ export function useColorVariants(baseColor: string, variants: number[] = []) {
         getCSSVariableWithAlpha: (alpha: number) =>
           `hsl(var(--${colorName}) / ${alpha.toString()})`,
         parseHSL: () => {
-          if (!hslValue) return null
-          const values = hslValue.split(' ')
-          if (values.length !== 3) return null
+          if (!hslValue) return null;
+          const values = hslValue.split(' ');
+          if (values.length !== 3) return null;
           return {
             hue: parseInt(values[0] ?? '0'),
             saturation: parseInt((values[1] ?? '0').replace('%', '')),
             lightness: parseInt((values[2] ?? '0').replace('%', '')),
-          }
+          };
         },
         isDark: resolvedTheme === 'dark',
         isLight: resolvedTheme === 'light',
-      }
-    })
+      };
+    });
 
-    return colors
-  }, [baseColor, variants, colorValues, resolvedTheme])
+    return colors;
+  }, [baseColor, variants, colorValues, resolvedTheme]);
 }
 
 /**
  * Hook for semantic colors (success, warning, error, info)
  */
 export function useSemanticColors() {
-  const success = useThemeColor('success')
-  const warning = useThemeColor('warning')
-  const error = useThemeColor('error')
-  const info = useThemeColor('info')
+  const success = useThemeColor('success');
+  const warning = useThemeColor('warning');
+  const error = useThemeColor('error');
+  const info = useThemeColor('info');
 
   return {
     success,
     warning,
     error,
     info,
-  }
+  };
 }
 
 /**
@@ -246,26 +246,26 @@ export function useSemanticColors() {
 export function useThemeChangeListener(
   callback: (theme: 'light' | 'dark') => void
 ) {
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const handleThemeChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ theme: 'dark' | 'light' }>
-      callback(customEvent.detail.theme)
-    }
+      const customEvent = event as CustomEvent<{ theme: 'dark' | 'light' }>;
+      callback(customEvent.detail.theme);
+    };
 
-    window.addEventListener('theme-change', handleThemeChange as EventListener)
+    window.addEventListener('theme-change', handleThemeChange as EventListener);
 
     return () => {
       window.removeEventListener(
         'theme-change',
         handleThemeChange as EventListener
-      )
-    }
-  }, [callback])
+      );
+    };
+  }, [callback]);
 
   // Also call immediately with current theme
   useEffect(() => {
-    callback(resolvedTheme)
-  }, [resolvedTheme, callback])
+    callback(resolvedTheme);
+  }, [resolvedTheme, callback]);
 }

@@ -1,11 +1,11 @@
-import { Outlet } from 'react-router-dom'
-import { Toaster } from '@/components/ui/Sonner'
-import { TooltipProvider } from '@/components/ui/Tooltip'
-import { ThemeProvider } from '@/providers/ThemeProvider'
-import { AppErrorBoundary } from '@/shared/components/ErrorBoundary'
+import { Outlet } from 'react-router-dom';
+import { Toaster } from '@/components/ui/Sonner';
+import { TooltipProvider } from '@/components/ui/Tooltip';
+import { ThemeProvider } from '@/providers/ThemeProvider';
+import { AppErrorBoundary } from '@/shared/components/ErrorBoundary';
 
 interface RootLayoutProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export function RootLayout({ children }: RootLayoutProps) {
@@ -20,5 +20,5 @@ export function RootLayout({ children }: RootLayoutProps) {
         </TooltipProvider>
       </ThemeProvider>
     </AppErrorBoundary>
-  )
+  );
 }

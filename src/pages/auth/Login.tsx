@@ -1,17 +1,17 @@
-import { SignIn, useAuth } from '@clerk/clerk-react'
-import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { toast } from 'sonner'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
+import { SignIn, useAuth } from '@clerk/clerk-react';
+import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
+} from '@/components/ui/Card';
 
 // Define OAuth error codes and their user-friendly messages
 const OAUTH_ERROR_MESSAGES = {
@@ -46,7 +46,7 @@ const OAUTH_ERROR_MESSAGES = {
     'Authentication service is temporarily unavailable. Please try again later.',
   oauth_unknown_error:
     'An unknown error occurred during authentication. Please try again.',
-} as const
+} as const;
 
 // Log error with contextual information for debugging
 const logError = (error: unknown, context: string) => {
@@ -67,27 +67,27 @@ const logError = (error: unknown, context: string) => {
     },
     userAgent: navigator.userAgent,
     url: window.location.href,
-  }
+  };
 
   // Log to console in development
   if (import.meta.env.DEV) {
-    console.error('[OAuth Error]', errorInfo)
+    console.error('[OAuth Error]', errorInfo);
   }
 
   // TODO: In production, send to error tracking service (e.g., Sentry)
   // errorTrackingService.captureError(errorInfo)
-}
+};
 
 // Process URL parameters and detect OAuth errors
 const processAuthError = (searchParams: URLSearchParams): string | null => {
   // Standard OAuth error parameter
-  const error = searchParams.get('error')
-  const errorDescription = searchParams.get('error_description')
-  const errorUri = searchParams.get('error_uri')
+  const error = searchParams.get('error');
+  const errorDescription = searchParams.get('error_description');
+  const errorUri = searchParams.get('error_uri');
 
   // Clerk-specific error parameters
-  const clerkError = searchParams.get('clerk_error')
-  const clerkErrorDescription = searchParams.get('clerk_error_description')
+  const clerkError = searchParams.get('clerk_error');
+  const clerkErrorDescription = searchParams.get('clerk_error_description');
 
   // Check for various error indicators
   if (error) {
@@ -98,13 +98,13 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
         uri: errorUri,
       },
       'OAuth URL Error Parameter'
-    )
+    );
 
     const message =
       error in OAUTH_ERROR_MESSAGES
         ? OAUTH_ERROR_MESSAGES[error as keyof typeof OAUTH_ERROR_MESSAGES]
-        : (errorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error)
-    return message
+        : (errorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error);
+    return message;
   }
 
   if (clerkError) {
@@ -114,25 +114,25 @@ const processAuthError = (searchParams: URLSearchParams): string | null => {
         description: clerkErrorDescription,
       },
       'Clerk URL Error Parameter'
-    )
+    );
 
-    return clerkErrorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error
+    return clerkErrorDescription ?? OAUTH_ERROR_MESSAGES.oauth_unknown_error;
   }
 
-  return null
-}
+  return null;
+};
 
 export function Login() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [hasProcessedError, setHasProcessedError] = useState(false)
-  const navigate = useNavigate()
-  const { isLoaded, isSignedIn } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [hasProcessedError, setHasProcessedError] = useState(false);
+  const navigate = useNavigate();
+  const { isLoaded, isSignedIn } = useAuth();
 
   // Process and display OAuth errors from URL parameters
   useEffect(() => {
-    if (hasProcessedError) return
+    if (hasProcessedError) return;
 
-    const errorMessage = processAuthError(searchParams)
+    const errorMessage = processAuthError(searchParams);
     if (errorMessage) {
       toast.error('Authentication Failed', {
         description: errorMessage,
@@ -141,22 +141,22 @@ export function Login() {
           label: 'Try Again',
           onClick: () => {
             // Clear error parameters and refresh
-            setSearchParams(new URLSearchParams())
-            window.location.reload()
+            setSearchParams(new URLSearchParams());
+            window.location.reload();
           },
         },
-      })
-      setHasProcessedError(true)
+      });
+      setHasProcessedError(true);
     }
-  }, [searchParams, setSearchParams, hasProcessedError])
+  }, [searchParams, setSearchParams, hasProcessedError]);
 
   // Redirect if already signed in - now goes to auth callback for proper handling
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      const redirectTo = searchParams.get('redirect_url') ?? '/auth/callback'
-      void navigate(redirectTo, { replace: true })
+      const redirectTo = searchParams.get('redirect_url') ?? '/auth/callback';
+      void navigate(redirectTo, { replace: true });
     }
-  }, [isLoaded, isSignedIn, navigate, searchParams])
+  }, [isLoaded, isSignedIn, navigate, searchParams]);
 
   // Note: Error handling is now done through Clerk's built-in error handling
   // and URL parameter processing. The error detection and toast notifications
@@ -171,7 +171,7 @@ export function Login() {
           <span>Loading...</span>
         </div>
       </div>
-    )
+    );
   }
 
   // If already signed in, show a message while redirecting
@@ -187,10 +187,10 @@ export function Login() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
-  const hasError = processAuthError(searchParams) !== null
+  const hasError = processAuthError(searchParams) !== null;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-background to-muted">
@@ -251,8 +251,8 @@ export function Login() {
                     variant="outline"
                     className="w-full"
                     onClick={() => {
-                      setSearchParams(new URLSearchParams())
-                      window.location.reload()
+                      setSearchParams(new URLSearchParams());
+                      window.location.reload();
                     }}
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
@@ -289,7 +289,7 @@ export function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Enhanced error boundary for the Login component
@@ -298,7 +298,7 @@ export function LoginWithErrorBoundary() {
     <div className="min-h-screen">
       <Login />
     </div>
-  )
+  );
 }
 
-export default LoginWithErrorBoundary
+export default LoginWithErrorBoundary;

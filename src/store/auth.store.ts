@@ -1,21 +1,21 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
-import type { User } from '@/services/auth/AuthService'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { User } from '@/services/auth/AuthService';
 
 // Profile information beyond basic authentication
 export interface Profile {
-  displayName?: string
-  bio?: string
-  timezone?: string
-  avatar?: string
-  company?: string
-  role?: string
-  phone?: string
-  website?: string
-  location?: string
-  linkedIn?: string
-  twitter?: string
-  github?: string
+  displayName?: string;
+  bio?: string;
+  timezone?: string;
+  avatar?: string;
+  company?: string;
+  role?: string;
+  phone?: string;
+  website?: string;
+  location?: string;
+  linkedIn?: string;
+  twitter?: string;
+  github?: string;
   preferences: {
     language:
       | 'en'
@@ -27,141 +27,141 @@ export interface Profile {
       | 'pt'
       | 'it'
       | 'ru'
-      | 'ko'
+      | 'ko';
     notifications: {
-      email: boolean
-      push: boolean
-      sms: boolean
-      marketing: boolean
-    }
+      email: boolean;
+      push: boolean;
+      sms: boolean;
+      marketing: boolean;
+    };
     privacy: {
-      profileVisibility: 'public' | 'private' | 'organization'
-      showEmail: boolean
-      showPhone: boolean
-    }
-  }
-  lastProfileUpdate?: string
+      profileVisibility: 'public' | 'private' | 'organization';
+      showEmail: boolean;
+      showPhone: boolean;
+    };
+  };
+  lastProfileUpdate?: string;
 }
 
 // User preferences for app behavior
 export interface Preferences {
-  theme: 'light' | 'dark' | 'system'
+  theme: 'light' | 'dark' | 'system';
   sidebar: {
-    collapsed: boolean
-    width: number
-  }
+    collapsed: boolean;
+    width: number;
+  };
   dashboard: {
-    layout: 'grid' | 'list'
-    itemsPerPage: 10 | 20 | 50 | 100
-    showWelcomeMessage: boolean
-  }
+    layout: 'grid' | 'list';
+    itemsPerPage: 10 | 20 | 50 | 100;
+    showWelcomeMessage: boolean;
+  };
   notifications: {
-    sound: boolean
-    desktop: boolean
-    realtime: boolean
-    frequency: 'immediate' | 'hourly' | 'daily' | 'weekly'
-  }
+    sound: boolean;
+    desktop: boolean;
+    realtime: boolean;
+    frequency: 'immediate' | 'hourly' | 'daily' | 'weekly';
+  };
   accessibility: {
-    highContrast: boolean
-    reducedMotion: boolean
-    fontSize: 'small' | 'medium' | 'large'
-    screenReader: boolean
-  }
+    highContrast: boolean;
+    reducedMotion: boolean;
+    fontSize: 'small' | 'medium' | 'large';
+    screenReader: boolean;
+  };
   developer: {
-    showDebugInfo: boolean
-    enableBetaFeatures: boolean
-    apiCallLogging: boolean
-  }
-  lastPreferencesUpdate?: string
+    showDebugInfo: boolean;
+    enableBetaFeatures: boolean;
+    apiCallLogging: boolean;
+  };
+  lastPreferencesUpdate?: string;
 }
 
 // Onboarding progress and state
 export interface OnboardingState {
-  isCompleted: boolean
-  currentStep: number
-  totalSteps: number
-  completedSteps: string[]
-  skippedSteps: string[]
-  startedAt?: string
-  completedAt?: string
-  lastInteractionAt?: string
+  isCompleted: boolean;
+  currentStep: number;
+  totalSteps: number;
+  completedSteps: string[];
+  skippedSteps: string[];
+  startedAt?: string;
+  completedAt?: string;
+  lastInteractionAt?: string;
   data: {
     // Step 1: Welcome
-    hasSeenWelcome?: boolean
+    hasSeenWelcome?: boolean;
     // Step 2: Profile setup
-    hasSetupProfile?: boolean
+    hasSetupProfile?: boolean;
     // Step 3: Preferences
-    hasSetupPreferences?: boolean
+    hasSetupPreferences?: boolean;
     // Step 4: First project
-    hasCreatedFirstProject?: boolean
+    hasCreatedFirstProject?: boolean;
     // Step 5: Integration
-    hasConnectedIntegration?: boolean
+    hasConnectedIntegration?: boolean;
     // Step 6: Tutorial completion
-    hasCompletedTutorial?: boolean
-  }
+    hasCompletedTutorial?: boolean;
+  };
   metadata: {
-    version: string
-    source: 'signup' | 'invitation' | 'demo'
-    referrer?: string
-    utmParams?: Record<string, string>
-  }
+    version: string;
+    source: 'signup' | 'invitation' | 'demo';
+    referrer?: string;
+    utmParams?: Record<string, string>;
+  };
 }
 
 interface AuthStoreState {
   // Authentication state
-  isAuthenticated: boolean
-  user: User | null
-  sessionId: string | null
-  token: string | null
+  isAuthenticated: boolean;
+  user: User | null;
+  sessionId: string | null;
+  token: string | null;
 
   // Extended state
-  profile: Profile | null
-  preferences: Preferences | null
-  onboarding: OnboardingState | null
+  profile: Profile | null;
+  preferences: Preferences | null;
+  onboarding: OnboardingState | null;
 
   // Initialization tracking
-  isInitialized: boolean
-  isProfileLoaded: boolean
-  isPreferencesLoaded: boolean
-  isOnboardingLoaded: boolean
+  isInitialized: boolean;
+  isProfileLoaded: boolean;
+  isPreferencesLoaded: boolean;
+  isOnboardingLoaded: boolean;
 
   // Authentication actions
-  setAuthenticated: (user: User, sessionId: string, token: string) => void
-  setUnauthenticated: () => void
-  updateToken: (token: string) => void
-  clearAuth: () => void
+  setAuthenticated: (user: User, sessionId: string, token: string) => void;
+  setUnauthenticated: () => void;
+  updateToken: (token: string) => void;
+  clearAuth: () => void;
 
   // Profile actions
-  setProfile: (profile: Profile) => void
-  updateProfile: (updates: Partial<Profile>) => void
-  clearProfile: () => void
+  setProfile: (profile: Profile) => void;
+  updateProfile: (updates: Partial<Profile>) => void;
+  clearProfile: () => void;
 
   // Preferences actions
-  setPreferences: (preferences: Preferences) => void
-  updatePreferences: (updates: Partial<Preferences>) => void
-  updateTheme: (theme: Preferences['theme']) => void
+  setPreferences: (preferences: Preferences) => void;
+  updatePreferences: (updates: Partial<Preferences>) => void;
+  updateTheme: (theme: Preferences['theme']) => void;
   updateNotifications: (
     notifications: Partial<Preferences['notifications']>
-  ) => void
+  ) => void;
   updateAccessibility: (
     accessibility: Partial<Preferences['accessibility']>
-  ) => void
-  clearPreferences: () => void
+  ) => void;
+  clearPreferences: () => void;
 
   // Onboarding actions
-  setOnboarding: (onboarding: OnboardingState) => void
-  updateOnboarding: (updates: Partial<OnboardingState>) => void
-  completeOnboardingStep: (stepName: string) => void
-  skipOnboardingStep: (stepName: string) => void
-  completeOnboarding: () => void
-  resetOnboarding: () => void
-  clearOnboarding: () => void
+  setOnboarding: (onboarding: OnboardingState) => void;
+  updateOnboarding: (updates: Partial<OnboardingState>) => void;
+  completeOnboardingStep: (stepName: string) => void;
+  skipOnboardingStep: (stepName: string) => void;
+  completeOnboarding: () => void;
+  resetOnboarding: () => void;
+  clearOnboarding: () => void;
 
   // Initialization actions
-  setInitialized: (initialized: boolean) => void
-  setProfileLoaded: (loaded: boolean) => void
-  setPreferencesLoaded: (loaded: boolean) => void
-  setOnboardingLoaded: (loaded: boolean) => void
+  setInitialized: (initialized: boolean) => void;
+  setProfileLoaded: (loaded: boolean) => void;
+  setPreferencesLoaded: (loaded: boolean) => void;
+  setOnboardingLoaded: (loaded: boolean) => void;
 }
 
 // Default preferences
@@ -193,7 +193,7 @@ const getDefaultPreferences = (): Preferences => ({
     enableBetaFeatures: false,
     apiCallLogging: false,
   },
-})
+});
 
 // Default onboarding state
 const getDefaultOnboarding = (): OnboardingState => ({
@@ -207,10 +207,10 @@ const getDefaultOnboarding = (): OnboardingState => ({
     version: '1.0.0',
     source: 'signup',
   },
-})
+});
 
 // Performance optimization: Reuse timestamp generation
-const getCurrentTimestamp = () => new Date().toISOString()
+const getCurrentTimestamp = () => new Date().toISOString();
 export const useAuthStore = create<AuthStoreState>()(
   persist(
     (set, get) => ({
@@ -238,7 +238,7 @@ export const useAuthStore = create<AuthStoreState>()(
           user,
           sessionId,
           token,
-        })
+        });
       },
 
       setUnauthenticated: () => {
@@ -247,14 +247,14 @@ export const useAuthStore = create<AuthStoreState>()(
           user: null,
           sessionId: null,
           token: null,
-        })
+        });
       },
 
       updateToken: (token) => {
         set((state) => ({
           ...state,
           token,
-        }))
+        }));
       },
 
       clearAuth: () => {
@@ -270,7 +270,7 @@ export const useAuthStore = create<AuthStoreState>()(
           isProfileLoaded: false,
           isPreferencesLoaded: false,
           isOnboardingLoaded: false,
-        })
+        });
       },
 
       // Profile actions
@@ -281,11 +281,11 @@ export const useAuthStore = create<AuthStoreState>()(
             lastProfileUpdate: getCurrentTimestamp(),
           },
           isProfileLoaded: true,
-        })
+        });
       },
 
       updateProfile: (updates) => {
-        const currentProfile = get().profile
+        const currentProfile = get().profile;
         set({
           profile: currentProfile
             ? {
@@ -294,14 +294,14 @@ export const useAuthStore = create<AuthStoreState>()(
                 lastProfileUpdate: getCurrentTimestamp(),
               }
             : null,
-        })
+        });
       },
 
       clearProfile: () => {
         set({
           profile: null,
           isProfileLoaded: false,
-        })
+        });
       },
 
       // Preferences actions
@@ -312,11 +312,11 @@ export const useAuthStore = create<AuthStoreState>()(
             lastPreferencesUpdate: getCurrentTimestamp(),
           },
           isPreferencesLoaded: true,
-        })
+        });
       },
 
       updatePreferences: (updates) => {
-        const currentPreferences = get().preferences
+        const currentPreferences = get().preferences;
         set({
           preferences: currentPreferences
             ? {
@@ -325,11 +325,11 @@ export const useAuthStore = create<AuthStoreState>()(
                 lastPreferencesUpdate: getCurrentTimestamp(),
               }
             : null,
-        })
+        });
       },
 
       updateTheme: (theme) => {
-        const currentPreferences = get().preferences
+        const currentPreferences = get().preferences;
         if (currentPreferences) {
           set({
             preferences: {
@@ -337,12 +337,12 @@ export const useAuthStore = create<AuthStoreState>()(
               theme,
               lastPreferencesUpdate: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
       updateNotifications: (notifications) => {
-        const currentPreferences = get().preferences
+        const currentPreferences = get().preferences;
         if (currentPreferences) {
           set({
             preferences: {
@@ -353,12 +353,12 @@ export const useAuthStore = create<AuthStoreState>()(
               },
               lastPreferencesUpdate: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
       updateAccessibility: (accessibility) => {
-        const currentPreferences = get().preferences
+        const currentPreferences = get().preferences;
         if (currentPreferences) {
           set({
             preferences: {
@@ -369,7 +369,7 @@ export const useAuthStore = create<AuthStoreState>()(
               },
               lastPreferencesUpdate: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
@@ -377,7 +377,7 @@ export const useAuthStore = create<AuthStoreState>()(
         set({
           preferences: null,
           isPreferencesLoaded: false,
-        })
+        });
       },
 
       // Onboarding actions
@@ -388,11 +388,11 @@ export const useAuthStore = create<AuthStoreState>()(
             lastInteractionAt: getCurrentTimestamp(),
           },
           isOnboardingLoaded: true,
-        })
+        });
       },
 
       updateOnboarding: (updates) => {
-        const currentOnboarding = get().onboarding
+        const currentOnboarding = get().onboarding;
         set({
           onboarding: currentOnboarding
             ? {
@@ -401,25 +401,25 @@ export const useAuthStore = create<AuthStoreState>()(
                 lastInteractionAt: getCurrentTimestamp(),
               }
             : null,
-        })
+        });
       },
 
       completeOnboardingStep: (stepName) => {
-        const currentOnboarding = get().onboarding
+        const currentOnboarding = get().onboarding;
         if (currentOnboarding) {
-          const newCompletedSteps = [...currentOnboarding.completedSteps]
+          const newCompletedSteps = [...currentOnboarding.completedSteps];
           if (!newCompletedSteps.includes(stepName)) {
-            newCompletedSteps.push(stepName)
+            newCompletedSteps.push(stepName);
           }
 
           const newSkippedSteps = currentOnboarding.skippedSteps.filter(
             (step) => step !== stepName
-          )
+          );
 
           const newCurrentStep = Math.min(
             currentOnboarding.currentStep + 1,
             currentOnboarding.totalSteps
-          )
+          );
 
           set({
             onboarding: {
@@ -433,26 +433,26 @@ export const useAuthStore = create<AuthStoreState>()(
               },
               lastInteractionAt: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
       skipOnboardingStep: (stepName) => {
-        const currentOnboarding = get().onboarding
+        const currentOnboarding = get().onboarding;
         if (currentOnboarding) {
-          const newSkippedSteps = [...currentOnboarding.skippedSteps]
+          const newSkippedSteps = [...currentOnboarding.skippedSteps];
           if (!newSkippedSteps.includes(stepName)) {
-            newSkippedSteps.push(stepName)
+            newSkippedSteps.push(stepName);
           }
 
           const newCompletedSteps = currentOnboarding.completedSteps.filter(
             (step) => step !== stepName
-          )
+          );
 
           const newCurrentStep = Math.min(
             currentOnboarding.currentStep + 1,
             currentOnboarding.totalSteps
-          )
+          );
 
           set({
             onboarding: {
@@ -462,12 +462,12 @@ export const useAuthStore = create<AuthStoreState>()(
               currentStep: newCurrentStep,
               lastInteractionAt: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
       completeOnboarding: () => {
-        const currentOnboarding = get().onboarding
+        const currentOnboarding = get().onboarding;
         if (currentOnboarding) {
           set({
             onboarding: {
@@ -476,38 +476,38 @@ export const useAuthStore = create<AuthStoreState>()(
               completedAt: getCurrentTimestamp(),
               lastInteractionAt: getCurrentTimestamp(),
             },
-          })
+          });
         }
       },
 
       resetOnboarding: () => {
         set({
           onboarding: getDefaultOnboarding(),
-        })
+        });
       },
 
       clearOnboarding: () => {
         set({
           onboarding: null,
           isOnboardingLoaded: false,
-        })
+        });
       },
 
       // Initialization actions
       setInitialized: (initialized) => {
-        set({ isInitialized: initialized })
+        set({ isInitialized: initialized });
       },
 
       setProfileLoaded: (loaded) => {
-        set({ isProfileLoaded: loaded })
+        set({ isProfileLoaded: loaded });
       },
 
       setPreferencesLoaded: (loaded) => {
-        set({ isPreferencesLoaded: loaded })
+        set({ isPreferencesLoaded: loaded });
       },
 
       setOnboardingLoaded: (loaded) => {
-        set({ isOnboardingLoaded: loaded })
+        set({ isOnboardingLoaded: loaded });
       },
     }),
     {
@@ -528,24 +528,24 @@ export const useAuthStore = create<AuthStoreState>()(
       }),
     }
   )
-)
+);
 
 // Memoized selector creators for performance optimization
 const createMemoizedSelector = <T, R>(
   selector: (state: T) => R
 ): ((state: T) => R) => {
-  let lastState: T | undefined
-  let lastResult: R
+  let lastState: T | undefined;
+  let lastResult: R;
 
   return (state: T) => {
     if (state === lastState) {
-      return lastResult
+      return lastResult;
     }
-    lastState = state
-    lastResult = selector(state)
-    return lastResult
-  }
-}
+    lastState = state;
+    lastResult = selector(state);
+    return lastResult;
+  };
+};
 
 // Selectors for easy state access with memoization
 export const authSelectors = {
@@ -556,9 +556,9 @@ export const authSelectors = {
   userEmail: (state: AuthStoreState) => state.user?.email,
   userName: createMemoizedSelector((state: AuthStoreState) => {
     if (state.user?.firstName && state.user.lastName) {
-      return `${state.user.firstName} ${state.user.lastName}`
+      return `${state.user.firstName} ${state.user.lastName}`;
     }
-    return state.user?.firstName ?? state.user?.email ?? 'User'
+    return state.user?.firstName ?? state.user?.email ?? 'User';
   }),
 
   // Profile selectors
@@ -566,15 +566,15 @@ export const authSelectors = {
   displayName: createMemoizedSelector((state: AuthStoreState) => {
     // Can't use authSelectors.userName here since it would create circular dependency
     // Inline the logic instead
-    let userName = 'User'
+    let userName = 'User';
     if (state.user?.firstName && state.user.lastName) {
-      userName = `${state.user.firstName} ${state.user.lastName}`
+      userName = `${state.user.firstName} ${state.user.lastName}`;
     } else if (state.user?.firstName) {
-      userName = state.user.firstName
+      userName = state.user.firstName;
     } else if (state.user?.email) {
-      userName = state.user.email
+      userName = state.user.email;
     }
-    return state.profile?.displayName ?? userName
+    return state.profile?.displayName ?? userName;
   }),
   profilePreferences: (state: AuthStoreState) => state.profile?.preferences,
 
@@ -597,9 +597,9 @@ export const authSelectors = {
   currentOnboardingStep: (state: AuthStoreState) =>
     state.onboarding?.currentStep ?? 0,
   onboardingProgress: createMemoizedSelector((state: AuthStoreState) => {
-    const onboarding = state.onboarding
-    if (!onboarding) return 0
-    return (onboarding.completedSteps.length / onboarding.totalSteps) * 100
+    const onboarding = state.onboarding;
+    if (!onboarding) return 0;
+    return (onboarding.completedSteps.length / onboarding.totalSteps) * 100;
   }),
   shouldShowOnboarding: createMemoizedSelector(
     (state: AuthStoreState) =>
@@ -623,7 +623,7 @@ export const authSelectors = {
     preferences: state.isPreferencesLoaded,
     onboarding: state.isOnboardingLoaded,
   })),
-}
+};
 
 // Helper hooks for common use cases
 export const useAuthSelectors = () => ({
@@ -648,21 +648,21 @@ export const useAuthSelectors = () => ({
   isInitialized: useAuthStore(authSelectors.isInitialized),
   isFullyLoaded: useAuthStore(authSelectors.isFullyLoaded),
   loadingStatus: useAuthStore(authSelectors.loadingStatus),
-})
+});
 
 // Initialize default preferences and onboarding for new users
 export const initializeNewUser = () => {
-  const store = useAuthStore.getState()
+  const store = useAuthStore.getState();
 
   if (!store.preferences) {
-    store.setPreferences(getDefaultPreferences())
+    store.setPreferences(getDefaultPreferences());
   }
 
   if (!store.onboarding) {
-    store.setOnboarding(getDefaultOnboarding())
+    store.setOnboarding(getDefaultOnboarding());
   }
 
   if (!store.isInitialized) {
-    store.setInitialized(true)
+    store.setInitialized(true);
   }
-}
+};

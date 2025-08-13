@@ -1,21 +1,21 @@
-import { ArrowLeft, CheckCircle } from 'lucide-react'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
-import { Progress } from '@/components/ui/Progress'
-import { useOnboarding } from '@/hooks/useOnboarding'
-import { cn } from '@/lib/utils'
-import type { OnboardingProgress } from '@/types/onboarding'
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Progress } from '@/components/ui/Progress';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { cn } from '@/lib/utils';
+import type { OnboardingProgress } from '@/types/onboarding';
 
 interface OnboardingHeaderProps {
-  progress: OnboardingProgress
+  progress: OnboardingProgress;
   navigation: {
-    isFirstStep: boolean
-    isLastStep: boolean
-    currentRoute: string
-    canGoBack: boolean
-    canSkip: boolean
-    canProceed: boolean
-  }
+    isFirstStep: boolean;
+    isLastStep: boolean;
+    currentRoute: string;
+    canGoBack: boolean;
+    canSkip: boolean;
+    canProceed: boolean;
+  };
 }
 
 const stepLabels = {
@@ -23,30 +23,30 @@ const stepLabels = {
   profile: 'Profile Information',
   preferences: 'Preferences',
   complete: 'Complete Setup',
-} as const
+} as const;
 
 export function OnboardingHeader({
   progress,
   navigation,
 }: OnboardingHeaderProps) {
-  const { goBack, currentState } = useOnboarding()
+  const { goBack, currentState } = useOnboarding();
 
   const currentStepKey = (() => {
     switch (currentState.type) {
       case 'ORGANIZATION_SETUP':
-        return 'organization'
+        return 'organization';
       case 'PROFILE_COMPLETION':
-        return 'profile'
+        return 'profile';
       case 'PREFERENCES':
-        return 'preferences'
+        return 'preferences';
       case 'COMPLETION':
-        return 'complete'
+        return 'complete';
       default:
-        return 'organization'
+        return 'organization';
     }
-  })()
+  })();
 
-  const currentStepLabel = stepLabels[currentStepKey]
+  const currentStepLabel = stepLabels[currentStepKey];
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -91,10 +91,10 @@ export function OnboardingHeader({
         {/* Step Breadcrumbs - Hidden on mobile */}
         <div className="hidden md:flex items-center justify-center mt-4 gap-2">
           {Object.entries(stepLabels).map(([key, label], index) => {
-            const stepNumber = index + 1
-            const isCompleted = progress.completedSteps.includes(key)
-            const isCurrent = key === currentStepKey
-            const isSkipped = progress.skippedSteps.includes(key)
+            const stepNumber = index + 1;
+            const isCompleted = progress.completedSteps.includes(key);
+            const isCurrent = key === currentStepKey;
+            const isSkipped = progress.skippedSteps.includes(key);
 
             return (
               <div key={key} className="flex items-center">
@@ -142,10 +142,10 @@ export function OnboardingHeader({
                   </span>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </header>
-  )
+  );
 }

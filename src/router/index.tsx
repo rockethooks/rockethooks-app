@@ -1,8 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom'
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
-import { PublicRoute } from '@/components/auth/PublicRoute'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { RootLayout } from '@/layouts/RootLayout'
+import { createBrowserRouter } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { PublicRoute } from '@/components/auth/PublicRoute';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { RootLayout } from '@/layouts/RootLayout';
 import {
   ActivityPage,
   AnalyticsPage,
@@ -15,12 +15,12 @@ import {
   SettingsPage,
   TeamPage,
   WebhooksPage,
-} from '@/pages'
+} from '@/pages';
 import {
   combineGuards,
   requireAuth,
   requireOnboarding,
-} from '@/services/auth/guards'
+} from '@/services/auth/guards';
 
 export const router = createBrowserRouter([
   {
@@ -100,6 +100,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-])
+]);
 
-export default router
+export default router;

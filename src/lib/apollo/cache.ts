@@ -3,25 +3,25 @@
  * Defines cache policies and key fields for GraphQL types
  */
 
-import { InMemoryCache, type TypePolicies } from '@apollo/client'
+import { InMemoryCache, type TypePolicies } from '@apollo/client';
 
 // Type definitions for GraphQL entities
 interface Member {
-  id: string
-  userId: string
-  organizationId: string
-  role: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  userId: string;
+  organizationId: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface WebhookEvent {
-  id: string
-  webhookId: string
-  status: string
-  payload: Record<string, unknown>
-  response?: Record<string, unknown>
-  createdAt: string
+  id: string;
+  webhookId: string;
+  status: string;
+  payload: Record<string, unknown>;
+  response?: Record<string, unknown>;
+  createdAt: string;
 }
 
 /**
@@ -45,7 +45,7 @@ const typePolicies: TypePolicies = {
     fields: {
       members: {
         merge: (_, incoming: Member[] = []) => {
-          return incoming
+          return incoming;
         },
       },
     },
@@ -55,7 +55,7 @@ const typePolicies: TypePolicies = {
     fields: {
       events: {
         merge: (_, incoming: WebhookEvent[] = []) => {
-          return incoming
+          return incoming;
         },
       },
     },
@@ -64,7 +64,7 @@ const typePolicies: TypePolicies = {
     keyFields: ['id'],
   },
   // Add more type policies as needed for other GraphQL types
-}
+};
 
 /**
  * Create and configure the Apollo InMemoryCache
@@ -76,5 +76,5 @@ export const createApolloCache = (): InMemoryCache => {
     possibleTypes: {},
     // Configure cache persistence if needed in the future
     resultCaching: true,
-  })
-}
+  });
+};

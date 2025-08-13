@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
-import { type Theme, ThemeProviderContext } from './themeContext'
+import { useEffect, useState } from 'react';
+import { type Theme, ThemeProviderContext } from './themeContext';
 
 type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
-}
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  storageKey?: string;
+};
 
 export function ThemeProvider({
   children,
@@ -14,64 +14,64 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem(storageKey) as Theme | null
-    return stored ?? defaultTheme
-  })
-  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('light')
+    const stored = localStorage.getItem(storageKey) as Theme | null;
+    return stored ?? defaultTheme;
+  });
+  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>('light');
 
   useEffect(() => {
-    const root = window.document.documentElement
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const root = window.document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const applyTheme = () => {
-      root.classList.remove('light', 'dark')
+      root.classList.remove('light', 'dark');
 
-      let effectiveTheme: 'dark' | 'light'
+      let effectiveTheme: 'dark' | 'light';
       if (theme === 'system') {
-        effectiveTheme = mediaQuery.matches ? 'dark' : 'light'
+        effectiveTheme = mediaQuery.matches ? 'dark' : 'light';
       } else {
-        effectiveTheme = theme
+        effectiveTheme = theme;
       }
 
-      root.classList.add(effectiveTheme)
-      setResolvedTheme(effectiveTheme)
+      root.classList.add(effectiveTheme);
+      setResolvedTheme(effectiveTheme);
 
       // Dispatch theme change event for other components to listen to
       const event = new CustomEvent('theme-change', {
         detail: { theme: effectiveTheme },
-      })
-      window.dispatchEvent(event)
-    }
+      });
+      window.dispatchEvent(event);
+    };
 
     // Apply theme immediately
-    applyTheme()
+    applyTheme();
 
     // Listen for system theme changes
     const handleSystemThemeChange = () => {
       if (theme === 'system') {
-        applyTheme()
+        applyTheme();
       }
-    }
+    };
 
-    mediaQuery.addEventListener('change', handleSystemThemeChange)
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
 
     return () => {
-      mediaQuery.removeEventListener('change', handleSystemThemeChange)
-    }
-  }, [theme])
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, [theme]);
 
   const value = {
     theme,
     resolvedTheme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme)
-      setTheme(theme)
+      localStorage.setItem(storageKey, theme);
+      setTheme(theme);
     },
-  }
+  };
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
       {children}
     </ThemeProviderContext.Provider>
-  )
+  );
 }

@@ -1,36 +1,36 @@
-import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 // Import our custom RocketHooks components
-import { ComponentsDemo } from '@/components/rockethooks/Demo'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+import { ComponentsDemo } from '@/components/rockethooks/Demo';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/Alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Label } from '@/components/ui/Label'
-import { Progress } from '@/components/ui/Progress'
+} from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Progress } from '@/components/ui/Progress';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/Select'
-import { Separator } from '@/components/ui/Separator'
-import { Switch } from '@/components/ui/Switch'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { Textarea } from '@/components/ui/Textarea'
+} from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
+import { Switch } from '@/components/ui/Switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
 
 export function ComponentTest() {
-  const [activeTab, setActiveTab] = useState('shadcn')
+  const [activeTab, setActiveTab] = useState('shadcn');
 
   return (
     <div className="p-8 space-y-6">
@@ -322,5 +322,5 @@ export function ComponentTest() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }

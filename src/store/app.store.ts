@@ -1,11 +1,11 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface AppState {
-  theme: 'light' | 'dark' | 'system'
-  sidebarOpen: boolean
-  setTheme: (theme: AppState['theme']) => void
-  toggleSidebar: () => void
+  theme: 'light' | 'dark' | 'system';
+  sidebarOpen: boolean;
+  setTheme: (theme: AppState['theme']) => void;
+  toggleSidebar: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -14,14 +14,14 @@ export const useAppStore = create<AppState>()(
       theme: 'system',
       sidebarOpen: true,
       setTheme: (theme) => {
-        set({ theme })
+        set({ theme });
       },
       toggleSidebar: () => {
-        set((state) => ({ sidebarOpen: !state.sidebarOpen }))
+        set((state) => ({ sidebarOpen: !state.sidebarOpen }));
       },
     }),
     {
       name: 'app-storage',
     }
   )
-)
+);

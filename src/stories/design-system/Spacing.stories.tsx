@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import type React from 'react'
+import type { Meta, StoryObj } from '@storybook/react';
+import type React from 'react';
 
 /**
  * Spacing system documentation showing the design tokens and their usage
@@ -7,9 +7,9 @@ import type React from 'react'
  */
 
 const SpacingExample: React.FC<{
-  size: string
-  value: string
-  description: string
+  size: string;
+  value: string;
+  description: string;
 }> = ({ size, value, description }) => (
   <div className="flex items-center gap-4 p-4 border rounded">
     <div className="flex items-center gap-2">
@@ -27,7 +27,7 @@ const SpacingExample: React.FC<{
     <div className="text-sm text-muted-foreground">{value}</div>
     <div className="text-sm">{description}</div>
   </div>
-)
+);
 
 function SpacingComponent() {
   return (
@@ -502,7 +502,7 @@ function SpacingComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const meta = {
@@ -545,12 +545,12 @@ Our spacing system uses CSS custom properties with a base unit of 4px:
       },
     },
   },
-} satisfies Meta<typeof SpacingComponent>
+} satisfies Meta<typeof SpacingComponent>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Complete spacing system documentation with examples and usage guidelines
  */
-export const SpacingSystem: Story = {}
+export const SpacingSystem: Story = {};

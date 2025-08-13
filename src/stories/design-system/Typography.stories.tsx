@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import type React from 'react'
+import type { Meta, StoryObj } from '@storybook/react';
+import type React from 'react';
 
 /**
  * Typography system for RocketHooks including font families, sizes,
@@ -8,11 +8,11 @@ import type React from 'react'
  */
 
 const TypeSample: React.FC<{
-  title: string
-  description: string
-  cssClass?: string
-  style?: React.CSSProperties
-  children: React.ReactNode
+  title: string;
+  description: string;
+  cssClass?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
 }> = ({ title, description, cssClass, style, children }) => (
   <div className="mb-6">
     <div className="mb-2">
@@ -30,7 +30,7 @@ const TypeSample: React.FC<{
       {children}
     </div>
   </div>
-)
+);
 
 function TypographyComponent() {
   return (
@@ -436,7 +436,7 @@ function TypographyComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const meta = {
@@ -461,13 +461,13 @@ The system uses CSS custom properties for easy theming and consistency.
       },
     },
   },
-} satisfies Meta<typeof TypographyComponent>
+} satisfies Meta<typeof TypographyComponent>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Complete typography system showing font families, sizes, weights, and text colors.
  * All typography uses CSS custom properties for consistent theming.
  */
-export const TypographySystem: Story = {}
+export const TypographySystem: Story = {};

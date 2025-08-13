@@ -1,36 +1,36 @@
-import { Button } from '@/components/ui/Button'
-import { Separator } from '@/components/ui/Separator'
-import { cn } from '@/lib/utils'
-import { ComponentErrorBoundary } from './ErrorBoundary'
+import { Button } from '@/components/ui/Button';
+import { Separator } from '@/components/ui/Separator';
+import { cn } from '@/lib/utils';
+import { ComponentErrorBoundary } from './ErrorBoundary';
 
 interface PageLayoutProps {
-  children: React.ReactNode
-  title?: string
-  description?: string
-  actions?: React.ReactNode
-  breadcrumb?: React.ReactNode
-  className?: string
-  headerClassName?: string
-  contentClassName?: string
-  fullWidth?: boolean
+  children: React.ReactNode;
+  title?: string;
+  description?: string;
+  actions?: React.ReactNode;
+  breadcrumb?: React.ReactNode;
+  className?: string;
+  headerClassName?: string;
+  contentClassName?: string;
+  fullWidth?: boolean;
 }
 
 interface PageHeaderProps {
-  title?: string | undefined
-  description?: string | undefined
-  actions?: React.ReactNode
-  breadcrumb?: React.ReactNode
-  className?: string | undefined
+  title?: string | undefined;
+  description?: string | undefined;
+  actions?: React.ReactNode;
+  breadcrumb?: React.ReactNode;
+  className?: string | undefined;
 }
 
 interface PageContentProps {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }
 
 interface PageActionsProps {
-  children: React.ReactNode
-  className?: string
+  children: React.ReactNode;
+  className?: string;
 }
 
 export function PageLayout({
@@ -44,7 +44,7 @@ export function PageLayout({
   contentClassName,
   fullWidth = false,
 }: PageLayoutProps) {
-  const hasHeader = Boolean(title ?? description ?? actions ?? breadcrumb)
+  const hasHeader = Boolean(title ?? description ?? actions ?? breadcrumb);
 
   return (
     <ComponentErrorBoundary>
@@ -71,7 +71,7 @@ export function PageLayout({
         </PageContent>
       </div>
     </ComponentErrorBoundary>
-  )
+  );
 }
 
 export function PageHeader({
@@ -111,11 +111,11 @@ export function PageHeader({
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export function PageContent({ children, className }: PageContentProps) {
-  return <div className={cn('flex-1 p-6', className)}>{children}</div>
+  return <div className={cn('flex-1 p-6', className)}>{children}</div>;
 }
 
 export function PageActions({ children, className }: PageActionsProps) {
@@ -123,22 +123,22 @@ export function PageActions({ children, className }: PageActionsProps) {
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
       {children}
     </div>
-  )
+  );
 }
 
 // Convenience components for common page types
 interface DashboardPageProps extends Omit<PageLayoutProps, 'title'> {
-  title: string
+  title: string;
 }
 
 export function DashboardPage({ title, ...props }: DashboardPageProps) {
-  return <PageLayout title={title} {...props} />
+  return <PageLayout title={title} {...props} />;
 }
 
 interface SettingsPageProps
   extends Omit<PageLayoutProps, 'title' | 'description'> {
-  title: string
-  description?: string
+  title: string;
+  description?: string;
 }
 
 export function SettingsPage({
@@ -146,14 +146,14 @@ export function SettingsPage({
   description = 'Manage your account settings and preferences.',
   ...props
 }: SettingsPageProps) {
-  return <PageLayout title={title} description={description} {...props} />
+  return <PageLayout title={title} description={description} {...props} />;
 }
 
 interface DetailPageProps extends Omit<PageLayoutProps, 'actions'> {
-  backAction?: () => void
-  editAction?: () => void
-  deleteAction?: () => void
-  customActions?: React.ReactNode
+  backAction?: () => void;
+  editAction?: () => void;
+  deleteAction?: () => void;
+  customActions?: React.ReactNode;
 }
 
 export function DetailPage({
@@ -182,7 +182,7 @@ export function DetailPage({
       )}
       {customActions}
     </>
-  )
+  );
 
-  return <PageLayout actions={actions} {...props} />
+  return <PageLayout actions={actions} {...props} />;
 }

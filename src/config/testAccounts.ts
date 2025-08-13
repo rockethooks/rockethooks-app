@@ -11,12 +11,12 @@ export const TEST_ACCOUNTS = {
       role: 'user',
     },
   },
-} as const
+} as const;
 
 export function getTestAccount(role: keyof typeof TEST_ACCOUNTS.development) {
-  const env = import.meta.env.MODE
+  const env = import.meta.env.MODE;
   if (env !== 'development') {
-    throw new Error('Test accounts only available in development')
+    throw new Error('Test accounts only available in development');
   }
-  return TEST_ACCOUNTS.development[role]
+  return TEST_ACCOUNTS.development[role];
 }

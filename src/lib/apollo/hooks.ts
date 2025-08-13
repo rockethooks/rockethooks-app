@@ -3,4 +3,4 @@
  * Exports hooks for accessing Apollo Client functionality
  */
 
-export { useApolloClient } from '@apollo/client'
+export { useApolloClient } from '@apollo/client';

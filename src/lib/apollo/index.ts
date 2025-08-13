@@ -4,19 +4,19 @@
  */
 
 // Export types if needed
-export type { TypePolicies } from '@apollo/client'
-export { createApolloCache } from './cache'
+export type { TypePolicies } from '@apollo/client';
+export { createApolloCache } from './cache';
 export {
   createApolloClient,
   getApolloClient,
   resetApolloClient,
-} from './client'
+} from './client';
 export {
   getAppSyncConfig,
   getAwsRegion,
   getEnvironment,
   getGraphqlUrl,
   validateConfig,
-} from './config'
-export { useApolloClient } from './hooks'
-export { ApolloWrapper } from './provider'
+} from './config';
+export { useApolloClient } from './hooks';
+export { ApolloWrapper } from './provider';

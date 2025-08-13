@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
 /**
  * Welcome to the RocketHooks Design System
@@ -220,7 +220,7 @@ function WelcomeComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 const meta = {
@@ -232,13 +232,13 @@ const meta = {
       page: null, // Disable the docs page for this story
     },
   },
-} satisfies Meta<typeof WelcomeComponent>
+} satisfies Meta<typeof WelcomeComponent>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 /**
  * Welcome to the RocketHooks Design System - your guide to building consistent,
  * accessible, and beautiful user interfaces.
  */
-export const Welcome: Story = {}
+export const Welcome: Story = {};

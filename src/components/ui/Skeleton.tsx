@@ -1,8 +1,8 @@
-import type { VariantProps } from 'class-variance-authority'
-import type * as React from 'react'
+import type { VariantProps } from 'class-variance-authority';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
-import { skeletonVariants } from './skeletonVariants'
+import { cn } from '@/lib/utils';
+import { skeletonVariants } from './skeletonVariants';
 
 export interface SkeletonProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -10,11 +10,11 @@ export interface SkeletonProps
   /**
    * Width of the skeleton (CSS value)
    */
-  width?: string | number
+  width?: string | number;
   /**
    * Height of the skeleton (CSS value)
    */
-  height?: string | number
+  height?: string | number;
 }
 
 /**
@@ -44,7 +44,7 @@ function Skeleton({
     ...(height !== undefined && {
       height: typeof height === 'number' ? `${String(height)}px` : height,
     }),
-  }
+  };
 
   return (
     <div
@@ -53,7 +53,7 @@ function Skeleton({
       style={inlineStyles}
       {...props}
     />
-  )
+  );
 }
 
-export { Skeleton }
+export { Skeleton };

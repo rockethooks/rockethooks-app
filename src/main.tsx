@@ -1,24 +1,24 @@
-import { ClerkProvider } from '@clerk/clerk-react'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ApolloWrapper } from '@/lib/apollo'
-import './index.css'
-import App from './App.tsx'
+import { ClerkProvider } from '@clerk/clerk-react';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ApolloWrapper } from '@/lib/apollo';
+import './index.css';
+import App from './App.tsx';
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 if (!PUBLISHABLE_KEY) {
   const errorMessage = import.meta.env.DEV
     ? 'Missing VITE_CLERK_PUBLISHABLE_KEY in .env file. Please add your Clerk Publishable Key.'
-    : 'Authentication configuration error. Please contact support.'
-  throw new Error(errorMessage)
+    : 'Authentication configuration error. Please contact support.';
+  throw new Error(errorMessage);
 }
 
-const rootElement = document.getElementById('root')
+const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error(
     'Failed to find the root element. Please ensure index.html contains a div with id="root".'
-  )
+  );
 }
 
 createRoot(rootElement).render(
@@ -34,4 +34,4 @@ createRoot(rootElement).render(
       </ApolloWrapper>
     </ClerkProvider>
   </StrictMode>
-)
+);

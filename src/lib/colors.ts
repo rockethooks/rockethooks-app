@@ -45,7 +45,7 @@ export const LIGHT_COLORS = {
   chart3: '197 37% 24%',
   chart4: '43 74% 66%',
   chart5: '27 87% 67%',
-} as const
+} as const;
 
 // Core Theme Colors - Dark Mode
 export const DARK_COLORS = {
@@ -82,7 +82,7 @@ export const DARK_COLORS = {
   chart3: '30 80% 55%',
   chart4: '280 65% 60%',
   chart5: '340 75% 55%',
-} as const
+} as const;
 
 // Semantic Colors - Light Mode
 export const LIGHT_SEMANTIC_COLORS = {
@@ -94,7 +94,7 @@ export const LIGHT_SEMANTIC_COLORS = {
   infoForeground: '210 40% 98%',
   error: '0 84.2% 60.2%',
   errorForeground: '210 40% 98%',
-} as const
+} as const;
 
 // Semantic Colors - Dark Mode
 export const DARK_SEMANTIC_COLORS = {
@@ -106,7 +106,7 @@ export const DARK_SEMANTIC_COLORS = {
   infoForeground: '222.2 84% 4.9%',
   error: '0 62.8% 30.6%',
   errorForeground: '210 40% 98%',
-} as const
+} as const;
 
 // Primary Color Variants
 export const PRIMARY_VARIANTS = {
@@ -121,7 +121,7 @@ export const PRIMARY_VARIANTS = {
   800: '223 47% 23%',
   900: '224 39% 17%',
   950: '226 22% 9%',
-} as const
+} as const;
 
 // Gray Color Variants - Light Mode
 export const LIGHT_GRAY_VARIANTS = {
@@ -136,7 +136,7 @@ export const LIGHT_GRAY_VARIANTS = {
   800: '217 33% 17%',
   900: '222.2 84% 4.9%',
   950: '229 84% 5%',
-} as const
+} as const;
 
 // Gray Color Variants - Dark Mode (inverted)
 export const DARK_GRAY_VARIANTS = {
@@ -151,7 +151,7 @@ export const DARK_GRAY_VARIANTS = {
   800: '214.3 31.8% 91.4%',
   900: '210 40% 96%',
   950: '210 40% 98%',
-} as const
+} as const;
 
 // Utility Functions
 export const colorUtils = {
@@ -181,16 +181,16 @@ export const colorUtils = {
    * Parse HSL string into components
    */
   parseHSL: (hslValue: string) => {
-    const values = hslValue.split(' ')
-    if (values.length !== 3) return null
+    const values = hslValue.split(' ');
+    if (values.length !== 3) return null;
 
     return {
       hue: parseInt(values[0] ?? '0') || 0,
       saturation: parseInt((values[1] ?? '0').replace('%', '')) || 0,
       lightness: parseInt((values[2] ?? '0').replace('%', '')) || 0,
-    }
+    };
   },
-}
+};
 
 // Color Palette Export
 export const COLOR_PALETTE = {
@@ -206,19 +206,19 @@ export const COLOR_PALETTE = {
     primary: PRIMARY_VARIANTS,
     gray: DARK_GRAY_VARIANTS,
   },
-} as const
+} as const;
 
 // Type definitions for better TypeScript support
-export type ColorName = keyof typeof LIGHT_COLORS
-export type SemanticColorName = keyof typeof LIGHT_SEMANTIC_COLORS
-export type ColorVariant = keyof typeof PRIMARY_VARIANTS
-export type Theme = 'light' | 'dark'
+export type ColorName = keyof typeof LIGHT_COLORS;
+export type SemanticColorName = keyof typeof LIGHT_SEMANTIC_COLORS;
+export type ColorVariant = keyof typeof PRIMARY_VARIANTS;
+export type Theme = 'light' | 'dark';
 
 /**
  * Type guard to check if a string is a valid ColorName
  */
 function isColorName(colorName: string): colorName is ColorName {
-  return colorName in LIGHT_COLORS
+  return colorName in LIGHT_COLORS;
 }
 
 /**
@@ -227,15 +227,15 @@ function isColorName(colorName: string): colorName is ColorName {
 function isSemanticColorName(
   colorName: string
 ): colorName is SemanticColorName {
-  return colorName in LIGHT_SEMANTIC_COLORS
+  return colorName in LIGHT_SEMANTIC_COLORS;
 }
 
 /**
  * Type guard to check if a value is a valid ColorVariant (number keys)
  */
 function isColorVariant(value: string | number): value is ColorVariant {
-  const numValue = typeof value === 'string' ? parseInt(value, 10) : value
-  return !Number.isNaN(numValue) && numValue in PRIMARY_VARIANTS
+  const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  return !Number.isNaN(numValue) && numValue in PRIMARY_VARIANTS;
 }
 
 /**
@@ -246,41 +246,41 @@ export function getColorValue(
   colorType: 'core' | 'semantic' | 'primary' | 'gray',
   colorName: string
 ): string {
-  const palette = COLOR_PALETTE[theme]
+  const palette = COLOR_PALETTE[theme];
 
   switch (colorType) {
     case 'core': {
       if (isColorName(colorName)) {
-        const value = palette[colorName]
-        return typeof value === 'string' ? value : ''
+        const value = palette[colorName];
+        return typeof value === 'string' ? value : '';
       }
-      return ''
+      return '';
     }
     case 'semantic':
       if (isSemanticColorName(colorName)) {
-        return palette.semantic[colorName]
+        return palette.semantic[colorName];
       }
-      return ''
+      return '';
     case 'primary':
       if (isColorVariant(colorName)) {
         const numKey =
-          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
+          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName;
         if (!Number.isNaN(numKey) && numKey in palette.primary) {
-          return palette.primary[numKey as ColorVariant]
+          return palette.primary[numKey as ColorVariant];
         }
       }
-      return ''
+      return '';
     case 'gray':
       if (isColorVariant(colorName)) {
         const numKey =
-          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName
+          typeof colorName === 'string' ? parseInt(colorName, 10) : colorName;
         if (!Number.isNaN(numKey) && numKey in palette.gray) {
-          return palette.gray[numKey as ColorVariant]
+          return palette.gray[numKey as ColorVariant];
         }
       }
-      return ''
+      return '';
     default:
-      return ''
+      return '';
   }
 }
 
@@ -324,4 +324,4 @@ export const COLOR_COMBINATIONS = {
     foreground: 'info-foreground',
     border: 'info/20',
   },
-} as const
+} as const;

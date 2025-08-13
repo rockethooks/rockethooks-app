@@ -1,11 +1,11 @@
-'use client'
+'use client';
 
-import * as LabelPrimitive from '@radix-ui/react-label'
-import type * as React from 'react'
+import * as LabelPrimitive from '@radix-ui/react-label';
+import type * as React from 'react';
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils';
 
-export type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root>
+export type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root>;
 
 /**
  * Label component for form inputs with accessibility support
@@ -26,7 +26,7 @@ function Label({ className, ...props }: LabelProps) {
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Label }
+export { Label };

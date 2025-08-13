@@ -1,15 +1,15 @@
-import { useAuth, useUser } from '@clerk/clerk-react'
-import { useEffect } from 'react'
-import { initializeNewUser, useAuthStore } from '@/store/auth.store'
+import { useAuth, useUser } from '@clerk/clerk-react';
+import { useEffect } from 'react';
+import { initializeNewUser, useAuthStore } from '@/store/auth.store';
 
 export function AuthSync() {
-  const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth()
-  const { isLoaded: userLoaded, user } = useUser()
-  const { setAuthenticated, setUnauthenticated, updateToken } = useAuthStore()
+  const { isLoaded: authLoaded, isSignedIn, sessionId, getToken } = useAuth();
+  const { isLoaded: userLoaded, user } = useUser();
+  const { setAuthenticated, setUnauthenticated, updateToken } = useAuthStore();
 
   // Sync authentication state
   useEffect(() => {
-    if (!authLoaded || !userLoaded) return
+    if (!authLoaded || !userLoaded) return;
 
     if (isSignedIn && user && sessionId) {
       const userData = {
@@ -18,27 +18,27 @@ export function AuthSync() {
         ...(user.firstName && { firstName: user.firstName }),
         ...(user.lastName && { lastName: user.lastName }),
         ...(user.imageUrl && { imageUrl: user.imageUrl }),
-      }
+      };
 
       getToken()
         .then((token) => {
           if (token) {
-            setAuthenticated(userData, sessionId, token)
+            setAuthenticated(userData, sessionId, token);
 
             // Initialize profile, preferences, and onboarding for new or returning users
             try {
-              initializeNewUser()
+              initializeNewUser();
             } catch (error) {
-              console.error('Failed to initialize user profile:', error)
+              console.error('Failed to initialize user profile:', error);
             }
           }
         })
         .catch((error: unknown) => {
-          console.error('Failed to get auth token:', error)
-          setUnauthenticated()
-        })
+          console.error('Failed to get auth token:', error);
+          setUnauthenticated();
+        });
     } else {
-      setUnauthenticated()
+      setUnauthenticated();
     }
   }, [
     authLoaded,
@@ -49,34 +49,34 @@ export function AuthSync() {
     getToken,
     setAuthenticated,
     setUnauthenticated,
-  ])
+  ]);
 
   // Token refresh with proper cleanup
   useEffect(() => {
-    if (!isSignedIn) return
+    if (!isSignedIn) return;
 
-    let isMounted = true
+    let isMounted = true;
 
     const refreshInterval = setInterval(() => {
       void (async () => {
         try {
-          const newToken = await getToken()
+          const newToken = await getToken();
           if (isMounted && newToken) {
-            updateToken(newToken)
+            updateToken(newToken);
           }
         } catch (error) {
           if (isMounted) {
-            console.error('Failed to refresh token:', error)
+            console.error('Failed to refresh token:', error);
           }
         }
-      })()
-    }, 55000) // Refresh every 55 seconds (closer to typical token expiration)
+      })();
+    }, 55000); // Refresh every 55 seconds (closer to typical token expiration)
 
     return () => {
-      isMounted = false
-      clearInterval(refreshInterval)
-    }
-  }, [isSignedIn, getToken, updateToken])
+      isMounted = false;
+      clearInterval(refreshInterval);
+    };
+  }, [isSignedIn, getToken, updateToken]);
 
-  return null
+  return null;
 }

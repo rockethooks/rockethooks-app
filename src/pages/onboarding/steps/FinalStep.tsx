@@ -1,71 +1,71 @@
-import { ArrowRight, CheckCircle, Sparkles, Trophy } from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Alert } from '@/components/ui/Alert'
-import { Button } from '@/components/ui/Button'
+import { ArrowRight, CheckCircle, Sparkles, Trophy } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Alert } from '@/components/ui/Alert';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
-import { useAuthStore } from '@/store/auth.store'
-import { clearDrafts } from '@/utils/onboardingDrafts'
+} from '@/components/ui/Card';
+import { useAuthStore } from '@/store/auth.store';
+import { clearDrafts } from '@/utils/onboardingDrafts';
 
 export interface FinalStepProps {
-  onComplete?: () => void
-  onNext?: () => void
+  onComplete?: () => void;
+  onNext?: () => void;
 }
 
 export function FinalStep({ onComplete, onNext }: FinalStepProps) {
-  const navigate = useNavigate()
-  const { completeOnboarding, onboarding, user } = useAuthStore()
+  const navigate = useNavigate();
+  const { completeOnboarding, onboarding, user } = useAuthStore();
 
-  const [isCompleting, setIsCompleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Get user name for personalization
-  const userName = user?.firstName ?? 'there'
+  const userName = user?.firstName ?? 'there';
 
   // Handle onboarding completion
   const handleComplete = async () => {
     try {
-      setIsCompleting(true)
-      setError(null)
+      setIsCompleting(true);
+      setError(null);
 
       // Mark onboarding as complete in auth store
-      completeOnboarding()
+      completeOnboarding();
 
       // Clear all onboarding drafts from localStorage
-      const draftsClearSuccess = clearDrafts()
+      const draftsClearSuccess = clearDrafts();
       if (!draftsClearSuccess) {
-        console.warn('Failed to clear onboarding drafts from localStorage')
+        console.warn('Failed to clear onboarding drafts from localStorage');
       }
 
       // Call completion callback if provided
-      onComplete?.()
+      onComplete?.();
 
       // Small delay for UX (let user see the completion state)
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       // Navigate to dashboard or call next callback
       if (onNext) {
-        onNext()
+        onNext();
       } else {
-        void navigate('/dashboard')
+        void navigate('/dashboard');
       }
     } catch (completionError) {
-      console.error('Failed to complete onboarding:', completionError)
+      console.error('Failed to complete onboarding:', completionError);
       setError(
         completionError instanceof Error
           ? completionError.message
           : 'Failed to complete setup'
-      )
+      );
     } finally {
-      setIsCompleting(false)
+      setIsCompleting(false);
     }
-  }
+  };
 
   // Completed setup features list
   const completedFeatures = [
@@ -74,7 +74,7 @@ export function FinalStep({ onComplete, onNext }: FinalStepProps) {
     'Preferences and notification settings',
     'API monitoring workspace ready',
     'Webhook management tools available',
-  ]
+  ];
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -150,7 +150,7 @@ export function FinalStep({ onComplete, onNext }: FinalStepProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setError(null)
+                    setError(null);
                   }}
                   aria-label="Dismiss error"
                 >
@@ -210,5 +210,5 @@ export function FinalStep({ onComplete, onNext }: FinalStepProps) {
         </p>
       </div>
     </div>
-  )
+  );
 }

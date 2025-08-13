@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
-import { Sparkline } from '@/components/rockethooks/Sparkline'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
+import { Sparkline } from '@/components/rockethooks/Sparkline';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 /**
  * Sparkline component provides lightweight data visualization for showing trends
@@ -92,23 +92,25 @@ import { Sparkline } from '@/components/rockethooks/Sparkline'
     },
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof Sparkline>
+} satisfies Meta<typeof Sparkline>;
 
-export default meta
-type Story = StoryObj<typeof meta>
+export default meta;
+type Story = StoryObj<typeof meta>;
 
 // Sample data sets for different scenarios
 const responseTimeData = [
   145, 152, 138, 165, 142, 159, 146, 171, 155, 148, 163, 139,
-]
+];
 const uptimeData = [
   99.2, 99.8, 99.5, 99.9, 99.1, 99.7, 99.6, 99.3, 99.8, 99.4, 99.9, 99.6,
-]
+];
 const errorRateData = [
   2.1, 1.8, 2.5, 1.2, 1.9, 0.8, 1.5, 2.3, 1.1, 1.7, 0.9, 1.3,
-]
-const trafficData = [120, 135, 158, 142, 167, 189, 203, 178, 156, 171, 145, 132]
-const volatileData = [50, 82, 35, 91, 23, 67, 78, 44, 89, 31, 76, 52]
+];
+const trafficData = [
+  120, 135, 158, 142, 167, 189, 203, 178, 156, 171, 145, 132,
+];
+const volatileData = [50, 82, 35, 91, 23, 67, 78, 44, 89, 31, 76, 52];
 
 /**
  * Basic sparkline with default settings
@@ -117,7 +119,7 @@ export const Default: Story = {
   args: {
     data: responseTimeData,
   },
-}
+};
 
 /**
  * Different chart sizes for various use cases
@@ -171,7 +173,7 @@ export const Sizes: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Color variations for different metric types
@@ -248,7 +250,7 @@ export const Colors: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Interactive sparklines with tooltips
@@ -308,7 +310,7 @@ export const Interactive: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Dashboard integration showing multiple metrics
@@ -417,7 +419,7 @@ export const DashboardMetrics: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Edge cases and data scenarios
@@ -498,7 +500,7 @@ export const EdgeCases: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Real-time data simulation
@@ -508,7 +510,7 @@ export const RealTimeData: Story = {
   render: () => {
     const [data, setData] = React.useState([
       120, 135, 158, 142, 167, 189, 203, 178,
-    ])
+    ]);
 
     React.useEffect(() => {
       const interval = setInterval(() => {
@@ -516,15 +518,15 @@ export const RealTimeData: Story = {
           const newData = [
             ...prev.slice(1),
             Math.floor(Math.random() * 100) + 100,
-          ]
-          return newData
-        })
-      }, 1000)
+          ];
+          return newData;
+        });
+      }, 1000);
 
       return () => {
-        clearInterval(interval)
-      }
-    }, [])
+        clearInterval(interval);
+      };
+    }, []);
 
     return (
       <Card className="p-6">
@@ -549,7 +551,7 @@ export const RealTimeData: Story = {
           showTooltip
         />
       </Card>
-    )
+    );
   },
   parameters: {
     docs: {
@@ -559,7 +561,7 @@ export const RealTimeData: Story = {
       },
     },
   },
-}
+};
 
 /**
  * Playground for testing all sparkline properties
@@ -573,4 +575,4 @@ export const Playground: Story = {
     showTooltip: true,
     gradient: false,
   },
-}
+};

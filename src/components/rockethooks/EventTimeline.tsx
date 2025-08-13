@@ -1,30 +1,30 @@
-import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns'
-import { useMemo } from 'react'
+import { format, formatDistanceToNow, isToday, isYesterday } from 'date-fns';
+import { useMemo } from 'react';
 
-import { Badge } from '@/components/ui/Badge'
-import { Card, CardContent } from '@/components/ui/Card'
-import { cn } from '@/lib/utils'
+import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent } from '@/components/ui/Card';
+import { cn } from '@/lib/utils';
 
-import { WebhookStatus } from './WebhookStatus'
+import { WebhookStatus } from './WebhookStatus';
 
 export interface WebhookEvent {
-  id: string
-  timestamp: Date
-  status: 'success' | 'pending' | 'retrying' | 'failed' | 'circuit-open'
-  endpoint: string
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
-  responseTime?: number
-  statusCode?: number
-  retryCount?: number
-  errorMessage?: string
-  payload?: object
+  id: string;
+  timestamp: Date;
+  status: 'success' | 'pending' | 'retrying' | 'failed' | 'circuit-open';
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  responseTime?: number;
+  statusCode?: number;
+  retryCount?: number;
+  errorMessage?: string;
+  payload?: object;
 }
 
 export interface EventTimelineProps {
-  events: WebhookEvent[]
-  view?: 'compact' | 'detailed'
-  onEventClick?: (event: WebhookEvent) => void
-  className?: string
+  events: WebhookEvent[];
+  view?: 'compact' | 'detailed';
+  onEventClick?: (event: WebhookEvent) => void;
+  className?: string;
 }
 
 /**
@@ -47,51 +47,51 @@ function EventTimeline({
 }: EventTimelineProps) {
   // Group events by day
   const groupedEvents = useMemo(() => {
-    const groups: { [key: string]: WebhookEvent[] } = {}
+    const groups: { [key: string]: WebhookEvent[] } = {};
 
     events
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .forEach((event) => {
-        const dayKey = format(event.timestamp, 'yyyy-MM-dd')
-        groups[dayKey] ??= []
-        groups[dayKey].push(event)
-      })
+        const dayKey = format(event.timestamp, 'yyyy-MM-dd');
+        groups[dayKey] ??= [];
+        groups[dayKey].push(event);
+      });
 
     return Object.entries(groups).map(([dateKey, events]) => ({
       date: new Date(dateKey),
       events,
-    }))
-  }, [events])
+    }));
+  }, [events]);
 
   const getDateLabel = (date: Date) => {
-    if (isToday(date)) return 'Today'
-    if (isYesterday(date)) return 'Yesterday'
-    return format(date, 'MMM d, yyyy')
-  }
+    if (isToday(date)) return 'Today';
+    if (isYesterday(date)) return 'Yesterday';
+    return format(date, 'MMM d, yyyy');
+  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case 'success':
-        return 'success'
+        return 'success';
       case 'pending':
-        return 'secondary'
+        return 'secondary';
       case 'retrying':
-        return 'warning'
+        return 'warning';
       case 'failed':
-        return 'destructive'
+        return 'destructive';
       case 'circuit-open':
-        return 'outline'
+        return 'outline';
       default:
-        return 'secondary'
+        return 'secondary';
     }
-  }
+  };
 
   if (events.length === 0) {
     return (
       <div className={cn('text-center py-8 text-muted-foreground', className)}>
         <div className="text-sm">No events to display</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -259,7 +259,7 @@ function EventTimeline({
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-export { EventTimeline }
+export { EventTimeline };

@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/shared/components/PageLayout'
+import { DashboardPage } from '@/shared/components/PageLayout';
 
 export function HomePage() {
   return (
@@ -25,5 +25,5 @@ export function HomePage() {
         </div>
       </div>
     </DashboardPage>
-  )
+  );
 }

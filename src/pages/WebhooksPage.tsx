@@ -1,4 +1,4 @@
-import { DashboardPage } from '@/shared/components/PageLayout'
+import { DashboardPage } from '@/shared/components/PageLayout';
 
 export function WebhooksPage() {
   return (
@@ -10,5 +10,5 @@ export function WebhooksPage() {
         Webhooks page - Coming soon!
       </div>
     </DashboardPage>
-  )
+  );
 }

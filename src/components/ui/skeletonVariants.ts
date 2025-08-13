@@ -1,4 +1,4 @@
-import { cva } from 'class-variance-authority'
+import { cva } from 'class-variance-authority';
 
 export const skeletonVariants = cva('animate-pulse rounded-md bg-muted', {
   variants: {
@@ -17,4 +17,4 @@ export const skeletonVariants = cva('animate-pulse rounded-md bg-muted', {
     variant: 'default',
     shape: 'rectangle',
   },
-})
+});

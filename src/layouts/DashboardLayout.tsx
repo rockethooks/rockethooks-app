@@ -1,70 +1,70 @@
-import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
-import { cn } from '@/lib/utils'
-import { PageErrorBoundary } from '@/shared/components/ErrorBoundary'
-import { Header } from './Header'
-import { Sidebar } from './Sidebar'
+import { useEffect, useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { PageErrorBoundary } from '@/shared/components/ErrorBoundary';
+import { Header } from './Header';
+import { Sidebar } from './Sidebar';
 
 interface DashboardLayoutProps {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Handle responsive behavior
   useEffect(() => {
     const checkIsMobile = () => {
-      const mobile = window.innerWidth < 768
-      setIsMobile(mobile)
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
 
       // Auto-collapse sidebar on mobile
       if (mobile) {
-        setSidebarCollapsed(true)
-        setMobileSidebarOpen(false)
+        setSidebarCollapsed(true);
+        setMobileSidebarOpen(false);
       }
-    }
+    };
 
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
 
     return () => {
-      window.removeEventListener('resize', checkIsMobile)
-    }
-  }, [])
+      window.removeEventListener('resize', checkIsMobile);
+    };
+  }, []);
 
   // Close mobile sidebar when clicking outside or on overlay
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (mobileSidebarOpen && isMobile) {
-        const sidebar = document.querySelector('[data-sidebar]')
-        const target = event.target as Node
+        const sidebar = document.querySelector('[data-sidebar]');
+        const target = event.target as Node;
 
         if (sidebar && !sidebar.contains(target)) {
-          setMobileSidebarOpen(false)
+          setMobileSidebarOpen(false);
         }
       }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [mobileSidebarOpen, isMobile])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [mobileSidebarOpen, isMobile]);
 
   const handleMenuToggle = () => {
     if (isMobile) {
-      setMobileSidebarOpen(!mobileSidebarOpen)
+      setMobileSidebarOpen(!mobileSidebarOpen);
     } else {
-      setSidebarCollapsed(!sidebarCollapsed)
+      setSidebarCollapsed(!sidebarCollapsed);
     }
-  }
+  };
 
   const handleSidebarCollapsedChange = (collapsed: boolean) => {
-    setSidebarCollapsed(collapsed)
-  }
+    setSidebarCollapsed(collapsed);
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -75,7 +75,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           aria-label="Close sidebar"
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden border-0 p-0"
           onClick={() => {
-            setMobileSidebarOpen(false)
+            setMobileSidebarOpen(false);
           }}
         />
       )}
@@ -123,5 +123,5 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </main>
       </div>
     </div>
-  )
+  );
 }

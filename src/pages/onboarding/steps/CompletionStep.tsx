@@ -6,110 +6,110 @@ import {
   Sparkles,
   Trophy,
   User,
-} from 'lucide-react'
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Alert } from '@/components/ui/Alert'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar'
-import { Badge } from '@/components/ui/Badge'
-import { Button } from '@/components/ui/Button'
+} from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Alert } from '@/components/ui/Alert';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/Card'
-import { useOnboarding } from '@/hooks/useOnboarding'
+} from '@/components/ui/Card';
+import { useOnboarding } from '@/hooks/useOnboarding';
 import {
   getExperienceLevelLabel,
   getProfileRoleLabel,
-} from '@/lib/validations/onboarding'
+} from '@/lib/validations/onboarding';
 import {
   clearDrafts,
   getAllDrafts,
   type OrganizationDraft,
   type PreferencesDraft,
   type ProfileDraft,
-} from '@/utils/onboardingDrafts'
+} from '@/utils/onboardingDrafts';
 
 export interface CompletionStepProps {
-  onComplete?: () => void
-  onNext?: () => void
+  onComplete?: () => void;
+  onNext?: () => void;
 }
 
 export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { completeStep, hasErrors, latestError, clearErrors, progress } =
-    useOnboarding()
+    useOnboarding();
 
-  const [isCompleting, setIsCompleting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Get all collected onboarding data for summary
-  const allDrafts = getAllDrafts()
+  const allDrafts = getAllDrafts();
   const organizationData = allDrafts.organization as
     | OrganizationDraft
-    | undefined
-  const profileData = allDrafts.profile as ProfileDraft | undefined
-  const preferencesData = allDrafts.preferences as PreferencesDraft | undefined
+    | undefined;
+  const profileData = allDrafts.profile as ProfileDraft | undefined;
+  const preferencesData = allDrafts.preferences as PreferencesDraft | undefined;
 
   // Get user name for personalization
-  const userName = profileData?.firstName ?? 'there'
+  const userName = profileData?.firstName ?? 'there';
 
   // Generate avatar initials
   const getAvatarInitials = () => {
-    const firstName = profileData?.firstName ?? ''
-    const lastName = profileData?.lastName ?? ''
-    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase()
-  }
+    const firstName = profileData?.firstName ?? '';
+    const lastName = profileData?.lastName ?? '';
+    return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+  };
 
   // Handle onboarding completion
   const handleComplete = async () => {
     try {
-      setIsCompleting(true)
-      setError(null)
-      clearErrors()
+      setIsCompleting(true);
+      setError(null);
+      clearErrors();
 
       // Complete the final step using the state machine
-      const success = completeStep()
+      const success = completeStep();
 
       if (success) {
         // Clear all onboarding drafts from localStorage
-        const draftsClearSuccess = clearDrafts()
+        const draftsClearSuccess = clearDrafts();
         if (!draftsClearSuccess) {
-          console.warn('Failed to clear onboarding drafts from localStorage')
+          console.warn('Failed to clear onboarding drafts from localStorage');
         }
 
         // Call completion callbacks for backward compatibility
-        onComplete?.()
+        onComplete?.();
 
         // Small delay for UX (let user see the completion state)
-        await new Promise<void>((resolve) => setTimeout(resolve, 500))
+        await new Promise<void>((resolve) => setTimeout(resolve, 500));
 
         // Navigate to dashboard or call next callback
         if (onNext) {
-          onNext()
+          onNext();
         } else {
-          void navigate('/dashboard')
+          void navigate('/dashboard');
         }
       } else {
-        setError('Failed to complete onboarding')
+        setError('Failed to complete onboarding');
       }
     } catch (completionError) {
-      console.error('Failed to complete onboarding:', completionError)
+      console.error('Failed to complete onboarding:', completionError);
       const errorMessage =
         completionError instanceof Error
           ? completionError.message
-          : 'Failed to complete setup'
-      setError(errorMessage)
+          : 'Failed to complete setup';
+      setError(errorMessage);
     } finally {
-      setIsCompleting(false)
+      setIsCompleting(false);
     }
-  }
+  };
 
   // Summary sections for collected data
-  const summaryItems = []
+  const summaryItems = [];
 
   // Organization summary
   if (organizationData?.name) {
@@ -133,7 +133,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
           )}
         </div>
       ),
-    })
+    });
   }
 
   // Profile summary
@@ -180,16 +180,16 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
           </div>
         </div>
       ),
-    })
+    });
   }
 
   // Preferences summary
   if (preferencesData) {
-    const hasNotifications = preferencesData.notifications
-    const notificationTypes = []
-    if (hasNotifications?.email) notificationTypes.push('Email')
-    if (hasNotifications?.sms) notificationTypes.push('SMS')
-    if (hasNotifications?.push) notificationTypes.push('Push')
+    const hasNotifications = preferencesData.notifications;
+    const notificationTypes = [];
+    if (hasNotifications?.email) notificationTypes.push('Email');
+    if (hasNotifications?.sms) notificationTypes.push('SMS');
+    if (hasNotifications?.push) notificationTypes.push('Push');
 
     summaryItems.push({
       icon: Settings,
@@ -219,7 +219,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
           )}
         </div>
       ),
-    })
+    });
   }
 
   return (
@@ -321,8 +321,8 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setError(null)
-                    clearErrors()
+                    setError(null);
+                    clearErrors();
                   }}
                   aria-label="Dismiss error"
                 >
@@ -381,5 +381,5 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
         </p>
       </div>
     </div>
-  )
+  );
 }

@@ -1,28 +1,28 @@
-import { ArrowRight, SkipForward } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { useOnboarding } from '@/hooks/useOnboarding'
+import { ArrowRight, SkipForward } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 interface OnboardingFooterProps {
   navigation: {
-    isFirstStep: boolean
-    isLastStep: boolean
-    currentRoute: string
-    canGoBack: boolean
-    canSkip: boolean
-    canProceed: boolean
-  }
-  currentStep: string
+    isFirstStep: boolean;
+    isLastStep: boolean;
+    currentRoute: string;
+    canGoBack: boolean;
+    canSkip: boolean;
+    canProceed: boolean;
+  };
+  currentStep: string;
 }
 
 export function OnboardingFooter({
   navigation,
   currentStep,
 }: OnboardingFooterProps) {
-  const { goBack, skipStep, completeStep, canProceed } = useOnboarding()
+  const { goBack, skipStep, completeStep, canProceed } = useOnboarding();
 
   // Don't show footer on completion step
   if (currentStep === 'complete') {
-    return null
+    return null;
   }
 
   return (
@@ -61,5 +61,5 @@ export function OnboardingFooter({
         </div>
       </div>
     </footer>
-  )
+  );
 }
