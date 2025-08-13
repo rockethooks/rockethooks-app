@@ -1,9 +1,13 @@
 import type { OnboardingState } from '@/types/onboarding';
 import { OnboardingEvent } from '@/types/onboarding';
-import { stepConfigs } from './config';
+import { getStepConfig } from './config';
 import { useOnboardingStore } from './store';
 
-export { stepConfigs as onboardingStepConfigs } from './config';
+export {
+  getOrderedStepConfigs,
+  getStepConfig,
+  stepConfigs as onboardingStepConfigs,
+} from './config';
 // Re-export everything from the modular structure
 export { useOnboardingStore } from './store';
 export { transitions } from './transitions';
@@ -39,6 +43,6 @@ export function initializeOnboarding(userId: string, organizationId?: string) {
  * Get route for current state
  */
 export function getCurrentRoute(state: OnboardingState): string {
-  const config = stepConfigs[state.type as keyof typeof stepConfigs];
-  return config.route;
+  const config = getStepConfig(state.type);
+  return config?.route ?? '/onboarding/organization';
 }

@@ -9,7 +9,7 @@ import {
   type StateTransition,
 } from '@/types/onboarding';
 import { createDevtoolsConfig } from '../devtools.config';
-import { stepConfigs } from './config';
+import { getStepConfig } from './config';
 import { transitions } from './transitions';
 import {
   createInitialContext,
@@ -192,16 +192,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
 
         canGoBack: () => {
           const { currentState } = get();
-          const config =
-            stepConfigs[currentState.type as keyof typeof stepConfigs];
-          return config.canGoBack || false;
+          const config = getStepConfig(currentState.type);
+          return config?.canGoBack ?? false;
         },
 
         canSkip: () => {
           const { currentState } = get();
-          const config =
-            stepConfigs[currentState.type as keyof typeof stepConfigs];
-          return config.canSkip || false;
+          const config = getStepConfig(currentState.type);
+          return config?.canSkip ?? false;
         },
 
         getProgress: () => {
