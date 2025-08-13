@@ -171,13 +171,13 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
   }, [formData, saveDraft])
 
   // Handle form submission
-  const handleSubmit = async (data: PreferencesFormData) => {
+  const handleSubmit = (data: PreferencesFormData) => {
     try {
       // Clear any previous errors
       clearErrors()
 
       // Complete the step using the state machine
-      const success = await completeStep(data as PreferencesDraft)
+      const success = completeStep(data as PreferencesDraft)
 
       if (success) {
         // Call completion callbacks for backward compatibility

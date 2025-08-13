@@ -3,18 +3,52 @@
 // ========================================================================================
 
 /**
+ * Organization data interface for type safety
+ */
+export interface OrganizationData {
+  name: string
+  size?: string
+  industry?: string
+  description?: string
+}
+
+/**
+ * Profile data interface
+ */
+export interface ProfileData {
+  firstName?: string
+  lastName?: string
+  role?: string
+  company?: string
+}
+
+/**
+ * Preferences data interface
+ */
+export interface PreferencesData {
+  notifications?: boolean
+  marketing?: boolean
+  analytics?: boolean
+}
+
+/**
+ * Union type for all draft data types
+ */
+export type DraftDataTypes = OrganizationData | ProfileData | PreferencesData
+
+/**
  * Onboarding states using discriminated unions for type safety
  */
 export type OnboardingState =
   | { type: 'START' }
   | { type: 'CHECK_ORGANIZATION'; checking: boolean }
-  | { type: 'ORGANIZATION_SETUP'; draft?: Record<string, unknown> }
+  | { type: 'ORGANIZATION_SETUP'; draft?: OrganizationData }
   | {
       type: 'PROFILE_COMPLETION'
       organizationId: string
-      draft?: Record<string, unknown>
+      draft?: ProfileData
     }
-  | { type: 'PREFERENCES'; draft?: Record<string, unknown> }
+  | { type: 'PREFERENCES'; draft?: PreferencesData }
   | { type: 'COMPLETION' }
   | { type: 'DASHBOARD' }
   | { type: 'ERROR'; error: string; previousState: OnboardingState }
@@ -60,7 +94,7 @@ export interface StateTransition {
   from: string // State type
   event: OnboardingEvent
   to: string // State type
-  guard?: (context: OnboardingContext, draft?: any) => boolean
+  guard?: (context: OnboardingContext, payload?: DraftDataTypes) => boolean
   action?: (context: OnboardingContext) => void
 }
 

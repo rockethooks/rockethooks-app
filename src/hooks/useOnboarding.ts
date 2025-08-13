@@ -7,6 +7,7 @@ import {
   initializeOnboarding,
   useOnboardingStore,
 } from '@/store/onboarding.store'
+import type { OrganizationData } from '@/types/onboarding'
 import { OnboardingEvent } from '@/types/onboarding'
 import {
   clearStepDraft,
@@ -100,58 +101,47 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
     { enabled: !!currentStepName }
   )
 
-  // Initialize state machine on mount
+  // Combined initialization and navigation effect for better performance
   useEffect(() => {
-    if (!autoInitialize || !isLoaded || !user) return
+    // Initialize state machine on mount
+    if (autoInitialize && isLoaded && user) {
+      // Only initialize if we haven't started or if user changed
+      if (currentState.type === 'START' || context.userId !== user.id) {
+        if (debug) {
+          console.log(
+            '[useOnboarding] Initializing state machine for user:',
+            user.id
+          )
+        }
 
-    // Only initialize if we haven't started or if user changed
-    if (currentState.type === 'START' || context.userId !== user.id) {
-      if (debug) {
-        console.log(
-          '[useOnboarding] Initializing state machine for user:',
-          user.id
-        )
+        initializeOnboarding(user.id, orgId ?? undefined)
       }
-
-      initializeOnboarding(user.id, orgId ?? undefined)
     }
-  }, [
-    autoInitialize,
-    isLoaded,
-    user,
-    orgId,
-    currentState.type,
-    context.userId,
-    debug,
-  ])
 
-  // Auto-navigation based on state changes
-  useEffect(() => {
-    if (!autoNavigate) return
+    // Auto-navigation based on state changes
+    if (autoNavigate) {
+      const targetRoute = getCurrentRoute(currentState)
+      const currentPath = window.location.pathname
 
-    const targetRoute = getCurrentRoute(currentState)
-    const currentPath = window.location.pathname
-
-    // Only navigate if we're not already on the target route
-    if (
-      targetRoute !== currentPath &&
-      currentState.type !== 'START' &&
-      currentState.type !== 'CHECK_ORGANIZATION'
-    ) {
-      if (debug) {
-        console.log(
-          '[useOnboarding] Auto-navigating from',
-          currentPath,
-          'to',
-          targetRoute
-        )
+      // Only navigate if we're not already on the target route
+      if (
+        targetRoute !== currentPath &&
+        currentState.type !== 'START' &&
+        currentState.type !== 'CHECK_ORGANIZATION'
+      ) {
+        if (debug) {
+          console.log(
+            '[useOnboarding] Auto-navigating from',
+            currentPath,
+            'to',
+            targetRoute
+          )
+        }
+        void navigate(targetRoute)
       }
-      void navigate(targetRoute)
     }
-  }, [currentState, navigate, autoNavigate, debug])
 
-  // Sync with auth store for legacy compatibility
-  useEffect(() => {
+    // Sync with auth store for legacy compatibility
     if (context.completedSteps.size > 0) {
       const completedArray = Array.from(context.completedSteps)
 
@@ -160,7 +150,19 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
         completeOnboardingStep(stepName)
       })
     }
-  }, [context.completedSteps, completeOnboardingStep])
+  }, [
+    autoInitialize,
+    autoNavigate,
+    isLoaded,
+    user,
+    orgId,
+    currentState,
+    context.userId,
+    context.completedSteps,
+    navigate,
+    completeOnboardingStep,
+    debug,
+  ])
 
   // Complete current step
   const completeStep = useCallback(
@@ -173,15 +175,6 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
       }
 
       const event = eventMap[currentState.type as keyof typeof eventMap]
-      if (!event) {
-        if (debug) {
-          console.warn(
-            '[useOnboarding] Invalid state for completion:',
-            currentState.type
-          )
-        }
-        return false
-      }
 
       try {
         // Save final draft data if provided
@@ -190,7 +183,7 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
         }
 
         // Send state machine event
-        const success = sendEvent(event, data)
+        const success = sendEvent(event, data as Record<string, unknown>)
 
         if (success) {
           // Clear draft on successful transition
@@ -201,8 +194,9 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
           // Handle specific step completion logic
           if (currentState.type === 'ORGANIZATION_SETUP' && data) {
             // Update profile with organization information
+            const orgData = data as OrganizationData
             updateProfile({
-              company: (data as { name: string }).name,
+              company: orgData.name,
             })
           }
 

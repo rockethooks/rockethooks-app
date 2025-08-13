@@ -73,7 +73,7 @@ export const profileSchema = z.object({
     .array(z.string())
     .max(5, 'Please select at most 5 use cases')
     .optional(),
-  avatar: z.string().url().optional(),
+  avatar: z.url().optional(),
 })
 
 export type ProfileFormData = z.infer<typeof profileSchema>

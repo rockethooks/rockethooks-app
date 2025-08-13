@@ -36,26 +36,22 @@ export const errorMessages: Record<string, string> = {
     'The service is temporarily unavailable. Please try again later.',
 }
 
-export function getUserFriendlyMessage(error: unknown): string {
+export function getUserFriendlyMessage(error?: Error): string {
   const errorString = error?.toString() ?? ''
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-  const errorMessage = (error as any)?.message ?? ''
+  const errorMessage = error?.message ?? ''
 
   // Check for exact matches first
 
-  if (errorMessages[errorMessage as string]) {
+  if (errorMessages[errorMessage]) {
     return (
-      errorMessages[errorMessage as string] ??
+      errorMessages[errorMessage] ??
       'An unexpected error occurred. Please try again.'
     )
   }
 
   // Check for pattern matches
   for (const [pattern, message] of Object.entries(errorMessages)) {
-    if (
-      errorString.includes(pattern) ||
-      (errorMessage as string).includes(pattern)
-    ) {
+    if (errorString.includes(pattern) || errorMessage.includes(pattern)) {
       return message
     }
   }

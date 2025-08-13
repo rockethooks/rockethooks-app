@@ -1,4 +1,4 @@
-import type { ApolloError } from '@apollo/client'
+import type { ErrorResponse } from '@apollo/client/link/error'
 import {
   AppError,
   AuthenticationError,
@@ -71,7 +71,7 @@ function getOperationName(error: unknown): string | undefined {
 }
 
 export const GraphQLErrorClassifier = {
-  classify(error: ApolloError): AppError {
+  classify(error: ErrorResponse): AppError {
     // Check for network errors first
     if (error.networkError) {
       if ('statusCode' in error.networkError) {
@@ -101,11 +101,10 @@ export const GraphQLErrorClassifier = {
     }
 
     // Check GraphQL errors
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const firstError = error.graphQLErrors?.[0]
     if (firstError) {
-      const errorCode = firstError.extensions?.['code'] as string
-      const errorType = firstError.extensions?.['errorType'] as string
+      const errorCode = firstError.extensions?.code as string
+      const errorType = firstError.extensions?.errorType as string
 
       // Check error code first
       switch (errorCode) {
@@ -115,14 +114,11 @@ export const GraphQLErrorClassifier = {
           return new AuthenticationError(firstError.message, errorCode)
         case 'BAD_USER_INPUT':
         case 'VALIDATION_ERROR': {
-          const fields = firstError.extensions?.['fields'] as Record<
-            string,
-            string
-          >
+          const fields = firstError.extensions?.fields as Record<string, string>
           return new ValidationError(firstError.message, fields)
         }
         case 'RATE_LIMITED': {
-          const retryAfterRaw = firstError.extensions?.['retryAfter']
+          const retryAfterRaw = firstError.extensions?.retryAfter
           // Validate and ensure positive number
           const retryAfter =
             typeof retryAfterRaw === 'number' && retryAfterRaw > 0
@@ -135,12 +131,12 @@ export const GraphQLErrorClassifier = {
       // Check error type
       switch (errorType) {
         case 'WebhookError': {
-          const webhookId = firstError.extensions?.['webhookId'] as string
-          const webhookUrl = firstError.extensions?.['webhookUrl'] as string
+          const webhookId = firstError.extensions?.webhookId as string
+          const webhookUrl = firstError.extensions?.webhookUrl as string
           return new WebhookError(firstError.message, webhookId, webhookUrl)
         }
         case 'ValidationError': {
-          const validationFields = firstError.extensions?.['fields'] as Record<
+          const validationFields = firstError.extensions?.fields as Record<
             string,
             string
           >

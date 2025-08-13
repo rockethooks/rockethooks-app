@@ -159,7 +159,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
   }
 
   // Handle form submission
-  const handleSubmit = async (data: ProfileFormData) => {
+  const handleSubmit = (data: ProfileFormData) => {
     try {
       // Clear any previous errors
       clearErrors()
@@ -171,7 +171,7 @@ export function ProfileStep({ onComplete, onNext }: ProfileStepProps) {
       } as ProfileDraft
 
       // Complete the step using the state machine
-      const success = await completeStep(submissionData)
+      const success = completeStep(submissionData)
 
       if (success) {
         // Call completion callbacks for backward compatibility

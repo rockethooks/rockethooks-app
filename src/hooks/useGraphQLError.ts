@@ -1,4 +1,4 @@
-import type { ApolloError } from '@apollo/client'
+import type { ErrorResponse } from '@apollo/client/link/error'
 import { useAuth } from '@clerk/clerk-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -10,7 +10,7 @@ interface UseGraphQLErrorReturn {
   error: AppError | null
   validationErrors: Record<string, string> | null
   isRecovering: boolean
-  handleError: (error: ApolloError) => AppError
+  handleError: (error: ErrorResponse) => AppError
   recover: (retryFn?: () => void) => Promise<void>
   dismiss: () => void
 }
@@ -28,7 +28,7 @@ export function useGraphQLError(): UseGraphQLErrorReturn {
   // Use ref to store cleanup function
   const cleanupRef = useRef<(() => void) | null>(null)
 
-  const handleError = useCallback((apolloError: ApolloError): AppError => {
+  const handleError = useCallback((apolloError: ErrorResponse): AppError => {
     const classifiedError = GraphQLErrorClassifier.classify(apolloError)
     setError(classifiedError)
 

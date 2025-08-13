@@ -31,7 +31,7 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
     })
 
     // Log error to monitoring service in production
-    if (process.env['NODE_ENV'] === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       console.error(
         'Onboarding Error Boundary caught an error:',
         error,
@@ -63,22 +63,21 @@ export class OnboardingErrorBoundary extends Component<Props, State> {
                 </div>
               </Alert>
 
-              {process.env['NODE_ENV'] === 'development' &&
-                this.state.error && (
-                  <details className="mt-4">
-                    <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
-                      Error Details (Development Only)
-                    </summary>
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
+                    Error Details (Development Only)
+                  </summary>
+                  <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
+                    {this.state.error.stack}
+                  </pre>
+                  {this.state.errorInfo && (
                     <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
-                      {this.state.error.stack}
+                      {this.state.errorInfo.componentStack}
                     </pre>
-                    {this.state.errorInfo && (
-                      <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-auto">
-                        {this.state.errorInfo.componentStack}
-                      </pre>
-                    )}
-                  </details>
-                )}
+                  )}
+                </details>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <Button

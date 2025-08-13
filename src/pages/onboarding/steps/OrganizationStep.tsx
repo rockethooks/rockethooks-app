@@ -36,6 +36,7 @@ import {
   organizationSchema,
   organizationSizes,
 } from '@/lib/validations/onboarding'
+import type { OrganizationData } from '@/types/onboarding'
 import type { OrganizationDraft } from '@/utils/onboardingDrafts'
 
 export interface OrganizationStepProps {
@@ -105,18 +106,18 @@ export function OrganizationStep({
         (key) => formData[key as keyof typeof formData]
       )
     ) {
-      saveDraft(formData as OrganizationDraft)
+      saveDraft(formData as OrganizationData)
     }
   }, [formData, saveDraft])
 
   // Handle form submission
-  const handleSubmit = async (data: OrganizationFormData) => {
+  const handleSubmit = (data: OrganizationFormData) => {
     try {
       // Clear any previous errors
       clearErrors()
 
       // Complete the step using the state machine
-      const success = await completeStep(data as OrganizationDraft)
+      const success = completeStep(data as OrganizationData)
 
       if (success) {
         // Call completion callbacks for backward compatibility
@@ -146,9 +147,7 @@ export function OrganizationStep({
 
   // Handle back navigation
   const handleBack = () => {
-    if (goBack) {
-      goBack()
-    }
+    goBack()
   }
 
   // Check if form is valid and we can proceed
@@ -313,7 +312,7 @@ export function OrganizationStep({
                 {(hasErrors || latestError) && (
                   <Alert variant="destructive">
                     <div className="flex items-center justify-between">
-                      <span>{latestError?.error || 'An error occurred'}</span>
+                      <span>{latestError?.error ?? 'An error occurred'}</span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -400,7 +399,7 @@ export function OrganizationStep({
       </Card>
 
       {/* Progress Indicator */}
-      {progress && (
+      {progress.percentage && (
         <div className="text-center text-sm text-muted-foreground">
           Step {progress.currentStep} of {progress.totalSteps} (
           {progress.percentage}% complete)

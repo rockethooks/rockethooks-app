@@ -146,7 +146,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
           <Avatar className="h-12 w-12">
             <AvatarImage src={profileData.avatar} alt="Profile avatar" />
             <AvatarFallback>
-              {getAvatarInitials() ?? <User className="h-6 w-6" />}
+              {getAvatarInitials() || <User className="h-6 w-6" />}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-1">
@@ -308,7 +308,7 @@ export function CompletionStep({ onComplete, onNext }: CompletionStepProps) {
           </div>
 
           {/* Error Display */}
-          {(hasErrors || latestError || error) && (
+          {((hasErrors || latestError) ?? error) && (
             <Alert variant="destructive">
               <div className="flex items-center justify-between">
                 <span>

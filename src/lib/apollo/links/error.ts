@@ -3,8 +3,8 @@
  * Handles GraphQL errors, network errors, and implements retry logic
  */
 
-import { type ApolloError, Observable } from '@apollo/client'
-import { onError } from '@apollo/client/link/error'
+import { Observable } from '@apollo/client'
+import { type ErrorResponse, onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
 import toast from 'react-hot-toast'
 import { GraphQLErrorClassifier } from '@/lib/errors/classifier'
@@ -37,22 +37,15 @@ const handleAuthError = () => {
 /**
  * Log errors for debugging and monitoring
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const logError = (error: any) => {
+const logError = (error: ErrorResponse) => {
   if (import.meta.env.VITE_ENABLE_DEBUG === 'true') {
     console.group('Apollo Client Error')
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.error('Operation:', error.operation?.operationName)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.error('Variables:', error.operation?.variables)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    console.error('Operation:', error.operation.operationName)
+    console.error('Variables:', error.operation.variables)
     if (error.graphQLErrors) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       console.error('GraphQL Errors:', error.graphQLErrors)
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (error.networkError) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       console.error('Network Error:', error.networkError)
     }
     console.groupEnd()
@@ -63,12 +56,10 @@ const logError = (error: any) => {
  * Create enhanced error link for handling GraphQL and network errors
  */
 export const createErrorLink = () => {
-  return onError(({ graphQLErrors, networkError, operation, forward }) => {
-    const error = { graphQLErrors, networkError } as ApolloError
-    const classifiedError = GraphQLErrorClassifier.classify(error)
-
+  return onError((errorResponse) => {
+    const classifiedError = GraphQLErrorClassifier.classify(errorResponse)
     // Log the error for debugging
-    logError({ graphQLErrors, networkError, operation })
+    logError(errorResponse)
 
     // Don't show toast for validation errors
     if (classifiedError.type === ErrorType.VALIDATION) {
@@ -96,7 +87,7 @@ export const createErrorLink = () => {
           } else {
             clearInterval(interval)
             toast.dismiss(toastId)
-            forward(operation).subscribe(observer)
+            errorResponse.forward(errorResponse.operation).subscribe(observer)
           }
         }, 1000)
 
@@ -108,12 +99,15 @@ export const createErrorLink = () => {
     }
 
     // Handle network errors with retry
-    if (networkError && classifiedError.type === ErrorType.NETWORK) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const retryCount = operation.getContext()['retryCount'] ?? 0
+    if (
+      errorResponse.networkError &&
+      classifiedError.type === ErrorType.NETWORK
+    ) {
+      const retryCount = (errorResponse.operation.getContext().retryCount ??
+        0) as number
 
       if (retryCount < 3) {
-        const delay = 2 ** (retryCount as number) * 1000
+        const delay = 2 ** retryCount * 1000
 
         return new Observable((observer) => {
           const toastId = toast.loading('Retrying...', {
@@ -123,8 +117,8 @@ export const createErrorLink = () => {
           setTimeout(() => {
             toast.dismiss(toastId)
 
-            operation.setContext({ retryCount: (retryCount as number) + 1 })
-            forward(operation).subscribe(observer)
+            errorResponse.operation.setContext({ retryCount: retryCount + 1 })
+            errorResponse.forward(errorResponse.operation).subscribe(observer)
           }, delay)
         })
       }
@@ -178,7 +172,7 @@ export const createRetryLink = () => {
         if (retryError.graphQLErrors) {
           // Don't retry authentication or authorization errors
           const hasAuthError = retryError.graphQLErrors.some((gqlError) => {
-            const code = gqlError.extensions?.['code']
+            const code = gqlError.extensions?.code
             return code === 'UNAUTHENTICATED' || code === 'FORBIDDEN'
           })
 
