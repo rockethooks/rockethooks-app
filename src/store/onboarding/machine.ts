@@ -35,6 +35,7 @@ export enum OnboardingEvents {
   HAS_ORGANIZATION = 'HAS_ORGANIZATION',
   NO_ORGANIZATION = 'NO_ORGANIZATION',
   ORGANIZATION_CREATED = 'ORGANIZATION_CREATED',
+  SKIP_ORGANIZATION = 'SKIP_ORGANIZATION',
   PROFILE_COMPLETED = 'PROFILE_COMPLETED',
   PREFERENCES_SAVED = 'PREFERENCES_SAVED',
   SKIP_PREFERENCES = 'SKIP_PREFERENCES',
@@ -97,11 +98,14 @@ interface StateTransition {
  * Creates the initial context for the onboarding state machine
  */
 function createInitialContext(): OnboardingContext {
+  // Calculate total steps dynamically from step configuration
+  const totalSteps = Object.keys(stepConfigs).length;
+
   return {
     userId: '',
     organizationId: null,
     currentStep: 0,
-    totalSteps: 4,
+    totalSteps,
     completedSteps: new Set<string>(),
     skippedSteps: new Set<string>(),
     isComplete: false,
@@ -213,7 +217,7 @@ const transitions: StateTransition[] = [
   // Skip organization setup
   {
     from: OnboardingStates.ORGANIZATION_SETUP,
-    event: OnboardingEvents.SKIP_PREFERENCES,
+    event: OnboardingEvents.SKIP_ORGANIZATION,
     to: OnboardingStates.PROFILE_COMPLETION,
     action: (context) => {
       context.skippedSteps.add('organization');
@@ -552,7 +556,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
             return get().sendEvent(OnboardingEvents.SKIP_PREFERENCES);
           }
           if (currentState === OnboardingStates.ORGANIZATION_SETUP) {
-            return get().sendEvent(OnboardingEvents.SKIP_PREFERENCES);
+            return get().sendEvent(OnboardingEvents.SKIP_ORGANIZATION);
           }
           return false;
         },
@@ -594,9 +598,40 @@ export const useOnboardingStore = create<OnboardingStore>()(
         },
 
         updateContext: (updates) => {
+          // Define allowed context fields to prevent arbitrary updates
+          const allowedFields = new Set([
+            'userId',
+            'organizationId',
+            'currentStep',
+            'totalSteps',
+            'completedSteps',
+            'skippedSteps',
+            'isComplete',
+            'startedAt',
+            'completedAt',
+            'errors',
+          ]);
+
+          // Filter out disallowed fields using safer typing
+          const filteredUpdates = Object.keys(updates).reduce<
+            Partial<OnboardingContext>
+          >((acc, key) => {
+            if (allowedFields.has(key)) {
+              return { ...acc, [key]: updates[key as keyof typeof updates] };
+            } else {
+              console.warn(
+                `Attempted to update disallowed context field: ${key}`
+              );
+              return acc;
+            }
+          }, {});
+
           set(
             (state) => {
-              Object.assign(state.context, updates);
+              return {
+                ...state,
+                context: { ...state.context, ...filteredUpdates },
+              };
             },
             false,
             'onboarding/updateContext'

@@ -71,10 +71,11 @@ export function state<Context>(
   on: Record<string, Transition<Context>>;
 } {
   return {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    on: Object.assign(
-      {} as Record<string, Transition<Context>>,
-      ...transitions
+    on: transitions.reduce<Record<string, Transition<Context>>>(
+      (acc, transition) => {
+        return { ...acc, ...transition };
+      },
+      {}
     ),
   };
 }
@@ -108,10 +109,11 @@ export function stateWithLifecycle<Context>(
 } {
   return {
     ...config,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    on: Object.assign(
-      {} as Record<string, Transition<Context>>,
-      ...transitions
+    on: transitions.reduce<Record<string, Transition<Context>>>(
+      (acc, transition) => {
+        return { ...acc, ...transition };
+      },
+      {}
     ),
   };
 }

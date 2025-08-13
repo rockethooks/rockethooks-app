@@ -50,6 +50,7 @@ interface OnboardingActions {
   // Step completion actions
   setOrganization: (organizationId: string) => boolean;
   completeOrganization: () => boolean;
+  skipOrganization: () => boolean;
   completeProfile: () => boolean;
   savePreferences: () => boolean;
   skipPreferences: () => boolean;
@@ -169,7 +170,7 @@ export function useOnboarding(): UseOnboardingReturn {
     [store.context]
   );
 
-  // Progress information
+  // Progress information with proper Zustand selector
   const progress = useMemo<OnboardingProgress>(
     () => store.getProgress(),
     [store]
@@ -190,6 +191,8 @@ export function useOnboarding(): UseOnboardingReturn {
       },
       completeOrganization: () =>
         store.sendEvent(OnboardingEvents.ORGANIZATION_CREATED),
+      skipOrganization: () =>
+        store.sendEvent(OnboardingEvents.SKIP_ORGANIZATION),
       completeProfile: () =>
         store.sendEvent(OnboardingEvents.PROFILE_COMPLETED),
       savePreferences: () =>
@@ -347,6 +350,8 @@ export function useOnboardingActions(): OnboardingActions {
       },
       completeOrganization: () =>
         store.sendEvent(OnboardingEvents.ORGANIZATION_CREATED),
+      skipOrganization: () =>
+        store.sendEvent(OnboardingEvents.SKIP_ORGANIZATION),
       completeProfile: () =>
         store.sendEvent(OnboardingEvents.PROFILE_COMPLETED),
       savePreferences: () =>
