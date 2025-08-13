@@ -417,27 +417,3 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
     }),
   };
 }
-
-/**
- * Simplified hook for basic onboarding functionality
- * Use this when you don't need the full bridge functionality
- */
-export function useOnboardingBasic() {
-  return useOnboarding({
-    autoInitialize: true,
-    autoNavigate: false,
-    debug: false,
-  });
-}
-
-/**
- * Hook for debugging onboarding state machine
- * Only use in development
- */
-export function useOnboardingDebug() {
-  return useOnboarding({
-    autoInitialize: true,
-    autoNavigate: true,
-    debug: true,
-  });
-}
