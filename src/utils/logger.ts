@@ -73,6 +73,8 @@ export interface LoggerInterface {
 class Logger implements LoggerInterface {
   private config: Required<LoggerConfig>;
   private timers: Map<string, number> = new Map();
+  private cachedTimestamp: string = '';
+  private lastTimestampUpdate: number = 0;
 
   // Color codes for different log levels (browser console compatible)
   private static readonly COLORS = {
@@ -94,7 +96,15 @@ class Logger implements LoggerInterface {
     error: 5,
   } as const;
 
+  // Maximum number of timers to prevent unbounded growth
+  private static readonly MAX_TIMERS = 100;
+
   constructor(config: LoggerConfig = {}) {
+    // Validate config
+    if (config.level && !Object.keys(Logger.LEVELS).includes(config.level)) {
+      throw new Error(`Invalid log level: ${config.level}`);
+    }
+
     this.config = {
       namespace: config.namespace ?? 'app',
       enabled: config.enabled ?? this.isEnabled(),
@@ -117,7 +127,9 @@ class Logger implements LoggerInterface {
     if (import.meta.env.PROD) {
       try {
         return localStorage.getItem('rockethooks:debug') === 'true';
-      } catch {
+      } catch (error) {
+        // Could be SecurityError, QuotaExceededError, etc.
+        this.warn('Failed to access localStorage for debug setting:', error);
         return false;
       }
     }
@@ -141,12 +153,60 @@ class Logger implements LoggerInterface {
     return messageLevel >= currentLevel;
   }
 
+  private getCachedTimestamp(): string {
+    const now = Date.now();
+    if (now - this.lastTimestampUpdate > 1000) {
+      // Update every second
+      this.cachedTimestamp =
+        new Date(now).toISOString().split('T')[1]?.split('.')[0] ?? '';
+      this.lastTimestampUpdate = now;
+    }
+    return this.cachedTimestamp;
+  }
+
+  private sanitizeLogData(data: unknown): unknown {
+    if (data === null || data === undefined) return data;
+
+    const sensitiveKeys = [
+      'password',
+      'token',
+      'secret',
+      'key',
+      'auth',
+      'apiKey',
+      'privateKey',
+    ];
+
+    if (typeof data === 'object' && !Array.isArray(data)) {
+      const sanitized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(data)) {
+        if (
+          sensitiveKeys.some((sensitive) =>
+            key.toLowerCase().includes(sensitive.toLowerCase())
+          )
+        ) {
+          sanitized[key] = '[REDACTED]';
+        } else if (typeof value === 'object') {
+          sanitized[key] = this.sanitizeLogData(value);
+        } else {
+          sanitized[key] = value;
+        }
+      }
+      return sanitized;
+    }
+
+    if (Array.isArray(data)) {
+      return data.map((item) => this.sanitizeLogData(item));
+    }
+
+    return data;
+  }
+
   private formatMessage(
     level: LogLevel,
     ...args: unknown[]
   ): [string, ...unknown[]] {
-    const timestamp =
-      new Date().toISOString().split('T')[1]?.split('.')[0] ?? '';
+    const timestamp = this.getCachedTimestamp();
     const namespace = this.config.namespace;
 
     if (this.config.colors && this.isDevelopment()) {
@@ -162,37 +222,51 @@ class Logger implements LoggerInterface {
 
   log = (...args: unknown[]): void => {
     if (!this.shouldLog('log')) return;
-    const [prefix, ...rest] = this.formatMessage('log', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage('log', ...sanitizedArgs);
     console.log(prefix, ...rest);
   };
 
   debug = (...args: unknown[]): void => {
     if (!this.shouldLog('debug')) return;
-    const [prefix, ...rest] = this.formatMessage('debug', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage('debug', ...sanitizedArgs);
     console.debug(prefix, ...rest);
   };
 
   info = (...args: unknown[]): void => {
     if (!this.shouldLog('info')) return;
-    const [prefix, ...rest] = this.formatMessage('info', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage('info', ...sanitizedArgs);
     console.info(prefix, ...rest);
   };
 
   success = (...args: unknown[]): void => {
     if (!this.shouldLog('success')) return;
-    const [prefix, ...rest] = this.formatMessage('success', '✅', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage(
+      'success',
+      '✅',
+      ...sanitizedArgs
+    );
     console.log(prefix, ...rest);
   };
 
   warn = (...args: unknown[]): void => {
     if (!this.shouldLog('warn')) return;
-    const [prefix, ...rest] = this.formatMessage('warn', '⚠️', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage('warn', '⚠️', ...sanitizedArgs);
     console.warn(prefix, ...rest);
   };
 
   error = (...args: unknown[]): void => {
     if (!this.shouldLog('error')) return;
-    const [prefix, ...rest] = this.formatMessage('error', '❌', ...args);
+    const sanitizedArgs = args.map((arg) => this.sanitizeLogData(arg));
+    const [prefix, ...rest] = this.formatMessage(
+      'error',
+      '❌',
+      ...sanitizedArgs
+    );
     console.error(prefix, ...rest);
   };
 
@@ -219,6 +293,12 @@ class Logger implements LoggerInterface {
 
   time = (label: string): void => {
     if (!this.config.enabled) return;
+    if (this.timers.size >= Logger.MAX_TIMERS) {
+      const oldestKey = this.timers.keys().next().value;
+      if (oldestKey !== undefined) {
+        this.timers.delete(oldestKey);
+      }
+    }
     const fullLabel = `${this.config.namespace}:${label}`;
     this.timers.set(label, performance.now());
     console.time(fullLabel);
