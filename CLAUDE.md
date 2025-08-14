@@ -6,7 +6,6 @@
 **`@/Users/adnene/Projects/RocketHooks/specification/CLAUDE_CONTEXT.md`**
 
 This template contains essential shared patterns, standards, and guidelines that apply across ALL RocketHooks services and projects.
-Reading this file first ensures consistency and prevents duplication of common patterns.
 
 ---
 
@@ -16,17 +15,17 @@ Reading this file first ensures consistency and prevents duplication of common p
 RocketHooks frontend - React-based SaaS platform for API monitoring and webhook management with real-time features, OAuth authentication, and organization-based access control.
 
 ## Technology Stack
-- **Language**: TypeScript 5.7.2 with strict mode enabled
+- **Language**: TypeScript 5.7.2 (strict mode)
 - **Framework**: React 19.0.0 with React Router 7.8.0
-- **State Management**: Zustand 5.0.7 with Immer for immutable updates
+- **State Management**: Zustand 5.0.7 with Immer
 - **UI Framework**: Tailwind CSS v4.1.11 + ShadCN components
 - **GraphQL Client**: Apollo Client 3.13.9
 - **Authentication**: Clerk 5.40.0 (OAuth with Google/GitHub)
-- **Build Tool**: Vite 6.0.1 with React plugin
-- **Package Manager**: Yarn (preferred over npm)
-- **Code Quality**: ESLint 9.15.0, Biome 2.1.3, TypeScript strict mode
-- **Git Hooks**: Lefthook for pre-commit and pre-push validation
-- **Testing**: Playwright for E2E (configured but no unit tests present)
+- **Build Tool**: Vite 6.0.1
+- **Package Manager**: Yarn
+- **Code Quality**: ESLint 9.15.0, Biome 2.1.3
+- **Git Hooks**: Lefthook
+- **Testing**: Playwright E2E
 - **Component Development**: Storybook 8.6.14
 
 ## Project Status
@@ -91,22 +90,14 @@ rockethooks-app/
   - Prefer named exports over default exports
 
 - **TypeScript Conventions**:
-  - Strict mode enabled with all strict checks
   - Interfaces for object shapes, types for unions/primitives
   - Explicit return types for functions
   - No implicit any, unused variables, or unreachable code
-
-### State Management
-- **Zustand Stores**: Located in `src/store/`
-- **Immer Integration**: Used for immutable state updates
-- **Store Pattern**: Separate stores for different domains (auth, app, onboarding)
-- **DevTools**: Redux DevTools integration for debugging
 
 ### Component Architecture
 - **ShadCN Components**: Pre-built UI components in `src/components/ui/`
 - **Domain Components**: Business logic components in `src/components/rockethooks/`
 - **Form Handling**: React Hook Form with Zod validation
-- **Error Boundaries**: Implement graceful error handling
 
 ## Development Commands
 ```bash
@@ -146,10 +137,13 @@ yarn build-storybook # Build Storybook
 ## Environment Setup
 
 ### Required Environment Variables
-Create `.env` from `.env.example`:
+Create `.env` from `.env.example` with the following variables:
+- `VITE_CLERK_PUBLISHABLE_KEY`: Clerk authentication key
+- `VITE_APPSYNC_GRAPHQL_URL`: GraphQL API endpoint
+- `VITE_APPSYNC_WEBSOCKET_URL`: WebSocket URL for subscriptions
 
 ### Configuration Files
-- `tsconfig.json`: TypeScript configuration with strict mode
+- `tsconfig.json`: TypeScript configuration
 - `vite.config.ts`: Vite build configuration
 - `biome.json`: Biome formatter and linter settings
 - `eslint.config.js`: ESLint rules and plugins
@@ -211,10 +205,10 @@ Enforced by Lefthook commit-msg hook:
 - Organization-based access control
 
 ### State Management
-- **Zustand stores** for global state
-- **React Context** for component trees
-- **Immer** for immutable updates
-- **Redux DevTools** for debugging
+- **Zustand Stores**: Located in `src/store/` with separate stores for auth, app, and onboarding
+- **React Context**: For component tree state sharing  
+- **Immer Integration**: Enables immutable state updates
+- **Redux DevTools**: Integration for debugging
 
 ### Error Handling
 - Apollo Client error policy: `'all'`
@@ -278,11 +272,11 @@ loggers.api.warn('Rate limit approaching');
 loggers.graphql.error('Query failed', error);
 
 // Performance tracking
-const result = logger.measure('expensive-operation', () => {
+const syncResult = logger.measure('expensive-operation', () => {
   return performExpensiveOperation();
 });
 
-const { result, measurement } = await logger.measureAsync('api-call', async () => {
+const { result: asyncResult, measurement } = await logger.measureAsync('api-call', async () => {
   return await fetchData();
 });
 
@@ -317,10 +311,9 @@ componentLogger.debug('Rendered with props:', props);
 - Production logging can be enabled via localStorage: `enableDebugLogging()`
 - All sensitive data is automatically sanitized (passwords, tokens, keys)
 
-#### Testing
-Run the logger test suite:
+#### Logger Testing
 ```bash
-yarn test:unit         # Run all unit tests
+yarn test:unit         # Run logger unit tests
 yarn test:watch       # Run tests in watch mode
 yarn test:coverage    # Generate coverage report
 ```
@@ -356,36 +349,28 @@ yarn test:coverage    # Generate coverage report
 - Use Apollo Client error handling
 - Implement optimistic updates where appropriate
 
-### Documentation
-- Keep docs up-to-date with code changes
-- Link new docs in the Reference Documentation section
-- Use Context7 MCP for library usage guidance
+## Code Quality & Documentation
 
 ### Code Quality Requirements
-- Must pass `yarn quality` before committing
+- Must pass `yarn quality` before committing (runs type-check, biome, and eslint)
 - No TypeScript errors allowed
 - Follow ESLint and Biome rules
 - Maintain consistent code style
+- Always fix linting errors before pushing
+
+### Documentation
+- Keep docs up-to-date with code changes
+- Use Context7 MCP for library usage guidance
+- Available in `docs/` directory:
+  - `authentication-flow-guide.md` - Authentication flows, route guards, and user journey
+  - `legacy-docs/` - Historical documentation (no longer maintained)
 
 ## GitHub Repository
 - Repository: [rockethooks/rockethooks-app](https://github.com/rockethooks/rockethooks-app)
-- Always fix linting errors before pushing
-- Use conventional commits
-- Include issue numbers in commits
-
-## Reference Documentation
-Detailed documentation available in `docs/` directory:
-
-### Authentication & Security
-- `authentication-flow-guide.md` - Complete guide to authentication flows, route guards, and user journey
-
-### General Documentation
-- `legacy-docs/` - Historical documentation (no longer maintained)
+- Use conventional commits with issue numbers
 
 ## Best Practices
-- Professional Error Handling: Graceful degradation with user-friendly messages
-- Accessibility: Proper ARIA labels and keyboard navigation support
-- Internationalization Ready: Strings are externalized and ready for i18n
-- State Machine Patterns: Proper use of state machine with guards and actions
-- Immutable Updates: Zustand with Immer for safe state modifications
-- Development Experience: Excellent logging and DevTools integration
+- **Accessibility**: Proper ARIA labels and keyboard navigation support
+- **Internationalization Ready**: Strings are externalized and ready for i18n
+- **State Machine Patterns**: Proper use of state machine with guards and actions
+- **Development Experience**: Excellent logging and DevTools integration
