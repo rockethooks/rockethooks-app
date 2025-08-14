@@ -105,13 +105,9 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   // Helper to get current step name for draft system
   const currentStep = useMemo((): OnboardingStep => {
     const stepMap: Record<OnboardingStates, OnboardingStep> = {
-      [OnboardingStates.ORGANIZATION_SETUP]: 'organization',
-      [OnboardingStates.PROFILE_COMPLETION]: 'profile',
-      [OnboardingStates.PREFERENCES_SETUP]: 'preferences',
-      [OnboardingStates.ACCOUNT_SETUP]: 'account',
-      [OnboardingStates.START]: 'organization',
-      [OnboardingStates.CHECK_ORGANIZATION]: 'organization',
-      [OnboardingStates.COMPLETE]: 'organization',
+      [OnboardingStates.INITIAL_SETUP]: 'organization',
+      [OnboardingStates.TOUR_ACTIVE]: 'organization',
+      [OnboardingStates.COMPLETED]: 'organization',
       [OnboardingStates.ERROR]: 'organization',
     };
     return stepMap[store.currentState];
@@ -147,46 +143,72 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   // Navigation actions
   const completeStep = useCallback(
     (data?: DraftData) => {
-      let event: OnboardingEvents | null = null;
+      let success = false;
 
       switch (store.currentState) {
-        case OnboardingStates.ORGANIZATION_SETUP:
-          event = OnboardingEvents.ORGANIZATION_CREATED;
+        case OnboardingStates.INITIAL_SETUP:
+          // Complete organization setup by creating organization
+          if (data && 'organizationName' in data) {
+            void store.createOrganization(data.organizationName as string);
+            success = true;
+          } else {
+            // Skip organization setup
+            success = store.skipOrganization();
+          }
           break;
-        case OnboardingStates.PROFILE_COMPLETION:
-          event = OnboardingEvents.PROFILE_COMPLETED;
+        case OnboardingStates.TOUR_ACTIVE: {
+          // Advance tour step or complete onboarding
+          const progress = store.getProgress();
+          if (progress.current >= progress.total) {
+            success = store.completeOnboarding();
+          } else {
+            success = store.nextTourStep(data);
+          }
           break;
-        case OnboardingStates.PREFERENCES_SETUP:
-          event = OnboardingEvents.PREFERENCES_SAVED;
+        }
+        case OnboardingStates.COMPLETED:
+          // Already completed
+          success = true;
           break;
-        case OnboardingStates.ACCOUNT_SETUP:
-          event = OnboardingEvents.ACCOUNT_COMPLETED;
-          break;
+        default:
+          success = false;
       }
 
-      if (event) {
-        const success = store.sendEvent(event, data);
-        if (success) {
-          clearDraft();
-        }
-        return success;
+      if (success) {
+        clearDraft();
       }
-      return false;
+      return success;
     },
     [store, clearDraft]
   );
 
   const skipStep = useCallback(() => {
-    const success = store.skip();
+    let success = false;
+
+    switch (store.currentState) {
+      case OnboardingStates.INITIAL_SETUP:
+        success = store.skipOrganization();
+        break;
+      case OnboardingStates.TOUR_ACTIVE:
+        success = store.skipTour();
+        break;
+      default:
+        success = false;
+    }
+
     if (success) {
       clearDraft();
     }
     return success;
   }, [store, clearDraft]);
 
+  // goBack functionality is not available in the new 3-state system
   const goBack = useCallback(() => {
-    return store.goBack();
-  }, [store]);
+    if (debug) {
+      logger.warn('goBack is not supported in the 3-state system');
+    }
+    return false;
+  }, [debug]);
 
   const handleError = useCallback(
     (error: string) => {
@@ -199,27 +221,48 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   // Progress tracking
   const progress = useMemo(() => {
     const progressData = store.getProgress();
+
+    // Map states to step numbers for overall onboarding progress
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    switch (store.currentState) {
+      case OnboardingStates.INITIAL_SETUP:
+        currentStep = 1;
+        break;
+      case OnboardingStates.TOUR_ACTIVE:
+        currentStep = 2;
+        break;
+      case OnboardingStates.COMPLETED:
+        currentStep = 3;
+        break;
+      case OnboardingStates.ERROR:
+        currentStep = 1; // Reset to beginning
+        break;
+    }
+
     return {
       ...progressData,
-      isFirstStep: progressData.current === 1,
-      isLastStep: progressData.current === progressData.total,
-      stepsRemaining: progressData.total - progressData.current,
+      currentStep,
+      totalSteps,
+      isFirstStep: currentStep === 1,
+      isLastStep: currentStep === totalSteps,
+      stepsRemaining: totalSteps - currentStep,
     };
   }, [store]);
 
   // State checks
   const stateChecks = useMemo(
     () => ({
-      isStart: store.currentState === OnboardingStates.START,
-      isCheckingOrganization:
-        store.currentState === OnboardingStates.CHECK_ORGANIZATION,
-      isOrgSetup: store.currentState === OnboardingStates.ORGANIZATION_SETUP,
-      isProfile: store.currentState === OnboardingStates.PROFILE_COMPLETION,
-      isPreferences: store.currentState === OnboardingStates.PREFERENCES_SETUP,
-      isAccount: store.currentState === OnboardingStates.ACCOUNT_SETUP,
-      isComplete: store.currentState === OnboardingStates.COMPLETE,
+      isInitialSetup: store.currentState === OnboardingStates.INITIAL_SETUP,
+      isTourActive: store.currentState === OnboardingStates.TOUR_ACTIVE,
+      isComplete: store.currentState === OnboardingStates.COMPLETED,
       isError: store.currentState === OnboardingStates.ERROR,
       needsOnboarding: !store.context.isComplete && isSignedIn,
+
+      // Backward compatibility aliases
+      isOrgSetup: store.currentState === OnboardingStates.INITIAL_SETUP,
+      isStart: store.currentState === OnboardingStates.INITIAL_SETUP,
     }),
     [store.currentState, store.context.isComplete, isSignedIn]
   );
@@ -227,11 +270,13 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
   // Capabilities
   const capabilities = useMemo(
     () => ({
-      canGoBack: store.canGoBack(),
-      canSkip: store.canSkip(),
+      canGoBack: false, // Not supported in 3-state system
+      canSkip:
+        store.currentState === OnboardingStates.INITIAL_SETUP ||
+        store.currentState === OnboardingStates.TOUR_ACTIVE,
       canProceed: !!currentStep,
     }),
-    [store, currentStep]
+    [store.currentState, currentStep]
   );
 
   return {

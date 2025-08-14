@@ -13,16 +13,15 @@ export function useOnboarding() {
   // Memoized state checks
   const stateChecks = useMemo(
     () => ({
-      isStart: store.currentState === OnboardingStates.START,
-      isCheckingOrganization:
-        store.currentState === OnboardingStates.CHECK_ORGANIZATION,
-      isOrgSetup: store.currentState === OnboardingStates.ORGANIZATION_SETUP,
-      isProfile: store.currentState === OnboardingStates.PROFILE_COMPLETION,
-      isPreferences: store.currentState === OnboardingStates.PREFERENCES_SETUP,
-      isAccount: store.currentState === OnboardingStates.ACCOUNT_SETUP,
-      isComplete: store.currentState === OnboardingStates.COMPLETE,
-      isCompletion: store.currentState === OnboardingStates.COMPLETE, // alias
+      isInitialSetup: store.currentState === OnboardingStates.INITIAL_SETUP,
+      isTourActive: store.currentState === OnboardingStates.TOUR_ACTIVE,
+      isComplete: store.currentState === OnboardingStates.COMPLETED,
       isError: store.currentState === OnboardingStates.ERROR,
+
+      // Backward compatibility aliases
+      isStart: store.currentState === OnboardingStates.INITIAL_SETUP,
+      isOrgSetup: store.currentState === OnboardingStates.INITIAL_SETUP,
+      isCompletion: store.currentState === OnboardingStates.COMPLETED, // alias
       isDashboard: false, // deprecated state
     }),
     [store.currentState]
@@ -45,56 +44,67 @@ export function useOnboarding() {
     () => ({
       // Core navigation
       sendEvent: store.sendEvent,
-      goBack: store.goBack,
-      skip: store.skip,
       reset: store.reset,
+
+      // Organization management
+      createOrganization: store.createOrganization,
+      skipOrganization: store.skipOrganization,
+
+      // Tour management
+      startTour: store.startTour,
+      nextTourStep: store.nextTourStep,
+      skipTour: store.skipTour,
+      completeOnboarding: store.completeOnboarding,
 
       // Context updates
       updateContext: store.updateContext,
+      initializeWithUserInfo: store.initializeWithUserInfo,
 
       // Error handling
       addError: store.addError,
       clearErrors: store.clearErrors,
 
       // State checks
-      canGoBack: store.canGoBack,
-      canSkip: store.canSkip,
       canTransition: store.canTransition,
+      isInState: store.isInState,
+      getProgress: store.getProgress,
 
       // Helper action aliases for backward compatibility
-      begin: () => store.sendEvent(OnboardingEvents.BEGIN),
+      begin: (userId: string, email?: string, displayName?: string) => {
+        store.initializeWithUserInfo(userId, email, displayName);
+      },
       retry: () => store.sendEvent(OnboardingEvents.RETRY),
-      completeOrganization: () =>
-        store.sendEvent(OnboardingEvents.ORGANIZATION_CREATED),
-      completeProfile: () =>
-        store.sendEvent(OnboardingEvents.PROFILE_COMPLETED),
-      savePreferences: () =>
-        store.sendEvent(OnboardingEvents.PREFERENCES_SAVED),
-      skipPreferences: () => store.sendEvent(OnboardingEvents.SKIP_PREFERENCES),
-      complete: () => store.sendEvent(OnboardingEvents.ACCOUNT_COMPLETED),
+      complete: () => store.completeOnboarding(),
     }),
     [
       store.sendEvent,
-      store.goBack,
-      store.skip,
       store.reset,
+      store.createOrganization,
+      store.skipOrganization,
+      store.startTour,
+      store.nextTourStep,
+      store.skipTour,
+      store.completeOnboarding,
       store.updateContext,
+      store.initializeWithUserInfo,
       store.addError,
       store.clearErrors,
-      store.canGoBack,
-      store.canSkip,
       store.canTransition,
+      store.isInState,
+      store.getProgress,
     ]
   );
 
   // Capabilities
   const capabilities = useMemo(
     () => ({
-      canGoBack: store.canGoBack(),
-      canSkip: store.canSkip(),
+      canGoBack: false, // Not supported in 3-state system
+      canSkip:
+        store.currentState === OnboardingStates.INITIAL_SETUP ||
+        store.currentState === OnboardingStates.TOUR_ACTIVE,
       canProceed: true,
     }),
-    [store.canGoBack, store.canSkip]
+    [store.currentState]
   );
 
   // Current route
@@ -137,13 +147,9 @@ export function useOnboardingRoute() {
   const currentState = useOnboardingStore((state) => state.currentState);
 
   const routeMap: Partial<Record<OnboardingStates, string>> = {
-    [OnboardingStates.START]: '/onboarding',
-    [OnboardingStates.CHECK_ORGANIZATION]: '/onboarding',
-    [OnboardingStates.ORGANIZATION_SETUP]: '/onboarding/organization',
-    [OnboardingStates.PROFILE_COMPLETION]: '/onboarding/profile',
-    [OnboardingStates.PREFERENCES_SETUP]: '/onboarding/preferences',
-    [OnboardingStates.ACCOUNT_SETUP]: '/onboarding/account',
-    [OnboardingStates.COMPLETE]: '/onboarding/complete',
+    [OnboardingStates.INITIAL_SETUP]: '/onboarding/setup',
+    [OnboardingStates.TOUR_ACTIVE]: '/onboarding/tour',
+    [OnboardingStates.COMPLETED]: '/onboarding/complete',
     [OnboardingStates.ERROR]: '/onboarding/error',
   };
 
