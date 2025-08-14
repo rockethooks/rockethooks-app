@@ -6,7 +6,7 @@
 import { useUser } from '@clerk/clerk-react';
 import { useCallback, useEffect } from 'react';
 import { useOnboardingStore } from '@/store/onboarding';
-import { OrganizationNameGenerator } from '@/store/onboarding/organization-generator';
+import { OrganizationNameGenerator } from '@/store/onboarding/organizationGenerator';
 import { loggers } from '@/utils';
 
 const logger = loggers.onboarding;
@@ -101,7 +101,8 @@ export function useOnboardingInit(
   // Track initialization state
   const isInitialized = Boolean(context.userId);
   const isInitializing = context.isLoading;
-  const error = context.errors.length > 0 ? context.errors[0].message : null;
+  const error =
+    context.errors.length > 0 ? (context.errors[0]?.message ?? null) : null;
 
   /**
    * Get organization suggestions for the current user

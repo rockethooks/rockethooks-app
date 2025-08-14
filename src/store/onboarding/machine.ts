@@ -17,7 +17,7 @@ import {
 
 // Import modular components
 import * as guards from './guards';
-import { OrganizationNameGenerator } from './organization-generator';
+import { OrganizationNameGenerator } from './organizationGenerator';
 import { canTransition, findTransition, transitions } from './transitions';
 import type { OnboardingContext, OnboardingStore } from './types';
 // Import types
@@ -35,9 +35,11 @@ function filterAllowedContextFields(
 
   // Type-safe field filtering using known context field types
   for (const field of ALLOWED_CONTEXT_FIELDS) {
-    const fieldKey = field as keyof OnboardingContext;
-    if (fieldKey in updates) {
-      filteredUpdates[fieldKey] = updates[fieldKey];
+    if (field in updates) {
+      // Use Object.assign to safely copy the field value
+      Object.assign(filteredUpdates, {
+        [field]: updates[field as keyof OnboardingContext],
+      });
     }
   }
 

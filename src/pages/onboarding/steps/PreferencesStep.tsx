@@ -169,7 +169,8 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
 
       // Save preferences and complete the step
       actions.updateContext(data as Partial<typeof context>);
-      const success = actions.savePreferences();
+      // Preferences is part of the tour, advance to next tour step
+      const success = actions.nextTourStep(data as Record<string, unknown>);
 
       if (success) {
         // Call completion callbacks for backward compatibility
@@ -188,7 +189,8 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
 
   // Handle skip action
   const handleSkip = () => {
-    const success = actions.skipPreferences();
+    // Preferences is part of the tour, skip the tour
+    const success = actions.skipTour();
 
     if (success) {
       // Call completion callbacks for backward compatibility
@@ -197,9 +199,10 @@ export function PreferencesStep({ onComplete, onNext }: PreferencesStepProps) {
     }
   };
 
-  // Handle back navigation
+  // Handle back navigation - not supported in 3-state system
   const handleBack = () => {
-    actions.goBack();
+    // goBack is not supported in the 3-state system
+    logger.debug('goBack is not supported in the 3-state system');
   };
 
   // Since all fields are optional, we can always proceed

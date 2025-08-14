@@ -115,8 +115,7 @@ export function OrganizationStep({
       actions.updateContext(data as Partial<typeof context>); // Update with form data
 
       if (success) {
-        // Complete the organization step
-        actions.completeOrganization();
+        // Organization is created through the createOrganization action
 
         // Call completion callbacks for backward compatibility
         onComplete?.();
@@ -134,16 +133,17 @@ export function OrganizationStep({
 
   // Handle skip action
   const handleSkip = () => {
-    actions.skip();
+    actions.skipOrganization();
 
     // Call completion callbacks for backward compatibility
     onComplete?.();
     onNext?.();
   };
 
-  // Handle back navigation
+  // Handle back navigation - not supported in 3-state system
   const handleBack = () => {
-    actions.goBack();
+    // goBack is not supported in the 3-state system
+    logger.debug('goBack is not supported in the 3-state system');
   };
 
   // Check if form is valid and we can proceed

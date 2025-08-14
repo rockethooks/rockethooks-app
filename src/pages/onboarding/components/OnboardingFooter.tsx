@@ -22,11 +22,11 @@ export function OnboardingFooter({ currentStep }: OnboardingFooterProps) {
   // Determine the appropriate action for the current state
   const handleContinue = () => {
     if (stateChecks.isOrgSetup) {
-      actions.completeOrganization();
-    } else if (stateChecks.isProfile) {
-      actions.completeProfile();
-    } else if (stateChecks.isPreferences) {
-      actions.savePreferences();
+      // Organization setup is handled by the OrganizationStep component
+      // This will be called with organization data
+      return;
+    } else if (stateChecks.isTourActive) {
+      actions.nextTourStep();
     } else if (stateChecks.isCompletion) {
       actions.complete();
     }
@@ -45,23 +45,24 @@ export function OnboardingFooter({ currentStep }: OnboardingFooterProps) {
         <div className="flex items-center justify-between">
           {/* Left side - Back button */}
           <div>
-            {capabilities.canGoBack ? (
-              <Button
-                variant="outline"
-                onClick={actions.goBack}
-                className="gap-2"
-              >
-                Back
-              </Button>
-            ) : (
-              <div />
-            )}
+            {/* goBack is not supported in the 3-state system */}
+            <div />
           </div>
 
           {/* Right side - Skip and Continue */}
           <div className="flex items-center gap-3">
             {capabilities.canSkip && (
-              <Button variant="ghost" onClick={actions.skip} className="gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (stateChecks.isOrgSetup) {
+                    actions.skipOrganization();
+                  } else if (stateChecks.isTourActive) {
+                    actions.skipTour();
+                  }
+                }}
+                className="gap-2"
+              >
                 <SkipForward className="h-4 w-4" />
                 Skip
               </Button>

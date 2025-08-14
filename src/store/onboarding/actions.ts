@@ -98,6 +98,9 @@ export const addErrorAction = (
     field: payload.field,
     timestamp: new Date().toISOString(),
   });
+  // Reset any loading/creation flags when entering error state
+  context.isCreatingOrganization = false;
+  context.isLoading = false;
   context.lastUpdatedAt = new Date().toISOString();
 };
 
@@ -106,6 +109,10 @@ export const addErrorAction = (
  */
 export const clearErrorsAction = (context: OnboardingContext): void => {
   context.errors = [];
+  // Also reset any error-related flags when clearing errors (e.g., on retry)
+  context.isCreatingOrganization = false;
+  context.isLoading = false;
+  delete context.organizationCreationError;
   context.lastUpdatedAt = new Date().toISOString();
 };
 
