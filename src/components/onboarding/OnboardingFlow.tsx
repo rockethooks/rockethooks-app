@@ -1,10 +1,5 @@
-import {
-  AlertCircle,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle,
-  SkipForward,
-} from 'lucide-react';
+import { AlertCircle, CheckCircle, SkipForward } from 'lucide-react';
+import { useCallback } from 'react';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +12,8 @@ import {
 } from '@/components/ui/Card';
 import { Progress } from '@/components/ui/Progress';
 import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
+import { loggers } from '@/utils';
+import { OrganizationNameEdit } from './OrganizationNameEdit';
 
 /**
  * Centralized OnboardingFlow component demonstrating the new state machine hooks
@@ -35,6 +32,22 @@ export function OnboardingFlow() {
   } = useOnboarding();
 
   const progressDetails = useOnboardingProgress();
+
+  // Organization submit handler for INITIAL_SETUP state
+  const handleOrganizationSubmit = useCallback(
+    (name: string, usageType: 'solo' | 'team') => {
+      // Log the usage type for future customization
+      loggers.onboarding.info('Organization setup submitted', {
+        name,
+        usageType,
+        suggestedName: context.suggestedOrganizationName,
+      });
+
+      // Call the createOrganization action
+      void actions.createOrganization(name);
+    },
+    [actions, context.suggestedOrganizationName]
+  );
 
   // Error state handling
   if (stateChecks.isError) {
@@ -100,7 +113,8 @@ export function OnboardingFlow() {
                 </p>
               )}
               <p>
-                <strong>Completed Steps:</strong> {context.completedSteps.size}
+                <strong>Completed Steps:</strong>{' '}
+                {context.completedTourSteps.size}
               </p>
               {context.completedAt && (
                 <p>
@@ -123,12 +137,6 @@ export function OnboardingFlow() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              {capabilities.canGoBack && (
-                <Button variant="ghost" size="sm" onClick={actions.goBack}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
-                </Button>
-              )}
               <div>
                 <h1 className="text-lg font-semibold">
                   {getStepTitle(stateChecks)}
@@ -149,172 +157,36 @@ export function OnboardingFlow() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
-          {/* Start State */}
-          {stateChecks.isStart && (
+          {/* Initial Setup State */}
+          {stateChecks.isInitialSetup && (
             <Card>
               <CardHeader>
-                <CardTitle>Welcome to RocketHooks</CardTitle>
+                <CardTitle>Let&apos;s set up your workspace</CardTitle>
                 <CardDescription>
-                  Let&apos;s get you set up with your account and preferences.
+                  We&apos;ve suggested a name for your organization, but feel
+                  free to customize it to fit your needs.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <Button onClick={actions.begin} className="w-full">
-                  Start Onboarding
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+              <CardContent className="space-y-6">
+                <OrganizationNameEdit
+                  defaultName={
+                    context.suggestedOrganizationName ?? 'My Workspace'
+                  }
+                  onSubmit={handleOrganizationSubmit}
+                  isLoading={context.isCreatingOrganization}
+                  {...(context.organizationCreationError && {
+                    error: context.organizationCreationError,
+                  })}
+                />
 
-          {/* Checking Organization State */}
-          {stateChecks.isCheckingOrganization && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Checking Organization</CardTitle>
-                <CardDescription>
-                  We&apos;re checking your organization status...
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center space-y-4">
-                  <div className="animate-spin h-8 w-8 border border-current border-t-transparent rounded-full mx-auto" />
-                  <p className="text-sm text-muted-foreground">
-                    This will just take a moment
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Organization Setup State */}
-          {stateChecks.isOrgSetup && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Organization Setup</CardTitle>
-                <CardDescription>
-                  Set up your organization profile to get started.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  This step helps us customize your experience.
-                </p>
-                <div className="flex justify-between">
-                  <div className="flex gap-2">
-                    {capabilities.canSkip && (
-                      <Button variant="ghost" onClick={actions.skip}>
-                        <SkipForward className="h-4 w-4 mr-2" />
-                        Skip
-                      </Button>
-                    )}
-                  </div>
-                  <Button onClick={actions.completeOrganization}>
-                    Complete Setup
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Profile Completion State */}
-          {stateChecks.isProfile && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Completion</CardTitle>
-                <CardDescription>
-                  Complete your profile information.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Tell us more about yourself to personalize your experience.
-                </p>
-                <div className="flex justify-between">
-                  <div className="flex gap-2">
-                    {capabilities.canGoBack && (
-                      <Button variant="outline" onClick={actions.goBack}>
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back
-                      </Button>
-                    )}
-                    {capabilities.canSkip && (
-                      <Button variant="ghost" onClick={actions.skip}>
-                        <SkipForward className="h-4 w-4 mr-2" />
-                        Skip
-                      </Button>
-                    )}
-                  </div>
-                  <Button onClick={actions.completeProfile}>
-                    Complete Profile
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Preferences State */}
-          {stateChecks.isPreferences && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Preferences</CardTitle>
-                <CardDescription>
-                  Set your preferences and notification settings.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Customize how you want to interact with RocketHooks.
-                </p>
-                <div className="flex justify-between">
-                  <div className="flex gap-2">
-                    {capabilities.canGoBack && (
-                      <Button variant="outline" onClick={actions.goBack}>
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back
-                      </Button>
-                    )}
-                    <Button variant="ghost" onClick={actions.skipPreferences}>
+                {capabilities.canSkip && (
+                  <div className="flex justify-start">
+                    <Button variant="ghost" onClick={actions.skipOrganization}>
                       <SkipForward className="h-4 w-4 mr-2" />
-                      Skip Preferences
+                      Skip for now
                     </Button>
                   </div>
-                  <Button onClick={actions.savePreferences}>
-                    Save Preferences
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Completion State */}
-          {stateChecks.isCompletion && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Almost Done!</CardTitle>
-                <CardDescription>
-                  Just one final step to complete your onboarding.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-sm text-muted-foreground space-y-2">
-                  <p>
-                    <strong>Progress Summary:</strong>
-                  </p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Completed steps: {context.completedSteps.size}</li>
-                    <li>Skipped steps: {context.skippedSteps.size}</li>
-                    {progressDetails.stepsRemaining > 0 && (
-                      <li>Remaining steps: {progressDetails.stepsRemaining}</li>
-                    )}
-                  </ul>
-                </div>
-                <Button onClick={actions.complete} className="w-full">
-                  Complete Onboarding
-                  <CheckCircle className="h-4 w-4 ml-2" />
-                </Button>
+                )}
               </CardContent>
             </Card>
           )}
@@ -388,13 +260,9 @@ export function OnboardingFlow() {
 function getStepTitle(
   stateChecks: ReturnType<typeof useOnboarding>['stateChecks']
 ) {
-  if (stateChecks.isStart) return 'Welcome';
-  if (stateChecks.isCheckingOrganization) return 'Checking Organization';
-  if (stateChecks.isOrgSetup) return 'Organization Setup';
-  if (stateChecks.isProfile) return 'Profile Completion';
-  if (stateChecks.isPreferences) return 'Preferences';
-  if (stateChecks.isCompletion) return 'Final Step';
-  if (stateChecks.isDashboard) return 'Complete';
+  if (stateChecks.isInitialSetup) return "Let's set up your workspace";
+  if (stateChecks.isTourActive) return 'Tour';
+  if (stateChecks.isComplete) return 'Complete';
   if (stateChecks.isError) return 'Error';
   return 'Onboarding';
 }
