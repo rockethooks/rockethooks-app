@@ -29,6 +29,9 @@ RocketHooks frontend - React-based SaaS platform for API monitoring and webhook 
 - **Testing**: Playwright for E2E (configured but no unit tests present)
 - **Component Development**: Storybook 8.6.14
 
+## Project Status
+**Breaking Changes Policy**: As this is a greenfield project with no production users, feel free to make breaking changes without migration paths or backward compatibility concerns. Prioritize clean architecture over legacy support.
+
 ## Project Structure
 ```
 rockethooks-app/
