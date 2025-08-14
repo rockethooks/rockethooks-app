@@ -133,7 +133,8 @@ export function isValidEventPayload(event: string, payload: unknown): boolean {
  */
 export const hasOrganization = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.organizationId !== undefined;
+    const isValid = isValidContext(context);
+    return isValid && context.organizationId !== undefined;
   } catch (error) {
     logger.error('Guard hasOrganization failed:', error);
     return false;
@@ -145,7 +146,8 @@ export const hasOrganization = (context: OnboardingContext): boolean => {
  */
 export const noOrganization = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.organizationId === undefined;
+    const isValid = isValidContext(context);
+    return isValid && context.organizationId === undefined;
   } catch (error) {
     logger.error('Guard noOrganization failed:', error);
     return false;
@@ -157,10 +159,8 @@ export const noOrganization = (context: OnboardingContext): boolean => {
  */
 export const canAdvanceTourStep = (context: OnboardingContext): boolean => {
   try {
-    return (
-      isValidContext(context) &&
-      context.currentTourStep < context.totalTourSteps
-    );
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep < context.totalTourSteps;
   } catch (error) {
     logger.error('Guard canAdvanceTourStep failed:', error);
     return false;
@@ -172,10 +172,8 @@ export const canAdvanceTourStep = (context: OnboardingContext): boolean => {
  */
 export const isTourComplete = (context: OnboardingContext): boolean => {
   try {
-    return (
-      isValidContext(context) &&
-      context.currentTourStep >= context.totalTourSteps
-    );
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep >= context.totalTourSteps;
   } catch (error) {
     logger.error('Guard isTourComplete failed:', error);
     return false;
@@ -188,7 +186,8 @@ export const isTourComplete = (context: OnboardingContext): boolean => {
 export const canGoBackGuard = (context: OnboardingContext): boolean => {
   try {
     // Can go back from TOUR_ACTIVE to INITIAL_SETUP
-    return isValidContext(context) && context.currentTourStep > 1;
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep > 1;
   } catch (error) {
     logger.error('Guard canGoBackGuard failed:', error);
     return false;
@@ -201,7 +200,8 @@ export const canGoBackGuard = (context: OnboardingContext): boolean => {
 export const canSkipGuard = (context: OnboardingContext): boolean => {
   try {
     // Both organization setup and tour can be skipped
-    return isValidContext(context);
+    const isValid = isValidContext(context);
+    return isValid;
   } catch (error) {
     logger.error('Guard canSkipGuard failed:', error);
     return false;

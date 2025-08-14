@@ -49,16 +49,15 @@ export interface OrganizationSuggestion {
 }
 
 /**
- * OrganizationNameGenerator class
+ * OrganizationNameGenerator namespace
  * Generates appropriate organization names based on OAuth user information
  */
-// biome-ignore lint/complexity/noStaticOnlyClass: Utility class for organization name generation
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export class OrganizationNameGenerator {
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace OrganizationNameGenerator {
   /**
    * Generate organization name suggestions from user email and display name
    */
-  public static generateSuggestions(
+  export function generateSuggestions(
     email: string,
     displayName?: string
   ): OrganizationSuggestion[] {
@@ -68,14 +67,12 @@ export class OrganizationNameGenerator {
 
     try {
       // Parse email domain
-      const emailDomain = OrganizationNameGenerator.extractDomain(email);
-      const isPersonalEmail =
-        OrganizationNameGenerator.isPersonalEmail(emailDomain);
+      const emailDomain = extractDomain(email);
+      const isPersonalEmailDomain = isPersonalEmail(emailDomain);
 
-      if (!isPersonalEmail && emailDomain) {
+      if (!isPersonalEmailDomain && emailDomain) {
         // Business email - suggest company name from domain
-        const companySuggestion =
-          OrganizationNameGenerator.generateCompanyName(emailDomain);
+        const companySuggestion = generateCompanyName(emailDomain);
         if (companySuggestion) {
           suggestions.push({
             name: companySuggestion,
@@ -89,8 +86,7 @@ export class OrganizationNameGenerator {
       // Always provide personal workspace options
       if (displayName) {
         // Use display name for personal workspace
-        const personalName =
-          OrganizationNameGenerator.generatePersonalWorkspaceName(displayName);
+        const personalName = generatePersonalWorkspaceName(displayName);
         suggestions.push({
           name: personalName,
           isPersonal: true,
@@ -134,14 +130,11 @@ export class OrganizationNameGenerator {
   /**
    * Get the primary suggestion (highest confidence)
    */
-  public static getPrimarySuggestion(
+  export function getPrimarySuggestion(
     email: string,
     displayName?: string
   ): OrganizationSuggestion {
-    const suggestions = OrganizationNameGenerator.generateSuggestions(
-      email,
-      displayName
-    );
+    const suggestions = generateSuggestions(email, displayName);
 
     // Sort by confidence and prefer business suggestions
     const sortedSuggestions = suggestions.sort((a, b) => {
@@ -167,7 +160,7 @@ export class OrganizationNameGenerator {
   /**
    * Extract domain from email address
    */
-  private static extractDomain(email: string): string | null {
+  function extractDomain(email: string): string | null {
     try {
       const domain = email.split('@')[1]?.toLowerCase();
       return domain ?? null;
@@ -180,7 +173,7 @@ export class OrganizationNameGenerator {
   /**
    * Check if email domain is a personal email provider
    */
-  private static isPersonalEmail(domain: string | null): boolean {
+  function isPersonalEmail(domain: string | null): boolean {
     if (!domain) return true;
 
     // Handle GitHub noreply emails
@@ -194,7 +187,7 @@ export class OrganizationNameGenerator {
   /**
    * Generate company name from business email domain
    */
-  private static generateCompanyName(domain: string): string | null {
+  function generateCompanyName(domain: string): string | null {
     try {
       const parsed = parse(`https://${domain}`);
       const domainName = parsed.domain;
@@ -208,8 +201,7 @@ export class OrganizationNameGenerator {
       if (!companyPart || companyPart.length < 2) return null;
 
       // Capitalize and format company name
-      const companyName =
-        OrganizationNameGenerator.formatCompanyName(companyPart);
+      const companyName = formatCompanyName(companyPart);
 
       logger.debug('Generated company name from domain', {
         domain,
@@ -227,7 +219,7 @@ export class OrganizationNameGenerator {
   /**
    * Format company name (capitalize, handle common patterns)
    */
-  private static formatCompanyName(name: string): string {
+  function formatCompanyName(name: string): string {
     // Handle common company name patterns
     const formatted = name
       .replace(/[-_]/g, ' ') // Replace hyphens and underscores with spaces
@@ -244,7 +236,7 @@ export class OrganizationNameGenerator {
   /**
    * Generate personal workspace name from display name
    */
-  private static generatePersonalWorkspaceName(displayName: string): string {
+  function generatePersonalWorkspaceName(displayName: string): string {
     try {
       // Extract first name or use display name
       const firstName = displayName.split(' ')[0];
@@ -269,7 +261,7 @@ export class OrganizationNameGenerator {
   /**
    * Validate organization name
    */
-  public static validateOrganizationName(name: string): {
+  export function validateOrganizationName(name: string): {
     isValid: boolean;
     errors: string[];
   } {

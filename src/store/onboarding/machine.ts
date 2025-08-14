@@ -26,6 +26,25 @@ import { OnboardingEvents, OnboardingStates } from './types';
 const logger = loggers.onboarding;
 
 /**
+ * Type-safe utility to filter allowed context fields
+ */
+function filterAllowedContextFields(
+  updates: Partial<OnboardingContext>
+): Partial<OnboardingContext> {
+  const filteredUpdates: Partial<OnboardingContext> = {};
+
+  // Type-safe field filtering using known context field types
+  for (const field of ALLOWED_CONTEXT_FIELDS) {
+    const fieldKey = field as keyof OnboardingContext;
+    if (fieldKey in updates) {
+      filteredUpdates[fieldKey] = updates[fieldKey];
+    }
+  }
+
+  return filteredUpdates;
+}
+
+/**
  * Create the onboarding store with state machine logic
  */
 export const useOnboardingStore = create<OnboardingStore>()(
@@ -86,14 +105,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
             return;
           }
 
-          // Filter allowed fields
-          const filteredUpdates: Partial<OnboardingContext> = {};
-          for (const [key, value] of Object.entries(updates)) {
+          // Filter allowed fields using type-safe utility
+          const filteredUpdates = filterAllowedContextFields(updates);
+
+          // Log any disallowed fields
+          for (const key of Object.keys(updates)) {
             if (
-              ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
+              !ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
             ) {
-              (filteredUpdates as Record<string, unknown>)[key] = value;
-            } else {
               logger.warn(`Disallowed field update: ${key}`);
             }
           }
@@ -149,18 +168,22 @@ export const useOnboardingStore = create<OnboardingStore>()(
           try {
             store.updateContext({ isCreatingOrganization: true });
 
-            // TODO: Implement actual organization creation mutation here
-            // This should call the backend GraphQL mutation
-            // For now, simulate success with a small delay
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            const organizationId = `org_${String(Date.now())}`;
+            // Import GraphQL service for organization creation
+            const { createOrganization } = await import(
+              '@/services/graphql/organization'
+            );
+
+            // Call the backend GraphQL mutation
+            const organization = await createOrganization({
+              name: organizationName,
+            });
 
             // Send organization created event
             const success = store.sendEvent(
               OnboardingEvents.ORGANIZATION_CREATED,
               {
-                organizationId,
-                organizationName,
+                organizationId: organization.id,
+                organizationName: organization.name,
               }
             );
 

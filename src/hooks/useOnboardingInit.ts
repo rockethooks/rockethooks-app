@@ -204,14 +204,9 @@ export function useOnboardingInit(
       return;
     }
 
-    // Small delay to ensure all user data is fully loaded
-    const initTimer = setTimeout(() => {
-      initialize();
-    }, 100);
-
-    return () => {
-      clearTimeout(initTimer);
-    };
+    // Initialize immediately when all conditions are met
+    // No artificial delay needed - user.isLoaded already ensures data is ready
+    initialize();
   }, [isUserLoaded, user, isInitialized, autoInitialize, initialize]);
 
   return {
