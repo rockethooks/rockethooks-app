@@ -39,6 +39,27 @@ const DEFAULT_PERSONAL_WORKSPACE_NAMES = [
 ];
 
 /**
+ * Constants for validation and processing
+ */
+const MIN_COMPANY_NAME_LENGTH = 2;
+const MIN_ORGANIZATION_NAME_LENGTH = 3;
+const MAX_ORGANIZATION_NAME_LENGTH = 50;
+
+/**
+ * Regular expression for invalid characters in organization names
+ */
+const INVALID_CHARS_REGEX = /[<>:"\\|?*]/;
+
+/**
+ * Confidence scores for sorting suggestions
+ */
+const CONFIDENCE_SCORES = {
+  high: 3,
+  medium: 2,
+  low: 1,
+} as const;
+
+/**
  * Interface for generated organization suggestion
  */
 export interface OrganizationSuggestion {
@@ -143,8 +164,7 @@ export namespace OrganizationNameGenerator {
       if (a.isPersonal && !b.isPersonal) return 1;
 
       // Then by confidence
-      const confidenceOrder = { high: 3, medium: 2, low: 1 };
-      return confidenceOrder[b.confidence] - confidenceOrder[a.confidence];
+      return CONFIDENCE_SCORES[b.confidence] - CONFIDENCE_SCORES[a.confidence];
     });
 
     return (
@@ -198,7 +218,9 @@ export namespace OrganizationNameGenerator {
       const parts = domainName.split('.');
       const companyPart = parts[0];
 
-      if (!companyPart || companyPart.length < 2) return null;
+      if (!companyPart || companyPart.length < MIN_COMPANY_NAME_LENGTH) {
+        return null;
+      }
 
       // Capitalize and format company name
       const companyName = formatCompanyName(companyPart);
@@ -269,15 +291,18 @@ export namespace OrganizationNameGenerator {
 
     if (!name || name.trim().length === 0) {
       errors.push('Organization name is required');
-    } else if (name.trim().length < 3) {
-      errors.push('Organization name must be at least 3 characters');
-    } else if (name.trim().length > 50) {
-      errors.push('Organization name must be less than 50 characters');
+    } else if (name.trim().length < MIN_ORGANIZATION_NAME_LENGTH) {
+      errors.push(
+        `Organization name must be at least ${String(MIN_ORGANIZATION_NAME_LENGTH)} characters`
+      );
+    } else if (name.trim().length > MAX_ORGANIZATION_NAME_LENGTH) {
+      errors.push(
+        `Organization name must be less than ${String(MAX_ORGANIZATION_NAME_LENGTH)} characters`
+      );
     }
 
     // Check for invalid characters
-    const invalidChars = /[<>:"\\|?*]/;
-    if (invalidChars.test(name)) {
+    if (INVALID_CHARS_REGEX.test(name)) {
       errors.push('Organization name contains invalid characters');
     }
 

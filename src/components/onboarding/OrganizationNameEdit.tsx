@@ -23,6 +23,55 @@ export interface OrganizationNameEditProps {
 export type UsageType = 'solo' | 'team';
 
 /**
+ * UsageTypeSelector component for selecting organization usage type
+ */
+interface UsageTypeSelectorProps {
+  selectedUsageType: UsageType;
+  onUsageTypeChange: (type: UsageType) => void;
+  isLoading?: boolean;
+}
+
+function UsageTypeSelector({
+  selectedUsageType,
+  onUsageTypeChange,
+  isLoading = false,
+}: UsageTypeSelectorProps) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-medium text-foreground">
+        How will you use this organization?
+      </p>
+      <div className="flex gap-2">
+        <Button
+          variant={selectedUsageType === 'solo' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => {
+            onUsageTypeChange('solo');
+          }}
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          <User className="h-4 w-4" />
+          Just me
+        </Button>
+        <Button
+          variant={selectedUsageType === 'team' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => {
+            onUsageTypeChange('team');
+          }}
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          <Users className="h-4 w-4" />
+          With my team
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * OrganizationNameEdit component for inline editing of organization names
  *
  * Features:
@@ -130,37 +179,11 @@ export function OrganizationNameEdit({
           </div>
 
           {/* Usage Type Selection */}
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">
-              How will you use this organization?
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant={selectedUsageType === 'solo' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  handleUsageTypeChange('solo');
-                }}
-                disabled={isLoading}
-                className="flex items-center gap-2"
-              >
-                <User className="h-4 w-4" />
-                Just me
-              </Button>
-              <Button
-                variant={selectedUsageType === 'team' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => {
-                  handleUsageTypeChange('team');
-                }}
-                disabled={isLoading}
-                className="flex items-center gap-2"
-              >
-                <Users className="h-4 w-4" />
-                With my team
-              </Button>
-            </div>
-          </div>
+          <UsageTypeSelector
+            selectedUsageType={selectedUsageType}
+            onUsageTypeChange={handleUsageTypeChange}
+            isLoading={isLoading}
+          />
         </div>
 
         {/* Error Display */}
@@ -191,37 +214,11 @@ export function OrganizationNameEdit({
       </div>
 
       {/* Usage Type Selection in Display Mode */}
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-foreground">
-          How will you use this organization?
-        </p>
-        <div className="flex gap-2">
-          <Button
-            variant={selectedUsageType === 'solo' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              handleUsageTypeChange('solo');
-            }}
-            disabled={isLoading}
-            className="flex items-center gap-2"
-          >
-            <User className="h-4 w-4" />
-            Just me
-          </Button>
-          <Button
-            variant={selectedUsageType === 'team' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => {
-              handleUsageTypeChange('team');
-            }}
-            disabled={isLoading}
-            className="flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
-            With my team
-          </Button>
-        </div>
-      </div>
+      <UsageTypeSelector
+        selectedUsageType={selectedUsageType}
+        onUsageTypeChange={handleUsageTypeChange}
+        isLoading={isLoading}
+      />
 
       {/* Error Display */}
       {error && (
