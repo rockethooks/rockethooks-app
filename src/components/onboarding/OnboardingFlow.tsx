@@ -13,7 +13,7 @@ import {
 import { Progress } from '@/components/ui/Progress';
 import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 import { loggers } from '@/utils';
-import { OrganizationNameEdit } from './OrganizationNameEdit';
+import { OrganizationSetup } from './OrganizationSetup';
 
 /**
  * Centralized OnboardingFlow component demonstrating the new state machine hooks
@@ -168,7 +168,7 @@ export function OnboardingFlow() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <OrganizationNameEdit
+                <OrganizationSetup
                   defaultName={
                     context.suggestedOrganizationName ?? 'My Workspace'
                   }
