@@ -1,25 +1,22 @@
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
 import { cn } from '@/lib/utils';
 import { useOnboarding, useOnboardingProgress } from '@/store/onboarding/hooks';
 
 const stepLabels = {
   organization: 'Organization Setup',
-  profile: 'Profile Information',
-  preferences: 'Preferences',
+  tour: 'Product Tour',
   complete: 'Complete Setup',
 } as const;
 
 export function OnboardingHeader() {
-  const { actions, capabilities, stateChecks } = useOnboarding();
+  const { stateChecks } = useOnboarding();
   const progress = useOnboardingProgress();
 
   const currentStepKey = (() => {
     if (stateChecks.isOrgSetup) return 'organization';
-    if (stateChecks.isProfile) return 'profile';
-    if (stateChecks.isPreferences) return 'preferences';
+    if (stateChecks.isTourActive) return 'tour';
     if (stateChecks.isCompletion) return 'complete';
     return 'organization'; // default
   })();
@@ -32,17 +29,7 @@ export function OnboardingHeader() {
         <div className="flex items-center justify-between">
           {/* Back Button and Title */}
           <div className="flex items-center gap-4">
-            {capabilities.canGoBack && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={actions.goBack}
-                className="gap-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-            )}
+            {/* goBack is not supported in the 3-state system */}
             <div>
               <h1 className="text-lg font-semibold">{currentStepLabel}</h1>
               <p className="text-sm text-muted-foreground">
@@ -70,9 +57,8 @@ export function OnboardingHeader() {
         <div className="hidden md:flex items-center justify-center mt-4 gap-2">
           {Object.entries(stepLabels).map(([key, label], index) => {
             const stepNumber = index + 1;
-            const isCompleted = progress.completedSteps.includes(key);
+            const isCompleted = stepNumber < progress.currentStep;
             const isCurrent = key === currentStepKey;
-            const isSkipped = progress.skippedSteps.includes(key);
 
             return (
               <div key={key} className="flex items-center">
@@ -95,9 +81,7 @@ export function OnboardingHeader() {
                         ? 'bg-primary text-primary-foreground'
                         : isCurrent
                           ? 'bg-primary/20 text-primary border-2 border-primary'
-                          : isSkipped
-                            ? 'bg-muted text-muted-foreground'
-                            : 'bg-muted text-muted-foreground'
+                          : 'bg-muted text-muted-foreground'
                     )}
                   >
                     {isCompleted ? (

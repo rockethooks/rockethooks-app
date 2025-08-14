@@ -162,7 +162,11 @@ export function useOnboarding(options: UseOnboardingOptions = {}) {
           if (progress.current >= progress.total) {
             success = store.completeOnboarding();
           } else {
-            success = store.nextTourStep(data);
+            // Convert DraftData to plain object for nextTourStep
+            const stepData = data
+              ? ({ ...data } as Record<string, unknown>)
+              : undefined;
+            success = store.nextTourStep(stepData);
           }
           break;
         }

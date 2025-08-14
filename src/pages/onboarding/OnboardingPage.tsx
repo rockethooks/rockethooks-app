@@ -28,7 +28,7 @@ export function OnboardingPage() {
   const navigate = useNavigate();
 
   // Use the new state machine hooks
-  const { currentRoute, context, stateChecks } = useOnboarding();
+  const { currentRoute, context, stateChecks, progress } = useOnboarding();
 
   // Default to 'organization' if no step is provided or step is invalid
   const currentStep =
@@ -36,10 +36,7 @@ export function OnboardingPage() {
   const StepComponent = stepComponents[currentStep];
 
   // Check if we're still loading
-  const isLoading =
-    stateChecks.isStart ||
-    stateChecks.isCheckingOrganization ||
-    !context.userId;
+  const isLoading = stateChecks.isStart || context.isLoading || !context.userId;
 
   // Handle browser navigation and state machine synchronization
   useEffect(() => {
@@ -54,7 +51,7 @@ export function OnboardingPage() {
       expectedStep &&
       expectedStep !== currentStep &&
       !stateChecks.isStart &&
-      !stateChecks.isCheckingOrganization
+      !context.isLoading
     ) {
       // Only navigate if we're not in a loading state and the expected step is valid
       if (!isLoading && expectedStep in stepComponents) {
@@ -67,7 +64,7 @@ export function OnboardingPage() {
     navigate,
     isLoading,
     stateChecks.isStart,
-    stateChecks.isCheckingOrganization,
+    context.isLoading,
   ]);
 
   // Handle browser back/forward navigation - validate step access
@@ -82,7 +79,7 @@ export function OnboardingPage() {
       } as const;
 
       const currentStepOrder = stepOrder[step as keyof typeof stepOrder];
-      const allowedMaxStep = Math.max(context.currentStep, 1);
+      const allowedMaxStep = Math.max(progress.currentStep, 1);
 
       // If user tries to access a future step they haven't reached, redirect to current step
       if (currentStepOrder > allowedMaxStep) {
@@ -92,7 +89,7 @@ export function OnboardingPage() {
         }
       }
     }
-  }, [step, context.currentStep, isLoading, currentRoute, navigate]);
+  }, [step, progress.currentStep, isLoading, currentRoute, navigate]);
 
   // Show loading state while initializing
   if (isLoading) {
