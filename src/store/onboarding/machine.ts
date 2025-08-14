@@ -144,6 +144,11 @@ export const useOnboardingStore = create<OnboardingStore>()(
         initializeWithUserInfo: (userId, email, displayName) => {
           const store = get();
 
+          // Update context with user information
+          store.updateContext({
+            userId,
+          });
+
           // Start onboarding process
           store.sendEvent(OnboardingEvents.BEGIN, {
             userId,

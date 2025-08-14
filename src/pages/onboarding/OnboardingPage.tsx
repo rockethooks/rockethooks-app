@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { useOnboardingInit } from '@/hooks/useOnboardingInit';
 import { useOnboarding } from '@/store/onboarding/hooks';
 import { OnboardingErrorBoundary } from './components/OnboardingErrorBoundary';
 import { OnboardingFooter } from './components/OnboardingFooter';
@@ -27,6 +28,12 @@ export function OnboardingPage() {
   const { step } = useParams<{ step: string }>();
   const navigate = useNavigate();
 
+  // Initialize onboarding with Clerk user information
+  const { isInitialized, isInitializing } = useOnboardingInit({
+    autoInitialize: true,
+    generateSuggestions: true,
+  });
+
   // Use the new state machine hooks
   const { currentRoute, context, stateChecks, progress } = useOnboarding();
 
@@ -35,8 +42,8 @@ export function OnboardingPage() {
     step && step in stepComponents ? (step as StepName) : 'organization';
   const StepComponent = stepComponents[currentStep];
 
-  // Check if we're still loading
-  const isLoading = stateChecks.isStart || context.isLoading || !context.userId;
+  // Check if we're still loading - now also checking if initialization is complete
+  const isLoading = !isInitialized || isInitializing || context.isLoading;
 
   // Handle browser navigation and state machine synchronization
   useEffect(() => {
