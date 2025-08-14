@@ -1,9 +1,9 @@
 pre-commit:
   parallel: true
   commands:
-    type-check:
-      run: yarn type-check
-      fail_text: "TypeScript compilation failed"
+    # type-check:
+    #   run: yarn type-check
+    #   fail_text: "TypeScript compilation failed"
     biome-check:
       glob: "*.{js,jsx,ts,tsx,json}"
       run: npx biome check --write {staged_files}

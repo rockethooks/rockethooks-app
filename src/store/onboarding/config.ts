@@ -9,63 +9,23 @@ import { OnboardingStates } from './types';
  * Step configurations for the onboarding flow
  */
 export const stepConfigs: Record<string, StepConfig> = {
-  organization: {
-    id: 'organization',
+  initialSetup: {
+    id: 'initialSetup',
     title: 'Organization Setup',
-    description: 'Create or join an organization',
-    isRequired: false,
-    canSkip: true,
-    state: OnboardingStates.ORGANIZATION_SETUP,
-    validationRules: [
-      {
-        field: 'name',
-        rule: 'required',
-        message: 'Organization name is required',
-      },
-      {
-        field: 'name',
-        rule: 'minLength:3',
-        message: 'Organization name must be at least 3 characters',
-      },
-    ],
+    description: 'Create your organization and workspace',
+    state: OnboardingStates.INITIAL_SETUP,
   },
-  profile: {
-    id: 'profile',
-    title: 'Complete Your Profile',
-    description: 'Tell us a bit about yourself',
-    isRequired: true,
-    canSkip: false,
-    state: OnboardingStates.PROFILE_COMPLETION,
-    validationRules: [
-      {
-        field: 'displayName',
-        rule: 'required',
-        message: 'Display name is required',
-      },
-      {
-        field: 'role',
-        rule: 'required',
-        message: 'Please select your role',
-      },
-    ],
+  tourActive: {
+    id: 'tourActive',
+    title: 'Quick Tour',
+    description: 'Learn the basics of RocketHooks',
+    state: OnboardingStates.TOUR_ACTIVE,
   },
-  preferences: {
-    id: 'preferences',
-    title: 'Set Your Preferences',
-    description: 'Customize your experience',
-    isRequired: false,
-    canSkip: true,
-    state: OnboardingStates.PREFERENCES_SETUP,
-    validationRules: [],
-  },
-  account: {
-    id: 'account',
-    title: 'Account Settings',
-    description: 'Configure your account settings',
-    isRequired: false,
-    canSkip: true,
-    state: OnboardingStates.ACCOUNT_SETUP,
-    validationRules: [],
+  completed: {
+    id: 'completed',
+    title: 'Welcome!',
+    description: 'You are all set up and ready to go',
+    state: OnboardingStates.COMPLETED,
   },
 };
 
@@ -73,7 +33,8 @@ export const stepConfigs: Record<string, StepConfig> = {
  * Calculate total steps dynamically
  */
 export const calculateTotalSteps = (): number => {
-  return Object.keys(stepConfigs).length;
+  // Fixed 3 states: INITIAL_SETUP, TOUR_ACTIVE, COMPLETED
+  return 3;
 };
 
 /**
@@ -96,26 +57,38 @@ export const getStepConfigByState = (
  * Get required steps
  */
 export const getRequiredSteps = (): StepConfig[] => {
-  return Object.values(stepConfigs).filter((config) => config.isRequired);
+  // All steps are required in the 3-state system
+  return Object.values(stepConfigs);
 };
 
 /**
  * Get skippable steps
  */
 export const getSkippableSteps = (): StepConfig[] => {
-  return Object.values(stepConfigs).filter((config) => config.canSkip);
+  // Organization setup and tour can be skipped
+  return [stepConfigs.initialSetup, stepConfigs.tourActive].filter(
+    (config): config is StepConfig => Boolean(config)
+  );
 };
 
 /**
  * Initial context configuration
  */
 export const getInitialContext = (): OnboardingContext => ({
-  currentStep: 1,
-  totalSteps: calculateTotalSteps(),
-  completedSteps: new Set<string>(),
-  skippedSteps: new Set<string>(),
+  // Organization setup
+  isCreatingOrganization: false,
+
+  // Tour progress (3 meaningful steps)
+  currentTourStep: 1,
+  totalTourSteps: 3,
+  completedTourSteps: new Set<string>(),
+  skippedTour: false,
+
+  // State flags
   isComplete: false,
   isLoading: false,
+
+  // Error handling
   errors: [],
 });
 
@@ -131,10 +104,14 @@ export const STORAGE_VERSION = 1;
 export const ALLOWED_CONTEXT_FIELDS = [
   'userId',
   'organizationId',
-  'currentStep',
-  'totalSteps',
-  'completedSteps',
-  'skippedSteps',
+  'suggestedOrganizationName',
+  'organizationName',
+  'isCreatingOrganization',
+  'organizationCreationError',
+  'currentTourStep',
+  'totalTourSteps',
+  'completedTourSteps',
+  'skippedTour',
   'isComplete',
   'isLoading',
   'errors',

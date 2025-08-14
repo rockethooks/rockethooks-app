@@ -73,6 +73,20 @@ export const getApolloClient = (
 };
 
 /**
+ * Get the current Apollo Client instance (if available)
+ * This can be used when you need access to the client outside of React context
+ * Note: The client must be initialized first through the provider
+ */
+export const getCurrentApolloClient = (): ApolloClient<unknown> => {
+  if (!apolloClientInstance) {
+    throw new Error(
+      'Apollo Client not initialized. Make sure the app is wrapped with ApolloProvider.'
+    );
+  }
+  return apolloClientInstance;
+};
+
+/**
  * Reset the Apollo Client instance
  * Useful for testing or when switching authentication contexts
  */

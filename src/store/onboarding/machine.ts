@@ -11,19 +11,38 @@ import { createDevtoolsConfig } from '../devtools.config';
 import {
   ALLOWED_CONTEXT_FIELDS,
   getInitialContext,
-  getStepConfigByState,
   STORAGE_KEY,
   STORAGE_VERSION,
 } from './config';
 
 // Import modular components
 import * as guards from './guards';
+import { OrganizationNameGenerator } from './organization-generator';
 import { canTransition, findTransition, transitions } from './transitions';
 import type { OnboardingContext, OnboardingStore } from './types';
 // Import types
 import { OnboardingEvents, OnboardingStates } from './types';
 
 const logger = loggers.onboarding;
+
+/**
+ * Type-safe utility to filter allowed context fields
+ */
+function filterAllowedContextFields(
+  updates: Partial<OnboardingContext>
+): Partial<OnboardingContext> {
+  const filteredUpdates: Partial<OnboardingContext> = {};
+
+  // Type-safe field filtering using known context field types
+  for (const field of ALLOWED_CONTEXT_FIELDS) {
+    const fieldKey = field as keyof OnboardingContext;
+    if (fieldKey in updates) {
+      filteredUpdates[fieldKey] = updates[fieldKey];
+    }
+  }
+
+  return filteredUpdates;
+}
 
 /**
  * Create the onboarding store with state machine logic
@@ -33,7 +52,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
     persist(
       immer((set, get) => ({
         // Initial state
-        currentState: OnboardingStates.START,
+        currentState: OnboardingStates.INITIAL_SETUP,
         context: getInitialContext(),
         transitions,
 
@@ -86,14 +105,14 @@ export const useOnboardingStore = create<OnboardingStore>()(
             return;
           }
 
-          // Filter allowed fields
-          const filteredUpdates: Partial<OnboardingContext> = {};
-          for (const [key, value] of Object.entries(updates)) {
+          // Filter allowed fields using type-safe utility
+          const filteredUpdates = filterAllowedContextFields(updates);
+
+          // Log any disallowed fields
+          for (const key of Object.keys(updates)) {
             if (
-              ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
+              !ALLOWED_CONTEXT_FIELDS.includes(key as keyof OnboardingContext)
             ) {
-              (filteredUpdates as Record<string, unknown>)[key] = value;
-            } else {
               logger.warn(`Disallowed field update: ${key}`);
             }
           }
@@ -111,7 +130,7 @@ export const useOnboardingStore = create<OnboardingStore>()(
         reset: () => {
           set(
             (state) => {
-              state.currentState = OnboardingStates.START;
+              state.currentState = OnboardingStates.INITIAL_SETUP;
               Object.assign(state.context, getInitialContext());
             },
             false,
@@ -119,64 +138,107 @@ export const useOnboardingStore = create<OnboardingStore>()(
           );
         },
 
-        // Navigation helpers
-        goBack: () => {
-          const { currentState } = get();
+        // Organization setup
+        initializeWithUserInfo: (userId, email, displayName) => {
+          const store = get();
 
-          // Define back navigation map
-          const backMap: Partial<Record<OnboardingStates, OnboardingEvents>> = {
-            [OnboardingStates.PROFILE_COMPLETION]: OnboardingEvents.BACK,
-            [OnboardingStates.PREFERENCES_SETUP]: OnboardingEvents.BACK,
-            [OnboardingStates.ACCOUNT_SETUP]: OnboardingEvents.BACK,
-          };
+          // Start onboarding process
+          store.sendEvent(OnboardingEvents.BEGIN, {
+            userId,
+            email,
+            displayName,
+          });
 
-          const backEvent = backMap[currentState];
-          if (backEvent) {
-            return get().sendEvent(backEvent);
+          // Generate suggested organization name if email is provided
+          if (email) {
+            const suggestion = OrganizationNameGenerator.getPrimarySuggestion(
+              email,
+              displayName
+            );
+
+            store.updateContext({
+              suggestedOrganizationName: suggestion.name,
+            });
           }
-          return false;
         },
 
-        skip: () => {
-          const { currentState } = get();
+        createOrganization: async (organizationName) => {
+          const store = get();
 
-          // Define which states can be skipped
-          const skipMap: Partial<Record<OnboardingStates, OnboardingEvents>> = {
-            [OnboardingStates.ORGANIZATION_SETUP]:
-              OnboardingEvents.SKIP_ORGANIZATION,
-            [OnboardingStates.PREFERENCES_SETUP]:
-              OnboardingEvents.SKIP_PREFERENCES,
-          };
+          try {
+            store.updateContext({ isCreatingOrganization: true });
 
-          const skipEvent = skipMap[currentState];
-          if (skipEvent) {
-            return get().sendEvent(skipEvent);
+            // Import GraphQL service for organization creation
+            const { createOrganization } = await import(
+              '@/services/graphql/organization'
+            );
+
+            // Call the backend GraphQL mutation
+            const organization = await createOrganization({
+              name: organizationName,
+            });
+
+            // Send organization created event
+            const success = store.sendEvent(
+              OnboardingEvents.ORGANIZATION_CREATED,
+              {
+                organizationId: organization.id,
+                organizationName: organization.name,
+              }
+            );
+
+            return success;
+          } catch (error) {
+            logger.error('Failed to create organization:', error);
+            store.updateContext({
+              isCreatingOrganization: false,
+              organizationCreationError:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to create organization',
+            });
+
+            store.sendEvent(OnboardingEvents.ERROR, {
+              error: 'Failed to create organization',
+              code: 'ORGANIZATION_CREATION_FAILED',
+            });
+
+            return false;
           }
-          return false;
         },
 
-        canGoBack: () => {
-          const { context } = get();
-          return context.currentStep > 1;
+        skipOrganization: () => {
+          return get().sendEvent(OnboardingEvents.SKIP_ORGANIZATION);
         },
 
-        canSkip: () => {
-          const { currentState } = get();
-          const config = getStepConfigByState(currentState);
-          return config?.canSkip ?? false;
+        // Tour management
+        startTour: () => {
+          return get().sendEvent(OnboardingEvents.START_TOUR);
+        },
+
+        nextTourStep: (stepData) => {
+          return get().sendEvent(OnboardingEvents.NEXT_TOUR_STEP, { stepData });
+        },
+
+        skipTour: () => {
+          return get().sendEvent(OnboardingEvents.SKIP_TOUR);
+        },
+
+        completeOnboarding: () => {
+          return get().sendEvent(OnboardingEvents.COMPLETE_ONBOARDING);
         },
 
         // Progress helpers
         getProgress: () => {
           const { context } = get();
           return {
-            current: context.currentStep,
-            total: context.totalSteps,
+            current: context.currentTourStep,
+            total: context.totalTourSteps,
             percentage: Math.round(
-              (context.currentStep / context.totalSteps) * 100
+              (context.currentTourStep / context.totalTourSteps) * 100
             ),
-            completedSteps: Array.from(context.completedSteps),
-            skippedSteps: Array.from(context.skippedSteps),
+            tourStepsCompleted: Array.from(context.completedTourSteps),
+            skippedTour: context.skippedTour,
           };
         },
 
@@ -227,23 +289,22 @@ export const useOnboardingStore = create<OnboardingStore>()(
           currentState: state.currentState,
           context: {
             ...state.context,
-            completedSteps: Array.from(state.context.completedSteps),
-            skippedSteps: Array.from(state.context.skippedSteps),
+            completedTourSteps: Array.from(state.context.completedTourSteps),
           },
         }),
 
         // Deserialize Arrays back to Sets
         onRehydrateStorage: () => (state) => {
           if (state?.context) {
-            const completedSteps = Array.isArray(state.context.completedSteps)
-              ? state.context.completedSteps
-              : [];
-            const skippedSteps = Array.isArray(state.context.skippedSteps)
-              ? state.context.skippedSteps
+            const completedTourSteps = Array.isArray(
+              state.context.completedTourSteps
+            )
+              ? state.context.completedTourSteps
               : [];
 
-            state.context.completedSteps = new Set(completedSteps as string[]);
-            state.context.skippedSteps = new Set(skippedSteps as string[]);
+            state.context.completedTourSteps = new Set(
+              completedTourSteps as string[]
+            );
           }
         },
       }
@@ -255,21 +316,13 @@ export const useOnboardingStore = create<OnboardingStore>()(
 /**
  * Helper function to initialize onboarding (backward compatibility)
  */
-export function initializeOnboarding(userId: string, organizationId?: string) {
+export function initializeOnboarding(
+  userId: string,
+  email?: string,
+  displayName?: string
+) {
   const store = useOnboardingStore.getState();
-
-  store.updateContext({
-    userId,
-    organizationId,
-  });
-
-  store.sendEvent(OnboardingEvents.BEGIN, { userId });
-
-  if (organizationId) {
-    store.sendEvent(OnboardingEvents.HAS_ORGANIZATION, { organizationId });
-  } else {
-    store.sendEvent(OnboardingEvents.NO_ORGANIZATION);
-  }
+  store.initializeWithUserInfo(userId, email, displayName);
 }
 
 /**
@@ -278,11 +331,9 @@ export function initializeOnboarding(userId: string, organizationId?: string) {
 export function getCurrentRoute(): string {
   const { currentState } = useOnboardingStore.getState();
   const routeMap: Partial<Record<OnboardingStates, string>> = {
-    [OnboardingStates.ORGANIZATION_SETUP]: '/onboarding/organization',
-    [OnboardingStates.PROFILE_COMPLETION]: '/onboarding/profile',
-    [OnboardingStates.PREFERENCES_SETUP]: '/onboarding/preferences',
-    [OnboardingStates.ACCOUNT_SETUP]: '/onboarding/account',
-    [OnboardingStates.COMPLETE]: '/onboarding/complete',
+    [OnboardingStates.INITIAL_SETUP]: '/onboarding/setup',
+    [OnboardingStates.TOUR_ACTIVE]: '/onboarding/tour',
+    [OnboardingStates.COMPLETED]: '/onboarding/complete',
     [OnboardingStates.ERROR]: '/onboarding/error',
   };
   return routeMap[currentState] ?? '/onboarding';

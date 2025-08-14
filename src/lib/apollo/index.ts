@@ -9,6 +9,7 @@ export { createApolloCache } from './cache';
 export {
   createApolloClient,
   getApolloClient,
+  getCurrentApolloClient,
   resetApolloClient,
 } from './client';
 export {

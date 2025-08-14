@@ -6,13 +6,9 @@
  * All possible states in the onboarding flow
  */
 export enum OnboardingStates {
-  START = 'start',
-  CHECK_ORGANIZATION = 'checkOrganization',
-  ORGANIZATION_SETUP = 'organizationSetup',
-  PROFILE_COMPLETION = 'profileCompletion',
-  PREFERENCES_SETUP = 'preferencesSetup',
-  ACCOUNT_SETUP = 'accountSetup',
-  COMPLETE = 'complete',
+  INITIAL_SETUP = 'initialSetup',
+  TOUR_ACTIVE = 'tourActive',
+  COMPLETED = 'completed',
   ERROR = 'error',
 }
 
@@ -21,18 +17,15 @@ export enum OnboardingStates {
  */
 export enum OnboardingEvents {
   BEGIN = 'BEGIN',
-  HAS_ORGANIZATION = 'HAS_ORGANIZATION',
-  NO_ORGANIZATION = 'NO_ORGANIZATION',
   ORGANIZATION_CREATED = 'ORGANIZATION_CREATED',
   SKIP_ORGANIZATION = 'SKIP_ORGANIZATION',
-  PROFILE_COMPLETED = 'PROFILE_COMPLETED',
-  PREFERENCES_SAVED = 'PREFERENCES_SAVED',
-  SKIP_PREFERENCES = 'SKIP_PREFERENCES',
-  ACCOUNT_COMPLETED = 'ACCOUNT_COMPLETED',
-  SKIP = 'SKIP',
-  BACK = 'BACK',
+  START_TOUR = 'START_TOUR',
+  NEXT_TOUR_STEP = 'NEXT_TOUR_STEP',
+  SKIP_TOUR = 'SKIP_TOUR',
+  COMPLETE_ONBOARDING = 'COMPLETE_ONBOARDING',
   ERROR = 'ERROR',
   RETRY = 'RETRY',
+  RESET = 'RESET',
 }
 
 /**
@@ -43,11 +36,17 @@ export interface OnboardingContext {
   userId?: string;
   organizationId?: string | undefined;
 
-  // Progress tracking
-  currentStep: number;
-  totalSteps: number;
-  completedSteps: Set<string>;
-  skippedSteps: Set<string>;
+  // Organization setup
+  suggestedOrganizationName?: string;
+  organizationName?: string;
+  isCreatingOrganization: boolean;
+  organizationCreationError?: string;
+
+  // Tour progress (3 meaningful steps)
+  currentTourStep: number;
+  totalTourSteps: number;
+  completedTourSteps: Set<string>;
+  skippedTour: boolean;
 
   // State flags
   isComplete: boolean;
@@ -69,8 +68,6 @@ export interface OnboardingContext {
   // Form data (temporary storage)
   draftData?: {
     organization?: Record<string, unknown>;
-    profile?: Record<string, unknown>;
-    preferences?: Record<string, unknown>;
   };
 }
 
@@ -81,39 +78,30 @@ export interface StepConfig {
   id: string;
   title: string;
   description: string;
-  isRequired: boolean;
-  canSkip: boolean;
   state: OnboardingStates;
-  validationRules?: Array<{
-    field: string;
-    rule: string;
-    message: string;
-  }>;
 }
 
 /**
  * Event payload types
  */
 export interface OnboardingEventPayload {
-  [OnboardingEvents.BEGIN]?: { userId: string };
-  [OnboardingEvents.HAS_ORGANIZATION]?: { organizationId: string };
-  [OnboardingEvents.NO_ORGANIZATION]?: undefined;
-  [OnboardingEvents.ORGANIZATION_CREATED]?: { organizationId: string };
+  [OnboardingEvents.BEGIN]?: {
+    userId: string;
+    email?: string;
+    displayName?: string;
+  };
+  [OnboardingEvents.ORGANIZATION_CREATED]?: {
+    organizationId: string;
+    organizationName: string;
+  };
   [OnboardingEvents.SKIP_ORGANIZATION]?: undefined;
-  [OnboardingEvents.PROFILE_COMPLETED]?: {
-    profileData: Record<string, unknown>;
-  };
-  [OnboardingEvents.PREFERENCES_SAVED]?: {
-    preferences: Record<string, unknown>;
-  };
-  [OnboardingEvents.SKIP_PREFERENCES]?: undefined;
-  [OnboardingEvents.ACCOUNT_COMPLETED]?: {
-    accountData: Record<string, unknown>;
-  };
-  [OnboardingEvents.SKIP]?: undefined;
-  [OnboardingEvents.BACK]?: undefined;
-  [OnboardingEvents.ERROR]?: { error: string; code?: string };
+  [OnboardingEvents.START_TOUR]?: undefined;
+  [OnboardingEvents.NEXT_TOUR_STEP]?: { stepData?: Record<string, unknown> };
+  [OnboardingEvents.SKIP_TOUR]?: undefined;
+  [OnboardingEvents.COMPLETE_ONBOARDING]?: undefined;
+  [OnboardingEvents.ERROR]?: { error: string; code?: string; field?: string };
   [OnboardingEvents.RETRY]?: undefined;
+  [OnboardingEvents.RESET]?: undefined;
 }
 
 /**
@@ -141,19 +129,28 @@ export interface OnboardingStore {
   updateContext: (updates: Partial<OnboardingContext>) => void;
   reset: () => void;
 
-  // Navigation helpers
-  goBack: () => boolean;
-  skip: () => boolean;
-  canGoBack: () => boolean;
-  canSkip: () => boolean;
+  // Organization setup
+  initializeWithUserInfo: (
+    userId: string,
+    email?: string,
+    displayName?: string
+  ) => void;
+  createOrganization: (organizationName: string) => Promise<boolean>;
+  skipOrganization: () => boolean;
+
+  // Tour management
+  startTour: () => boolean;
+  nextTourStep: (stepData?: Record<string, unknown>) => boolean;
+  skipTour: () => boolean;
+  completeOnboarding: () => boolean;
 
   // Progress helpers
   getProgress: () => {
     current: number;
     total: number;
     percentage: number;
-    completedSteps: string[];
-    skippedSteps: string[];
+    tourStepsCompleted: string[];
+    skippedTour: boolean;
   };
 
   // State checks

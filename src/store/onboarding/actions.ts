@@ -30,10 +30,9 @@ export const setOrganizationId = (
 /**
  * Action: Mark step as completed
  */
-export const markStepCompleted = (stepName: string) => {
+export const markTourStepCompleted = (stepName: string) => {
   return (context: OnboardingContext): void => {
-    context.completedSteps.add(stepName);
-    context.skippedSteps.delete(stepName); // Remove from skipped if it was there
+    context.completedTourSteps.add(stepName);
     context.lastUpdatedAt = new Date().toISOString();
   };
 };
@@ -41,52 +40,48 @@ export const markStepCompleted = (stepName: string) => {
 /**
  * Action: Mark step as skipped
  */
-export const markStepSkipped = (stepName: string) => {
-  return (context: OnboardingContext): void => {
-    context.skippedSteps.add(stepName);
-    context.completedSteps.delete(stepName); // Remove from completed if it was there
+export const advanceTourStep = (context: OnboardingContext): void => {
+  if (context.currentTourStep < context.totalTourSteps) {
+    context.currentTourStep++;
     context.lastUpdatedAt = new Date().toISOString();
-  };
+  }
 };
 
 /**
  * Action: Increment step
  */
-export const incrementStep = (context: OnboardingContext): void => {
-  if (context.currentStep < context.totalSteps) {
-    context.currentStep++;
-    context.lastUpdatedAt = new Date().toISOString();
-  }
+export const startTour = (context: OnboardingContext): void => {
+  context.currentTourStep = 1;
+  context.completedTourSteps.clear();
+  context.skippedTour = false;
+  context.lastUpdatedAt = new Date().toISOString();
 };
 
 /**
  * Action: Decrement step
  */
-export const decrementStep = (context: OnboardingContext): void => {
-  if (context.currentStep > 1) {
-    context.currentStep--;
-    context.lastUpdatedAt = new Date().toISOString();
-  }
+export const skipTour = (context: OnboardingContext): void => {
+  context.skippedTour = true;
+  context.lastUpdatedAt = new Date().toISOString();
 };
 
 /**
  * Action: Set specific step
  */
-export const setStep = (step: number) => {
-  return (context: OnboardingContext): void => {
-    if (step >= 1 && step <= context.totalSteps) {
-      context.currentStep = step;
-      context.lastUpdatedAt = new Date().toISOString();
-    }
-  };
+export const completeOnboarding = (context: OnboardingContext): void => {
+  context.isComplete = true;
+  context.completedAt = new Date().toISOString();
+  context.lastUpdatedAt = new Date().toISOString();
 };
 
 /**
  * Action: Mark onboarding as complete
  */
-export const markComplete = (context: OnboardingContext): void => {
-  context.isComplete = true;
-  context.completedAt = new Date().toISOString();
+export const setSuggestedOrganizationName = (
+  context: OnboardingContext,
+  suggestedName: string
+): void => {
+  context.suggestedOrganizationName = suggestedName;
   context.lastUpdatedAt = new Date().toISOString();
 };
 
@@ -128,7 +123,7 @@ export const setLoading = (isLoading: boolean) => {
  * Action: Save draft data
  */
 export const saveDraft = (
-  stepName: 'organization' | 'profile' | 'preferences',
+  stepName: 'organization',
   data: Record<string, unknown>
 ) => {
   return (context: OnboardingContext): void => {
@@ -141,9 +136,7 @@ export const saveDraft = (
 /**
  * Action: Clear draft data
  */
-export const clearDraft = (
-  stepName: 'organization' | 'profile' | 'preferences'
-) => {
+export const clearDraft = (stepName: 'organization') => {
   return (context: OnboardingContext): void => {
     if (context.draftData) {
       const { [stepName]: _, ...rest } = context.draftData;
@@ -163,20 +156,28 @@ export const clearDraft = (
 export const resetOnboarding = (context: OnboardingContext): void => {
   // Keep userId but reset everything else
   const userId = context.userId;
+
+  // Clear optional properties
+  delete context.organizationId;
+  delete context.suggestedOrganizationName;
+  delete context.organizationName;
+  delete context.organizationCreationError;
+  delete context.startedAt;
+  delete context.completedAt;
+  delete context.draftData;
+
+  // Reset required properties
   Object.assign(context, {
     userId,
-    organizationId: null,
-    currentStep: 1,
-    totalSteps: context.totalSteps, // Keep the calculated total
-    completedSteps: new Set<string>(),
-    skippedSteps: new Set<string>(),
+    isCreatingOrganization: false,
+    currentTourStep: 1,
+    totalTourSteps: 3,
+    completedTourSteps: new Set<string>(),
+    skippedTour: false,
     isComplete: false,
     isLoading: false,
     errors: [],
-    startedAt: undefined,
-    completedAt: undefined,
     lastUpdatedAt: new Date().toISOString(),
-    draftData: undefined,
   });
 };
 
@@ -185,50 +186,46 @@ export const resetOnboarding = (context: OnboardingContext): void => {
  */
 export const handleOrganizationCreated = (
   context: OnboardingContext,
-  payload: { organizationId: string }
+  payload: { organizationId: string; organizationName: string }
 ): void => {
-  setOrganizationId(context, payload);
-  markStepCompleted('organization')(context);
-  clearDraft('organization')(context);
-  incrementStep(context);
+  setOrganizationId(context, { organizationId: payload.organizationId });
+  context.organizationName = payload.organizationName;
+  context.isCreatingOrganization = false;
+  delete context.organizationCreationError;
+  context.lastUpdatedAt = new Date().toISOString();
 };
 
 /**
  * Composite action: Handle profile completion
  */
-export const handleProfileCompleted = (
+export const handleNextTourStep = (
   context: OnboardingContext,
-  payload: { profileData: Record<string, unknown> }
+  payload: { stepData?: Record<string, unknown> }
 ): void => {
-  saveDraft('profile', payload.profileData)(context);
-  markStepCompleted('profile')(context);
-  incrementStep(context);
+  // Mark current step as completed
+  const stepName = `step-${String(context.currentTourStep)}`;
+  markTourStepCompleted(stepName)(context);
+
+  // Save step data if provided
+  if (payload.stepData) {
+    saveDraft('organization', payload.stepData)(context);
+  }
+
+  // Advance to next tour step
+  advanceTourStep(context);
 };
 
 /**
  * Composite action: Handle preferences saved
  */
-export const handlePreferencesSaved = (
-  context: OnboardingContext,
-  payload: { preferences: Record<string, unknown> }
-): void => {
-  saveDraft('preferences', payload.preferences)(context);
-  markStepCompleted('preferences')(context);
-  incrementStep(context);
-};
-
-/**
- * Composite action: Handle skip organization
- */
 export const handleSkipOrganization = (context: OnboardingContext): void => {
-  markStepSkipped('organization')(context);
-  incrementStep(context);
+  // No organization created, continue with tour
+  delete context.organizationId;
+  delete context.organizationName;
+  context.isCreatingOrganization = false;
+  context.lastUpdatedAt = new Date().toISOString();
 };
 
-/**
- * Composite action: Handle skip preferences
- */
-export const handleSkipPreferences = (context: OnboardingContext): void => {
-  markStepSkipped('preferences')(context);
-  incrementStep(context);
-};
+// Removed duplicate function
+
+// No longer needed in 3-state system

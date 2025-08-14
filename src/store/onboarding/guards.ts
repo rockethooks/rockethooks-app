@@ -18,14 +18,16 @@ export function isValidContext(context: unknown): context is OnboardingContext {
   const ctx = context as Partial<OnboardingContext>;
 
   return (
-    typeof ctx.userId === 'string' &&
+    (ctx.userId === undefined || typeof ctx.userId === 'string') &&
     (ctx.organizationId === undefined ||
       typeof ctx.organizationId === 'string') &&
-    typeof ctx.currentStep === 'number' &&
-    typeof ctx.totalSteps === 'number' &&
-    ctx.completedSteps instanceof Set &&
-    ctx.skippedSteps instanceof Set &&
+    typeof ctx.isCreatingOrganization === 'boolean' &&
+    typeof ctx.currentTourStep === 'number' &&
+    typeof ctx.totalTourSteps === 'number' &&
+    ctx.completedTourSteps instanceof Set &&
+    typeof ctx.skippedTour === 'boolean' &&
     typeof ctx.isComplete === 'boolean' &&
+    typeof ctx.isLoading === 'boolean' &&
     Array.isArray(ctx.errors)
   );
 }
@@ -46,22 +48,28 @@ export function isValidContextUpdate(
   for (const [key, value] of Object.entries(upd)) {
     switch (key) {
       case 'userId':
-        if (typeof value !== 'string') return false;
+        if (value !== undefined && typeof value !== 'string') return false;
         break;
       case 'organizationId':
-        if (value !== null && typeof value !== 'string') return false;
+        if (value !== undefined && typeof value !== 'string') return false;
         break;
-      case 'currentStep':
-      case 'totalSteps':
-        if (typeof value !== 'number') return false;
+      case 'suggestedOrganizationName':
+      case 'organizationName':
+      case 'organizationCreationError':
+        if (value !== undefined && typeof value !== 'string') return false;
         break;
-      case 'completedSteps':
-      case 'skippedSteps':
-        if (!(value instanceof Set)) return false;
-        break;
+      case 'isCreatingOrganization':
+      case 'skippedTour':
       case 'isComplete':
       case 'isLoading':
         if (typeof value !== 'boolean') return false;
+        break;
+      case 'currentTourStep':
+      case 'totalTourSteps':
+        if (typeof value !== 'number') return false;
+        break;
+      case 'completedTourSteps':
+        if (!(value instanceof Set)) return false;
         break;
       case 'errors':
         if (!Array.isArray(value)) return false;
@@ -96,13 +104,16 @@ export function isValidEventPayload(event: string, payload: unknown): boolean {
         'userId' in payload &&
         typeof (payload as Record<string, unknown>).userId === 'string'
       );
-    case 'HAS_ORGANIZATION':
     case 'ORGANIZATION_CREATED':
       return (
         typeof payload === 'object' &&
         payload !== null &&
         'organizationId' in payload &&
-        typeof (payload as Record<string, unknown>).organizationId === 'string'
+        'organizationName' in payload &&
+        typeof (payload as Record<string, unknown>).organizationId ===
+          'string' &&
+        typeof (payload as Record<string, unknown>).organizationName ===
+          'string'
       );
     case 'ERROR':
       return (
@@ -122,7 +133,8 @@ export function isValidEventPayload(event: string, payload: unknown): boolean {
  */
 export const hasOrganization = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.organizationId !== undefined;
+    const isValid = isValidContext(context);
+    return isValid && context.organizationId !== undefined;
   } catch (error) {
     logger.error('Guard hasOrganization failed:', error);
     return false;
@@ -134,7 +146,8 @@ export const hasOrganization = (context: OnboardingContext): boolean => {
  */
 export const noOrganization = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.organizationId === undefined;
+    const isValid = isValidContext(context);
+    return isValid && context.organizationId === undefined;
   } catch (error) {
     logger.error('Guard noOrganization failed:', error);
     return false;
@@ -144,11 +157,12 @@ export const noOrganization = (context: OnboardingContext): boolean => {
 /**
  * Guard: Check if organization step was skipped
  */
-export const organizationSkipped = (context: OnboardingContext): boolean => {
+export const canAdvanceTourStep = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.skippedSteps.has('organization');
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep < context.totalTourSteps;
   } catch (error) {
-    logger.error('Guard organizationSkipped failed:', error);
+    logger.error('Guard canAdvanceTourStep failed:', error);
     return false;
   }
 };
@@ -156,11 +170,12 @@ export const organizationSkipped = (context: OnboardingContext): boolean => {
 /**
  * Guard: Check if profile step is completed
  */
-export const profileCompleted = (context: OnboardingContext): boolean => {
+export const isTourComplete = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.completedSteps.has('profile');
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep >= context.totalTourSteps;
   } catch (error) {
-    logger.error('Guard profileCompleted failed:', error);
+    logger.error('Guard isTourComplete failed:', error);
     return false;
   }
 };
@@ -170,7 +185,9 @@ export const profileCompleted = (context: OnboardingContext): boolean => {
  */
 export const canGoBackGuard = (context: OnboardingContext): boolean => {
   try {
-    return isValidContext(context) && context.currentStep > 1;
+    // Can go back from TOUR_ACTIVE to INITIAL_SETUP
+    const isValid = isValidContext(context);
+    return isValid && context.currentTourStep > 1;
   } catch (error) {
     logger.error('Guard canGoBackGuard failed:', error);
     return false;
@@ -182,13 +199,9 @@ export const canGoBackGuard = (context: OnboardingContext): boolean => {
  */
 export const canSkipGuard = (context: OnboardingContext): boolean => {
   try {
-    if (!isValidContext(context)) return false;
-
-    // Define which steps can be skipped
-    const skippableSteps = ['organization', 'preferences'];
-    const currentStepName = getCurrentStepName(context.currentStep);
-
-    return skippableSteps.includes(currentStepName);
+    // Both organization setup and tour can be skipped
+    const isValid = isValidContext(context);
+    return isValid;
   } catch (error) {
     logger.error('Guard canSkipGuard failed:', error);
     return false;
@@ -202,11 +215,8 @@ export const isOnboardingComplete = (context: OnboardingContext): boolean => {
   try {
     if (!isValidContext(context)) return false;
 
-    const requiredSteps = ['profile'];
-    return requiredSteps.every(
-      (step) =>
-        context.completedSteps.has(step) || context.skippedSteps.has(step)
-    );
+    // Onboarding is complete when we reach the COMPLETED state
+    return context.isComplete;
   } catch (error) {
     logger.error('Guard isOnboardingComplete failed:', error);
     return false;
@@ -216,12 +226,4 @@ export const isOnboardingComplete = (context: OnboardingContext): boolean => {
 /**
  * Helper: Get step name from step number
  */
-function getCurrentStepName(stepNumber: number): string {
-  const stepMap: Record<number, string> = {
-    1: 'organization',
-    2: 'profile',
-    3: 'preferences',
-    4: 'account',
-  };
-  return stepMap[stepNumber] ?? 'unknown';
-}
+// Removed helper function - no longer needed in 3-state system
