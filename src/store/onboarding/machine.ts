@@ -17,7 +17,7 @@ import {
 
 // Import modular components
 import * as guards from './guards';
-import { OrganizationNameGenerator } from './organization-generator';
+import { OrganizationNameGenerator } from './organizationGenerator';
 import { canTransition, findTransition, transitions } from './transitions';
 import type { OnboardingContext, OnboardingStore } from './types';
 // Import types
