@@ -3,6 +3,7 @@
  * Handles smart organization name generation from OAuth emails
  */
 
+import { faker } from '@faker-js/faker';
 import { parse } from 'tldts';
 import { loggers } from '@/utils';
 
@@ -39,6 +40,20 @@ const DEFAULT_PERSONAL_WORKSPACE_NAMES = [
 ];
 
 /**
+ * Creative workspace name templates using Faker.js
+ */
+const CREATIVE_WORKSPACE_TEMPLATES = [
+  () => `${faker.company.buzzAdjective()} ${faker.company.buzzNoun()}`,
+  () => `${faker.hacker.adjective()} ${faker.hacker.noun()}`,
+  () => `${faker.color.human()} ${faker.animal.type()}`,
+  () => `${faker.word.adjective()} Studio`,
+  () => `${faker.word.adjective()} Labs`,
+  () => `${faker.word.adjective()} Works`,
+  () => `${faker.company.catchPhraseAdjective()} Co`,
+  () => `${faker.science.chemicalElement().name} Labs`,
+] as const;
+
+/**
  * Constants for validation and processing
  */
 const MIN_COMPANY_NAME_LENGTH = 2;
@@ -67,6 +82,52 @@ export interface OrganizationSuggestion {
   isPersonal: boolean;
   source: 'email-domain' | 'display-name' | 'default';
   confidence: 'high' | 'medium' | 'low';
+}
+
+/**
+ * Generate creative workspace names using Faker.js
+ */
+function generateCreativeNames(count: number = 3): string[] {
+  const names: string[] = [];
+  const usedNames = new Set<string>();
+
+  for (let i = 0; i < count && names.length < count; i++) {
+    const template =
+      CREATIVE_WORKSPACE_TEMPLATES[
+        Math.floor(Math.random() * CREATIVE_WORKSPACE_TEMPLATES.length)
+      ];
+
+    if (template) {
+      try {
+        const name = template();
+
+        // Format and validate the generated name
+        const formattedName = formatWorkspaceName(name);
+        const validation =
+          OrganizationNameGenerator.validateOrganizationName(formattedName);
+
+        if (validation.isValid && !usedNames.has(formattedName)) {
+          names.push(formattedName);
+          usedNames.add(formattedName);
+        }
+      } catch (error) {
+        logger.debug('Failed to generate creative name', error);
+      }
+    }
+  }
+
+  return names;
+}
+
+/**
+ * Format workspace name for consistency
+ */
+function formatWorkspaceName(name: string): string {
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+    .trim();
 }
 
 /**
@@ -116,7 +177,25 @@ export namespace OrganizationNameGenerator {
         });
       }
 
-      // Default personal workspace options
+      // Add creative suggestions using Faker.js
+      try {
+        const creativeNames = generateCreativeNames(2);
+        creativeNames.forEach((name) => {
+          suggestions.push({
+            name,
+            isPersonal: true,
+            source: 'default',
+            confidence: 'medium',
+          });
+        });
+      } catch (error) {
+        logger.debug(
+          'Failed to generate creative names, falling back to defaults',
+          error
+        );
+      }
+
+      // Default personal workspace options as fallback
       DEFAULT_PERSONAL_WORKSPACE_NAMES.forEach((name) => {
         suggestions.push({
           name,
