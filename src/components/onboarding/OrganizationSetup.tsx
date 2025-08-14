@@ -71,7 +71,36 @@ export function OrganizationSetup({
 }: OrganizationSetupProps) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [localName, setLocalName] = useState(defaultName);
-  const [selectedUsageType, setSelectedUsageType] = useState<UsageType>('team');
+  const [nameValidationError, setNameValidationError] = useState<string | null>(
+    null
+  );
+  const [selectedUsageType, setSelectedUsageType] = useState<UsageType | null>(
+    null
+  );
+
+  // Organization name validation function
+  const validateOrganizationName = useCallback(
+    (name: string): string | null => {
+      const trimmedName = name.trim();
+
+      if (trimmedName.length < 3) {
+        return 'Organization name must be at least 3 characters long';
+      }
+
+      if (trimmedName.length > 50) {
+        return 'Organization name must be no more than 50 characters long';
+      }
+
+      // Check for only alphanumeric characters, hyphens, and spaces
+      const validNameRegex = /^[a-zA-Z0-9\s-]+$/;
+      if (!validNameRegex.test(trimmedName)) {
+        return 'Organization name can only contain letters, numbers, spaces, and hyphens';
+      }
+
+      return null;
+    },
+    []
+  );
 
   const handleStartNameEdit = useCallback(() => {
     logger.debug('Starting organization name edit', { currentName: localName });
@@ -81,20 +110,26 @@ export function OrganizationSetup({
   const handleCancelNameEdit = useCallback(() => {
     logger.debug('Cancelling organization name edit');
     setLocalName(defaultName);
+    setNameValidationError(null);
     setIsEditingName(false);
   }, [defaultName]);
 
   const handleSaveNameEdit = useCallback(() => {
     const trimmedName = localName.trim();
+    const validationError = validateOrganizationName(trimmedName);
 
-    if (!trimmedName) {
-      logger.warn('Attempted to save empty organization name');
+    if (validationError) {
+      setNameValidationError(validationError);
+      logger.warn('Organization name validation failed', {
+        error: validationError,
+      });
       return;
     }
 
     logger.debug('Saving organization name edit', { name: trimmedName });
+    setNameValidationError(null);
     setIsEditingName(false);
-  }, [localName]);
+  }, [localName, validateOrganizationName]);
 
   const handleNameKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
@@ -116,9 +151,18 @@ export function OrganizationSetup({
 
   const handleSubmit = useCallback(() => {
     const trimmedName = localName.trim();
+    const validationError = validateOrganizationName(trimmedName);
 
-    if (!trimmedName) {
-      logger.warn('Cannot submit with empty organization name');
+    if (validationError) {
+      setNameValidationError(validationError);
+      logger.warn('Cannot submit with invalid organization name', {
+        error: validationError,
+      });
+      return;
+    }
+
+    if (!selectedUsageType) {
+      logger.warn('Cannot submit without selecting usage type');
       return;
     }
 
@@ -128,7 +172,7 @@ export function OrganizationSetup({
     });
 
     onSubmit(trimmedName, selectedUsageType);
-  }, [localName, selectedUsageType, onSubmit]);
+  }, [localName, selectedUsageType, onSubmit, validateOrganizationName]);
 
   return (
     <div className={`space-y-8 ${className}`}>
@@ -150,7 +194,12 @@ export function OrganizationSetup({
             <Input
               value={localName}
               onChange={(e) => {
-                setLocalName(e.target.value);
+                const newName = e.target.value;
+                setLocalName(newName);
+                // Clear validation error when user starts typing
+                if (nameValidationError) {
+                  setNameValidationError(null);
+                }
               }}
               onKeyDown={handleNameKeyDown}
               placeholder="Enter organization name"
@@ -196,6 +245,13 @@ export function OrganizationSetup({
             <Pencil className="h-4 w-4 text-muted-foreground group-hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         )}
+
+        {/* Validation Error Display */}
+        {nameValidationError && (
+          <Alert variant="destructive">
+            <p className="text-sm">{nameValidationError}</p>
+          </Alert>
+        )}
       </div>
 
       {/* Usage Type Selection Section */}
@@ -214,7 +270,7 @@ export function OrganizationSetup({
             icon={User}
             title={USAGE_TYPES.solo.title}
             description={USAGE_TYPES.solo.description}
-            benefits={[...USAGE_TYPES.solo.benefits]}
+            benefits={USAGE_TYPES.solo.benefits}
             isSelected={selectedUsageType === 'solo'}
             isDisabled={isLoading}
             onClick={() => {
@@ -226,7 +282,7 @@ export function OrganizationSetup({
             icon={Users}
             title={USAGE_TYPES.team.title}
             description={USAGE_TYPES.team.description}
-            benefits={[...USAGE_TYPES.team.benefits]}
+            benefits={USAGE_TYPES.team.benefits}
             isSelected={selectedUsageType === 'team'}
             isDisabled={isLoading}
             onClick={() => {
@@ -247,7 +303,12 @@ export function OrganizationSetup({
       <div className="flex justify-end pt-4">
         <Button
           onClick={handleSubmit}
-          disabled={!localName.trim() || isLoading}
+          disabled={
+            !localName.trim() ||
+            !!validateOrganizationName(localName) ||
+            !selectedUsageType ||
+            isLoading
+          }
           size="lg"
           className="px-8"
         >

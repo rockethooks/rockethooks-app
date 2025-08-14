@@ -9,7 +9,7 @@ export interface UsageCardProps {
   /** Card description */
   description: string;
   /** List of benefits/features */
-  benefits: string[];
+  benefits: readonly string[];
   /** Whether the card is selected */
   isSelected: boolean;
   /** Whether the card is disabled */

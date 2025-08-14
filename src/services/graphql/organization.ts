@@ -100,7 +100,7 @@ export async function createOrganization(
       variables: {
         input,
       },
-      errorPolicy: 'none', // Throw on any errors
+      errorPolicy: 'all', // Handle partial errors gracefully
     });
 
     if (!data?.createOrganization) {
@@ -147,7 +147,7 @@ export async function createOrganizationWithExamples(
         variables: {
           input,
         },
-        errorPolicy: 'none', // Throw on any errors
+        errorPolicy: 'all', // Handle partial errors gracefully
       });
 
     if (!data?.createOrganizationWithExamples) {
